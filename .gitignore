@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Local Claude Code harness config (machine-specific paths, not needed to run)
+.claude/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Build / runtime artifacts
+dist/
+coverage/
+*.pid

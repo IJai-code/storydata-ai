@@ -1,0 +1,127 @@
+/* App shell: topbar + left control panel + right canvas stage.
+   Flat surfaces, hairline separation, generous breathing room. */
+
+.topbar {
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--sp-5);
+  background: rgba(11, 11, 12, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.brand {
+  font-weight: 600;
+  font-size: var(--fs-lg);
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  line-height: var(--lh-tight);
+}
+.brand em {
+  font-style: normal;
+  color: var(--text-3);
+  font-weight: 400;
+  margin-left: 1px;
+}
+.brand-mark {
+  color: var(--accent);
+  font-size: 0.7em;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.app {
+  display: grid;
+  grid-template-columns: var(--panel-w) 1fr;
+  height: calc(100vh - var(--topbar-h));
+}
+
+/* ---- Left control panel: glassmorphic studio console ---- */
+.panel {
+  background: rgba(15, 15, 16, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-y: auto;
+  padding: var(--sp-5) var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.panel-section h2 {
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-3);
+  margin: 0 0 var(--sp-3);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  line-height: var(--lh-tight);
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  color: var(--text-2);
+  font-size: 0.6rem;
+  font-family: var(--font-mono);
+}
+
+/* ---- Right canvas stage ---- */
+.stage {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--sp-4);
+  /* Faint atmospheric light so the glass surfaces have depth to refract. */
+  background:
+    radial-gradient(900px 480px at 78% -8%, rgba(255, 255, 255, 0.045), transparent 65%),
+    radial-gradient(700px 420px at 8% 108%, rgba(255, 255, 255, 0.03), transparent 60%),
+    var(--bg-0);
+}
+
+.canvas {
+  position: relative;
+  min-height: 100%;
+  padding: var(--sp-6);
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+/* ---- Responsive: stack panel above canvas on narrow screens ---- */
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: auto;
+    min-height: calc(100vh - var(--topbar-h));
+  }
+  .panel {
+    border-right: none;
+    border-bottom: 1px solid var(--line-soft);
+    max-height: 55vh;
+    padding: var(--sp-4);
+    gap: var(--sp-5);
+  }
+  .topbar { padding: 0 var(--sp-4); }
+  .canvas { padding: var(--sp-4); }
+}

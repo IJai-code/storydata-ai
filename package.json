@@ -1,0 +1,26 @@
+{
+  "name": "ellery-ai",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Ellery AI — turn raw data into quiet, interactive data stories. Express backend with server-side tier enforcement.",
+  "author": "Ishaan Jha",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server/server.js",
+    "lint": "eslint server public/js eslint.config.js",
+    "dev:mock": "python3 tools/mock_api.py 4173"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "express-session": "^1.18.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.4.1",
+    "globals": "^17.6.0"
+  }
+}

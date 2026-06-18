@@ -1,0 +1,80 @@
+/* Ellery AI — design tokens. Monochrome editorial system:
+   matte black canvas, soft white text, stone-gray structure, white accent. */
+:root {
+  /* Surfaces */
+  --bg-0: #0b0b0c;
+  --bg-1: #101012;
+  --bg-2: #141416;
+  --bg-3: #1a1a1c;
+  --line: #2a2a2c;
+  --line-soft: #1f1f21;
+
+  /* Text */
+  --text-1: #f5f5f7;
+  --text-2: #a0a0a6;
+  --text-3: #6e6e73;
+
+  /* Single accent */
+  --accent: #ffffff;
+
+  /* Semantic (kept deliberately muted) */
+  --danger: #c97a7a;
+  --warn: #b3a17a;
+
+  /* Visualization ramp — monochrome hierarchy */
+  --viz-1: #ffffff;
+  --viz-2: #9a9aa0;
+  --viz-3: #5c5c62;
+
+  /* Type */
+  --font-ui: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
+  --fs-xs: 0.69rem;
+  --fs-sm: 0.78rem;
+  --fs-md: 0.88rem;
+  --fs-lg: 1.05rem;
+  --fs-xl: 1.4rem;
+  --fs-hero: clamp(1.6rem, 3.4vw, 2.3rem);
+  --lh-body: 1.65;
+  --lh-tight: 1.35;
+
+  /* Spacing & shape — generous, architectural */
+  --sp-1: 6px;
+  --sp-2: 10px;
+  --sp-3: 16px;
+  --sp-4: 24px;
+  --sp-5: 40px;
+  --sp-6: 64px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /* Effects — quiet */
+  --shadow-lift: 0 10px 32px rgba(0, 0, 0, 0.5);
+  --shadow-modal: 0 28px 90px rgba(0, 0, 0, 0.7);
+  --ring: 0 0 0 1px rgba(255, 255, 255, 0.16);
+
+  --panel-w: 348px;
+  --topbar-h: 58px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg-0);
+  color: var(--text-1);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection { background: rgba(255, 255, 255, 0.18); }
+
+:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}

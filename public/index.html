@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ellery AI — Turn raw data into data stories</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none"
+             stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+          <path d="M5 6.2h13.2"/>
+          <path d="M5 12h9.4"/>
+          <path d="M5 17.8h12"/>
+          <path d="M18.6 3.4 10.2 20.6"/>
+        </svg>
+      </span>Ellery<em>AI</em>
+    </div>
+    <div class="topbar-right">
+      <button id="embedHelp" class="auth-link">How to Embed in Slides</button>
+      <span id="tierBadge" class="tier-badge free">FREE</span>
+      <div id="authArea" class="auth-area"></div>
+      <button id="upgradeBtn" class="btn btn-neon">Upgrade to Pro</button>
+    </div>
+  </header>
+
+  <div id="gate" class="gate" aria-label="Sign in to Ellery"></div>
+
+  <div class="app">
+    <aside class="panel" id="panel">
+      <section class="panel-section">
+        <h2><span class="step-num">1</span> Drop your data</h2>
+        <div id="dropzone" class="dropzone">
+          <textarea id="rawInput" spellcheck="false"
+            placeholder="Paste CSV, JSON, or raw notes here — or drop a file on me."></textarea>
+          <div class="dropzone-hint">CSV · TSV · JSON · plain text</div>
+        </div>
+        <div class="row-actions">
+          <button id="visualizeBtn" class="btn btn-primary">Visualize →</button>
+          <button id="fileBtn" class="btn btn-ghost">File…</button>
+          <input type="file" id="fileInput" accept=".csv,.tsv,.json,.txt" hidden>
+        </div>
+        <div class="example-row">
+          <span class="example-label">Examples</span>
+          <button class="example-link" data-demo="startup">Startup metrics</button>
+          <button class="example-link" data-demo="mission">Mission operations</button>
+          <button class="example-link" data-demo="research">Research data</button>
+        </div>
+        <div id="schemaChips" class="schema-chips"></div>
+      </section>
+
+      <section class="panel-section">
+        <h2><span class="step-num">2</span> Pick a story layout</h2>
+        <div class="layout-grid" id="layoutGrid"></div>
+      </section>
+
+      <section class="panel-section" id="storySection">
+        <h2><span class="step-num">3</span> Briefing</h2>
+        <button id="storyGenBtn" class="btn btn-primary btn-wide">Generate Briefing</button>
+        <p class="story-help">Ellery reads your data type, then authors a narrated briefing —
+          an opening card, the key findings, and a closing summary. Drag to reorder, ✕ to remove a step.</p>
+        <div id="storyType" class="story-type" hidden></div>
+        <div id="storyList" class="story-list"></div>
+        <div class="row-actions" id="storyActions" hidden>
+          <button id="storyPlayBtn" class="btn btn-ghost btn-wide">▶ Play briefing</button>
+        </div>
+      </section>
+
+      <section class="panel-section" id="simSection">
+        <h2><span class="step-num">4</span> Live Simulation <span class="pro-tag">PRO</span></h2>
+        <button id="simToggle" class="btn btn-ghost btn-wide sim-toggle">
+          <span class="sim-dot"></span><span class="sim-label">Send live pulses through the story</span>
+        </button>
+      </section>
+
+      <section class="panel-section">
+        <h2><span class="step-num">5</span> Save &amp; ship</h2>
+        <div class="row-actions">
+          <button id="saveBtn" class="btn btn-ghost">Save</button>
+          <button id="shareBtn" class="btn btn-ghost">Share preview</button>
+        </div>
+        <button id="mp4Btn" class="btn btn-ghost btn-wide ship-export">
+          Export Dynamic MP4 for Slides
+        </button>
+        <button id="pngBtn" class="btn btn-ghost btn-wide ship-export">
+          Export PNG for Slides
+        </button>
+        <button id="linkBtn" class="btn btn-ghost btn-wide ship-export">
+          Export Interactive Presentation Link <span class="pro-tag">PRO</span>
+        </button>
+        <button id="exportBtn" class="btn btn-primary btn-wide ship-export">
+          Export Clean Code <span class="pro-tag">PRO</span>
+        </button>
+        <div id="savedList" class="saved-list"></div>
+      </section>
+
+      <footer class="panel-credit">Ellery Studio — Designed &amp; Engineered by Ishaan Jha</footer>
+    </aside>
+
+    <main class="stage">
+      <div id="canvas" class="canvas" aria-live="polite"></div>
+    </main>
+  </div>
+
+  <div id="toastRoot" class="toast-root" aria-live="polite"></div>
+  <div id="modalRoot"></div>
+  <div id="tutorialRoot"></div>
+
+  <script src="js/render/kinetic-engine.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
