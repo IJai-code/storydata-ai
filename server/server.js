@@ -8,7 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
 import session from 'express-session';
-
+import cors from 'cors';
 import { ingest } from './ingest/normalize.js';
 import { tierOf, limitsFor, rowCapFor, validateSandboxCard } from './tier.js';
 import { buildExportDocument, buildInteractiveDocument } from './export.js';
@@ -25,6 +25,10 @@ const GATED_FILES = new Set(['map.js', 'simulation.js']);
 const IS_PROD = process.env.NODE_ENV === 'production';
 
 const app = express();
+app.use(cors({
+  origin: 'https://ijai-code.github.io',
+  credentials: true
+}));
 app.disable('x-powered-by');
 // Trust the platform's TLS-terminating proxy (Render/Railway/Fly/etc.) so
 // secure cookies and req.protocol resolve correctly in production.
