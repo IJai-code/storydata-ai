@@ -2,10 +2,12 @@
 // cookie, so every call uses same-origin credentials. All functions resolve
 // to a normalized { ok, status, ... } object and never throw.
 
+const API_BASE = "https://ellery-backend.onrender.com";
+
 async function request(path, options = {}) {
   let res;
   try {
-    res = await fetch(path, {
+    res = await fetch(API_BASE + path, {
       credentials: 'same-origin',
       headers: options.body ? { 'Content-Type': 'application/json' } : undefined,
       ...options,
