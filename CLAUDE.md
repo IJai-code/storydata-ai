@@ -1,4 +1,75 @@
-# ELLERY AI — PRODUCT CONSTITUTION & ENGINEERING RULES
+# Ellery AI — System Context
+
+## Architecture Overview
+
+Ellery AI is a web application with separated frontend and backend:
+
+### Frontend
+- Hosted on GitHub Pages
+- Located at repository root (NOT /public)
+- Entry point: index.html
+- Assets:
+  - /css
+  - /js
+
+### Backend
+- Node.js + Express server
+- Located in /server
+- Deployed on Render
+- Base URL: https://ellery-backend.onrender.com
+
+---
+
+## Core API
+
+### Session Endpoint
+- GET /api/session
+- Returns tier info and feature flags
+
+---
+
+## Key Systems
+
+### 1. Tier System
+- Free vs Pro gating handled server-side
+- Never modify client-side gating logic as authoritative
+
+### 2. Export System
+- MP4 export via MediaRecorder
+- Uses H.264 + AAC encoding
+- Free tier includes watermark "Captured with Ellery Studio"
+- Must NOT include personal attribution text
+
+### 3. Rendering Engine
+- Kinetic / timeline / cards / nodes layouts
+- Lives in /js/render/
+
+---
+
+## Critical Constraints
+
+DO NOT:
+- Move frontend back into /public
+- Break Render deployment structure
+- Remove or bypass tier system
+- Modify API routes without explicit intent
+
+---
+
+## Deployment
+
+- Frontend: GitHub Pages
+- Backend: Render
+- Communication via fetch('/api/...') with CORS enabled
+
+---
+
+## Stability Rule
+
+Any change must preserve:
+- API compatibility
+- Export system integrity
+- Deployment structure# ELLERY AI — PRODUCT CONSTITUTION & ENGINEERING RULES
 
 ## Core Mission
 
