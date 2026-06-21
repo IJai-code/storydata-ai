@@ -15,6 +15,7 @@
     "dev:mock": "python3 tools/mock_api.py 4173"
   },
   "dependencies": {
+    "cors": "^2.8.6",
     "express": "^4.19.2",
     "express-session": "^1.18.0"
   },
