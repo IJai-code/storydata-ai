@@ -12,7 +12,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ENGINE_PATH = path.join(__dirname, '..', 'public', 'js', 'render', 'kinetic-engine.js');
+// Frontend now lives at the repo root (GitHub Pages), not /public.
+const ENGINE_PATH = path.join(__dirname, '..', 'js', 'render', 'kinetic-engine.js');
 let engineSourceCache = null;
 
 const WATERMARK_HTML =
