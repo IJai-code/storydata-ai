@@ -2,7 +2,7 @@
 // cookie, so every call uses same-origin credentials. All functions resolve
 // to a normalized { ok, status, ... } object and never throw.
 
-const API_BASE = "https://ellery-backend.onrender.com";
+export const API_BASE = "https://ellery-backend.onrender.com";
 
 async function request(path, options = {}) {
   let res;

@@ -1,7 +1,10 @@
 // Pro layout: "Insight Map" — a zoomable, pannable packed-bubble field.
 // Bubble size encodes the value column; color encodes category.
 
-import {
+// Delivered cross-origin from the backend's tier-gated route, so util.js can't
+// be imported by path here. The host app (js/render/canvas.js) hands the same
+// util module over on the window before this module is imported.
+const {
   pickColumns,
   formatValue,
   escapeHTML,
@@ -10,7 +13,7 @@ import {
   showTooltip,
   hideTooltip,
   tooltipForRow,
-} from '/js/render/util.js';
+} = window.__elleryUtil;
 
 const MAX_BUBBLES = 300;
 const VIZ_COLORS = ['var(--viz-1)', 'var(--viz-2)', 'var(--viz-3)'];

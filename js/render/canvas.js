@@ -8,18 +8,29 @@
 
 import { subscribe, getState } from '../state.js';
 import { watermarkRequired, LAYOUTS } from '../tier/gates.js';
-import { api } from '../api.js';
+import { api, API_BASE } from '../api.js';
 import { applyWatermark } from './watermark.js';
+import * as util from './util.js';
 import * as timeline from './layouts/timeline.js';
 import * as cards from './layouts/cards.js';
 import * as nodes from './layouts/nodes.js';
 import * as kinetic from './layouts/kinetic.js';
 
 const LOCAL_RENDERERS = { kinetic, timeline, cards, nodes };
+// Gated modules are served by the backend (a different origin from the
+// GitHub Pages frontend), so they must be imported with an absolute URL built
+// from the single API base — a root-relative path would resolve against the
+// Pages origin and 404.
 const GATED_URLS = {
-  map: '/gated/map.js',
-  simulation: '/gated/simulation.js',
+  map: `${API_BASE}/gated/map.js`,
+  simulation: `${API_BASE}/gated/simulation.js`,
 };
+
+// Because the gated modules load cross-origin, their own imports can't resolve
+// the frontend's util.js by path. Hand them this realm's util module via the
+// window so they share the exact same helpers as the bundled layouts. Assigned
+// at module load — before any gated import can run.
+window.__elleryUtil = util;
 const SIMULATABLE = new Set(['nodes', 'timeline']);
 const gatedCache = new Map();
 
