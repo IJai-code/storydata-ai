@@ -11,6 +11,7 @@
 import { toast } from './toast.js';
 
 const USER_KEY = 'ellery_user';
+const ACCOUNTS_KEY = 'ellery_accounts';
 
 let gateEl = null;
 let areaEl = null;
@@ -18,6 +19,7 @@ let areaEl = null;
 export function initAuth({ gate, area }) {
   gateEl = gate;
   areaEl = area;
+  seedAccountFromCurrentUser();
   sync();
 }
 
@@ -27,6 +29,48 @@ function currentUser() {
     return u && typeof u.email === 'string' && typeof u.name === 'string' ? u : null;
   } catch {
     return null;
+  }
+}
+
+/* ---------- Simulated local account registry ----------
+   So the gate can show truthful "already exists" / "no account" / "wrong
+   password" messages, registered emails are remembered in this browser. We
+   store only a salted hash of the password — never the password itself, and
+   nothing ever leaves the device. */
+
+function loadAccounts() {
+  try {
+    return JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '{}') || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveAccounts(accounts) {
+  try {
+    localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+  } catch {
+    /* storage full — accounts simply aren't remembered this session */
+  }
+}
+
+async function hashPassword(email, password) {
+  if (!(window.crypto && crypto.subtle)) return null; // insecure context fallback
+  const data = new TextEncoder().encode(`ellery:${email.toLowerCase()}:${password}`);
+  const buf = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(buf), (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Existing signed-in users predate the registry; record their email (without a
+// hash, since we never stored it) so they aren't locked out on next login.
+function seedAccountFromCurrentUser() {
+  const user = currentUser();
+  if (!user) return;
+  const accounts = loadAccounts();
+  const key = user.email.toLowerCase();
+  if (!accounts[key]) {
+    accounts[key] = { name: user.name, hash: null };
+    saveAccounts(accounts);
   }
 }
 
@@ -85,7 +129,7 @@ function renderGate(mode) {
       <ol class="gate-steps" aria-label="How Ellery works">
         <li><span>01</span>Drop raw CSV, JSON, or meeting notes — Ellery cleans and maps it</li>
         <li><span>02</span>Pick a story layout: timeline, card grid, or branching mindmap</li>
-        <li><span>03</span>Share a preview, or go Pro for clean HTML &amp; slide exports</li>
+        <li><span>03</span>Share a preview, or export clean HTML &amp; slide-ready files</li>
       </ol>
 
       <form id="gateForm" novalidate>
@@ -107,8 +151,8 @@ function renderGate(mode) {
         <button type="submit" class="btn btn-primary btn-wide" id="gateSubmit">
           ${signup ? 'Create free account' : 'Log in'}
         </button>
-        <p class="checkout-note">Preview build — accounts are simulated locally.
-        Your password is checked for shape only and never sent or saved.</p>
+        <p class="checkout-note">Preview build — accounts are simulated in this browser only.
+        Your details stay on this device and are never sent to a server.</p>
       </form>
       <button class="auth-switch" id="gateSwitch">
         ${signup ? 'Already have an account? Log in' : 'New to Ellery? Create a free account'}
@@ -123,13 +167,17 @@ function renderGate(mode) {
   const emailInput = gateEl.querySelector('#gateEmail');
   emailInput.focus();
 
-  gateEl.querySelector('#gateForm').addEventListener('submit', (e) => {
+  gateEl.querySelector('#gateForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const errorEl = gateEl.querySelector('#gateError');
     const nameInput = gateEl.querySelector('#gateName');
+    const submit = gateEl.querySelector('#gateSubmit');
     const name = signup ? nameInput.value.trim() : '';
     const email = emailInput.value.trim();
     const password = gateEl.querySelector('#gatePassword').value;
+
+    errorEl.textContent = '';
+    emailInput.classList.remove('invalid');
 
     if (signup && name.length < 2) {
       errorEl.textContent = 'Tell us your name (at least 2 characters).';
@@ -148,14 +196,50 @@ function renderGate(mode) {
       return;
     }
 
-    const submit = gateEl.querySelector('#gateSubmit');
+    const accounts = loadAccounts();
+    const key = email.toLowerCase();
+    const existing = accounts[key];
+
+    // Account-existence checks run before the spinner so errors feel instant.
+    if (signup && existing) {
+      errorEl.textContent = 'An account with this email already exists. Please log in instead.';
+      emailInput.classList.add('invalid');
+      emailInput.focus();
+      return;
+    }
+    if (!signup && !existing) {
+      errorEl.textContent = 'No account found with this email. Create an account to get started.';
+      emailInput.classList.add('invalid');
+      emailInput.focus();
+      return;
+    }
+
     submit.disabled = true;
     submit.innerHTML = '<span class="spinner"></span>One moment…';
 
-    // Simulated session: keep only the display identity, drop the password.
+    const hash = await hashPassword(email, password);
+
+    // Login: verify the password against the stored hash. (Legacy accounts
+    // seeded without a hash, or contexts without crypto, skip verification.)
+    if (!signup && existing && existing.hash && hash && hash !== existing.hash) {
+      submit.disabled = false;
+      submit.textContent = 'Log in';
+      errorEl.textContent = 'Incorrect password. Please try again.';
+      gateEl.querySelector('#gatePassword').focus();
+      return;
+    }
+
+    const displayName = signup
+      ? name || email.split('@')[0].replace(/[._-]+/g, ' ').trim() || 'You'
+      : existing.name || email.split('@')[0].replace(/[._-]+/g, ' ').trim() || 'You';
+
+    // Persist the account (hash only — never the raw password) and the session.
+    if (signup) {
+      accounts[key] = { name: displayName, hash };
+      saveAccounts(accounts);
+    }
+
     setTimeout(() => {
-      const displayName =
-        name || email.split('@')[0].replace(/[._-]+/g, ' ').trim() || 'You';
       try {
         localStorage.setItem(USER_KEY, JSON.stringify({ name: displayName, email }));
       } catch {
@@ -163,7 +247,7 @@ function renderGate(mode) {
       }
       sync();
       toast(`Welcome${signup ? ' to Ellery' : ' back'}, ${displayName}.`);
-    }, 650);
+    }, 450);
   });
 }
 

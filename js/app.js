@@ -17,7 +17,25 @@ async function boot() {
   initAuth({ gate: document.getElementById('gate'), area: document.getElementById('authArea') });
   initTutorial(document.getElementById('tutorialRoot'), document.getElementById('embedHelp'));
 
+  // Independent of the network — render/measure the banner before any await so
+  // its height is applied even if the backend is slow or unreachable.
+  initPreviewBanner();
+
   const session = await refreshSession();
+
+  // Early Access Preview: every Pro feature is unlocked for everyone while
+  // Ellery is in active development. We grant Pro through the EXISTING sandbox
+  // endpoint (no real payment, no backend change, no card UI). The server then
+  // holds a Pro session cookie, so later boots short-circuit this block.
+  if (session.ok && session.tier !== 'pro') {
+    const unlock = await api.checkoutSandbox({
+      name: 'Ellery Preview',
+      number: '4242 4242 4242 4242',
+      exp: '12/34',
+      cvv: '123',
+    });
+    if (unlock.ok) await refreshSession(unlock);
+  }
 
   initPanel();
   initCanvas(document.getElementById('canvas'), {
@@ -52,6 +70,30 @@ async function boot() {
       enumerable: false,
     });
   }
+}
+
+// Early Access banner: dismissible, with its height fed to the layout so the
+// fixed-height workspace below it never overflows the viewport.
+function initPreviewBanner() {
+  const banner = document.getElementById('previewBanner');
+  if (!banner) return;
+  const DISMISS_KEY = 'ellery_preview_banner_dismissed';
+  try {
+    if (localStorage.getItem(DISMISS_KEY) === '1') banner.hidden = true;
+  } catch { /* ignore storage errors */ }
+
+  const measure = () => {
+    const h = banner.hidden ? 0 : banner.offsetHeight;
+    document.documentElement.style.setProperty('--banner-h', `${h}px`);
+  };
+  measure();
+  window.addEventListener('resize', measure);
+
+  document.getElementById('previewBannerClose')?.addEventListener('click', () => {
+    banner.hidden = true;
+    try { localStorage.setItem(DISMISS_KEY, '1'); } catch { /* ignore */ }
+    measure();
+  });
 }
 
 if (document.readyState === 'loading') {

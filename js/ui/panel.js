@@ -11,7 +11,7 @@ import {
   simulationAllowed,
   isPro,
 } from '../tier/gates.js';
-import { openPaywall } from '../tier/paywall.js';
+import { openPaywall, openPreviewInfo } from '../tier/paywall.js';
 import {
   exportCleanCode,
   exportSharePreview,
@@ -711,8 +711,9 @@ function renderSavedList() {
 /* ---------- Tier UI sync ---------- */
 
 function wireTierControls() {
+  // The topbar pill now surfaces the Early Access info for every tier.
   document.getElementById('upgradeBtn').addEventListener('click', () => {
-    if (!isPro()) openPaywall('upgrade');
+    openPreviewInfo();
   });
 }
 
@@ -724,5 +725,7 @@ function syncLocks() {
   const badge = document.getElementById('tierBadge');
   badge.textContent = pro ? 'PRO' : 'FREE';
   badge.className = `tier-badge ${pro ? 'pro' : 'free'}`;
-  document.getElementById('upgradeBtn').style.display = pro ? 'none' : '';
+  // The upgrade CTA is now a static "Included in Preview" status pill, so it
+  // stays visible in every tier during the Early Access period.
+  document.getElementById('upgradeBtn').style.display = '';
 }

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ellery AI — Turn raw data into data stories</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
@@ -27,9 +28,17 @@
       <button id="embedHelp" class="auth-link">How to Embed in Slides</button>
       <span id="tierBadge" class="tier-badge free">FREE</span>
       <div id="authArea" class="auth-area"></div>
-      <button id="upgradeBtn" class="btn btn-neon">Upgrade to Pro</button>
+      <button id="upgradeBtn" class="btn btn-ghost preview-pill" type="button">Included in Preview</button>
     </div>
   </header>
+
+  <div id="previewBanner" class="preview-banner" role="status">
+    <span class="preview-banner-text">🎉 <strong>Early Access Preview:</strong> All Pro features are
+      currently unlocked for everyone while Ellery is in active development. Paid subscriptions will
+      launch later.</span>
+    <button id="previewBannerClose" class="preview-banner-close" type="button"
+      aria-label="Dismiss announcement">✕</button>
+  </div>
 
   <div id="gate" class="gate" aria-label="Sign in to Ellery"></div>
 

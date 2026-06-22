@@ -1184,3 +1184,86 @@ body[data-authed="false"] .app { visibility: hidden; }
   transition: color 0.15s, border-color 0.15s;
 }
 .example-link:hover { color: var(--text-1); border-color: var(--text-3); }
+
+/* ---------- Early Access Preview banner ---------- */
+.preview-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 9px var(--sp-5);
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  line-height: var(--lh-tight);
+}
+.preview-banner[hidden] { display: none; }
+.preview-banner-text { flex: 1; }
+.preview-banner-text strong { color: var(--text-1); font-weight: 600; }
+.preview-banner-close {
+  flex: none;
+  background: none;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 4px 7px;
+  border-radius: var(--radius-sm);
+  transition: color 0.18s ease;
+}
+.preview-banner-close:hover { color: var(--text-1); }
+@media (max-width: 640px) {
+  .preview-banner { padding: 8px var(--sp-4); font-size: var(--fs-xs); }
+}
+
+/* ---------- Preview access pill (replaces the upgrade CTA) ---------- */
+/* A quiet status chip, not a call to action — payments arrive post-preview. */
+.preview-pill {
+  cursor: default;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding: 7px 13px;
+  color: var(--text-2);
+  border-color: var(--line);
+}
+.preview-pill::before { content: "✓ "; color: var(--text-1); }
+.preview-pill:hover { border-color: var(--line); color: var(--text-2); background: transparent; }
+
+/* ---------- Early Access modal: plan summary (replaces checkout) ---------- */
+.preview-pane { display: flex; flex-direction: column; }
+.preview-pane-title {
+  margin: 10px 0 8px;
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: var(--lh-tight);
+}
+.plan-row {
+  display: flex;
+  gap: var(--sp-3);
+  margin: var(--sp-4) 0 var(--sp-5);
+}
+.plan-card {
+  flex: 1;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3) var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.plan-card-pro { border-color: rgba(255, 255, 255, 0.45); }
+.plan-name {
+  font-weight: 600;
+  font-size: var(--fs-md);
+  color: var(--text-1);
+}
+.plan-state {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.plan-card-pro .plan-state { color: var(--text-2); }

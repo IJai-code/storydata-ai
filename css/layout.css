@@ -45,7 +45,9 @@
 .app {
   display: grid;
   grid-template-columns: var(--panel-w) 1fr;
-  height: calc(100vh - var(--topbar-h));
+  /* --banner-h is set by app.js to the Early Access banner's height (0 when
+     dismissed/absent) so the fixed-height workspace never overflows. */
+  height: calc(100vh - var(--topbar-h) - var(--banner-h, 0px));
 }
 
 /* ---- Left control panel: glassmorphic studio console ---- */
