@@ -12,9 +12,66 @@ const GLOW_ID = 'ellery-sim-glow';
 const EASE = '0.45 0.05 0.55 0.95'; // gentle ease-in-out
 
 export function start(canvasEl, layout) {
+  if (layout === 'map') return startInsightMap(canvasEl);
   if (layout === 'nodes') return startMindmap(canvasEl);
   if (layout === 'timeline') return startTimeline(canvasEl);
   return () => {};
+}
+
+/* ---------- Insight Map: a living marketplace ----------
+ * Every frame of motion stands for a change in the data: a bubble shrinking is
+ * inventory selling down, a bubble growing back is a restock, a brief glow is a
+ * surge in demand. Only a few records move per beat, with eased size
+ * transitions, so the field feels alive without becoming noisy. */
+
+function startInsightMap(canvasEl) {
+  const circles = [...canvasEl.querySelectorAll('.im-node circle')];
+  if (!circles.length) return () => {};
+
+  const nodes = circles.map((c) => {
+    const base = parseFloat(c.dataset.baseR || c.getAttribute('r')) || 10;
+    return { c, base, level: base };
+  });
+  circles.forEach((c) => {
+    c.style.transition = 'r 0.95s ease, fill-opacity 0.95s ease, stroke-width 0.35s ease';
+  });
+
+  const flash = (c) => {
+    c.setAttribute('stroke-width', '3');
+    setTimeout(() => c.setAttribute('stroke-width', '1.5'), 420);
+  };
+
+  const beat = setInterval(() => {
+    const k = 1 + Math.floor(Math.random() * 3); // 1–3 records move per beat
+    for (let i = 0; i < k; i++) {
+      const n = nodes[(Math.random() * nodes.length) | 0];
+      const roll = Math.random();
+      if (roll < 0.6) {
+        // a sale — inventory ticks down
+        n.level = Math.max(n.base * 0.42, n.level - n.base * (0.06 + Math.random() * 0.1));
+      } else if (roll < 0.9) {
+        // a restock — recovers toward baseline
+        n.level = Math.min(n.base * 1.12, n.level + n.base * (0.12 + Math.random() * 0.18));
+      } else {
+        // a demand surge — brief growth + glow
+        n.level = Math.min(n.base * 1.28, n.level + n.base * 0.22);
+        flash(n.c);
+      }
+      n.c.setAttribute('r', n.level.toFixed(2));
+      // Low stock reads brighter/denser so risk is visible at a glance.
+      n.c.setAttribute('fill-opacity', n.level / n.base < 0.55 ? '0.5' : '0.2');
+    }
+  }, 850);
+
+  return () => {
+    clearInterval(beat);
+    nodes.forEach((n) => {
+      n.c.style.transition = '';
+      n.c.setAttribute('r', n.c.dataset.baseR || String(n.base));
+      n.c.setAttribute('fill-opacity', '0.18');
+      n.c.setAttribute('stroke-width', '1.5');
+    });
+  };
 }
 
 /* ---------- Mindmap: white micro-dots gliding every branch path ---------- */

@@ -32,6 +32,36 @@ const MAX_SAVED = 12;
 // just one. Each row's date is generated relative to the user's real clock so
 // the examples always feel current. Definitions are [label, category, value].
 const DEMO_SETS = {
+  // Flagship demo: a realistic product catalog with enough breadth to show
+  // grouping (category), sizing (revenue), status colour, and auto insights.
+  // Provided as full CSV — no per-row date synthesis needed.
+  catalog: {
+    csv: `SKU,Product,Brand,Category,Price,Cost,Margin,Inventory,Units Sold,Revenue,Supplier,Warehouse,Rating,Reviews,Status
+AUD-101,Aura Wireless Earbuds,Sonance,Audio,129,58,71,340,1820,234780,Northwind,WH-East,4.6,1240,In Stock
+AUD-102,Pulse Over-Ear Headphones,Sonance,Audio,249,121,128,52,640,159360,Northwind,WH-East,4.4,860,Low Stock
+AUD-103,Echo Mini Speaker,Boomly,Audio,79,33,46,0,2100,165900,Castellan,WH-West,4.2,1530,Out of Stock
+AUD-104,Bass Mini Soundbar,Boomly,Audio,189,92,97,120,700,132300,Castellan,WH-East,4.3,560,In Stock
+WEA-201,Stride Fitness Watch,Vitalo,Wearables,199,90,109,210,1450,288550,Helios,WH-East,4.5,2010,In Stock
+WEA-202,Lumen Smart Ring,Vitalo,Wearables,299,140,159,18,320,95680,Helios,WH-Central,4.1,410,Low Stock
+WEA-203,Trek GPS Band,Northpeak,Wearables,89,40,49,430,1980,176220,Castellan,WH-West,4.0,990,In Stock
+WEA-204,Pace Heart Monitor,Vitalo,Wearables,69,30,39,0,840,57960,Helios,WH-West,4.0,430,Out of Stock
+CAM-301,Vista 4K Action Cam,Lenscape,Cameras,349,178,171,76,540,188460,Aperture,WH-Central,4.7,720,In Stock
+CAM-302,Pocket Gimbal Pro,Lenscape,Cameras,159,77,82,0,610,96990,Aperture,WH-West,4.3,540,Out of Stock
+CAM-303,NightOwl Security Cam,Sentry,Cameras,119,52,67,260,1340,159460,Sentinel,WH-East,4.2,1120,In Stock
+CAM-304,Studio Ring Light,Lenscape,Cameras,59,25,34,420,1120,66080,Aperture,WH-Central,4.2,690,In Stock
+CMP-401,Glide Wireless Mouse,Kinetix,Computers,49,18,31,620,3100,151900,Orbital,WH-West,4.5,2600,In Stock
+CMP-402,Mech Compact Keyboard,Kinetix,Computers,109,49,60,140,880,95920,Orbital,WH-Central,4.6,1340,In Stock
+CMP-403,Hyperdock USB-C Hub,Portus,Computers,69,29,40,9,1220,84180,Orbital,WH-East,4.1,760,Low Stock
+CMP-404,Nimbus Laptop Stand,Portus,Computers,59,24,35,310,940,55460,Castellan,WH-West,4.4,680,In Stock
+SMH-501,Halo Smart Bulb,Lumio,Smart Home,29,11,18,880,4200,121800,Helios,WH-Central,4.3,3100,In Stock
+SMH-502,Nest Thermostat Mini,Lumio,Smart Home,149,71,78,64,720,107280,Helios,WH-East,4.5,910,In Stock
+SMH-503,Guard Door Sensor,Sentry,Smart Home,39,16,23,0,1500,58500,Sentinel,WH-West,3.9,640,Out of Stock
+SMH-504,Breeze Smart Plug,Lumio,Smart Home,19,7,12,1200,3800,72200,Helios,WH-Central,4.2,2400,In Stock
+SMH-505,Aura Smart Lock,Sentry,Smart Home,179,86,93,47,520,93080,Sentinel,WH-East,4.6,780,In Stock
+ACC-601,Voyage Laptop Sleeve,Carryon,Accessories,45,19,26,540,1600,72000,Orbital,WH-West,4.4,820,In Stock
+ACC-602,Summit Travel Backpack,Carryon,Accessories,119,54,65,33,610,72590,Orbital,WH-East,4.7,1450,Low Stock
+ACC-603,Anchor Cable Kit,Portus,Accessories,25,9,16,760,2900,72500,Castellan,WH-Central,4.1,1980,In Stock`,
+  },
   startup: {
     header: 'milestone,category,date,revenue',
     rows: [
@@ -85,8 +115,10 @@ const DEMO_SETS = {
   },
 };
 
-function buildDemoCSV(key = 'startup') {
-  const set = DEMO_SETS[key] || DEMO_SETS.startup;
+function buildDemoCSV(key = 'catalog') {
+  const set = DEMO_SETS[key] || DEMO_SETS.catalog;
+  // Full-CSV demos (e.g. the product catalog) ship verbatim.
+  if (set.csv) return set.csv;
   const now = new Date();
   const last = set.rows.length - 1;
   const lines = set.rows.map(([label, category, value], i) => {
@@ -240,7 +272,7 @@ function reingestAfterUpgrade(state) {
   }
 }
 
-export function loadDemo(key = 'startup') {
+export function loadDemo(key = 'catalog') {
   const csv = buildDemoCSV(key);
   document.getElementById('rawInput').value = csv;
   runIngest(csv);
@@ -453,7 +485,7 @@ function wireSimulation() {
     const next = !getState().simulation;
     setState({ simulation: next });
     if (next && !simulationSupported(getState().layout)) {
-      toast('Pulses flow on the Mindmap and Timeline layouts — switch to one to see them.', 'warn');
+      toast('Live changes flow on the Insight Map, Mindmap, and Timeline — switch to one to watch.', 'warn');
     }
   });
   syncSimToggle();
@@ -465,8 +497,8 @@ function syncSimToggle() {
   btn.classList.toggle('active', simulation);
   btn.querySelector('.sim-label').textContent = simulation
     ? simulationSupported(layout)
-      ? 'Pulses live — data is flowing'
-      : 'Armed — switch to Mindmap or Timeline'
+      ? 'Live — data is moving'
+      : 'Armed — switch to Insight Map, Mindmap, or Timeline'
     : 'Send live pulses through the story';
 }
 

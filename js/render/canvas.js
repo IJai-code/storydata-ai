@@ -31,7 +31,7 @@ const GATED_URLS = {
 // window so they share the exact same helpers as the bundled layouts. Assigned
 // at module load — before any gated import can run.
 window.__elleryUtil = util;
-const SIMULATABLE = new Set(['nodes', 'timeline']);
+const SIMULATABLE = new Set(['map', 'nodes', 'timeline']);
 const gatedCache = new Map();
 
 let canvasEl = null;

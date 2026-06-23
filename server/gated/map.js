@@ -1,11 +1,16 @@
-// Pro layout: "Insight Map" — a zoomable, pannable packed-bubble field.
-// Bubble size encodes the value column; color encodes category.
-
+// Pro layout: "Insight Map" — a grouped, exploreable field of records.
+//
+// Reads meaning from the data: bubbles are CLUSTERED by category, SIZED by a
+// meaningful metric, and COLORED by status (falling back to a monochrome
+// category ramp). Hovering reveals the full record; clicking a record lifts
+// its whole group and dims the rest, drawing hub links so relationships read
+// at a glance. A live Insight Summary panel — generated from the dataset, not
+// hardcoded — sits alongside the map.
+//
 // Delivered cross-origin from the backend's tier-gated route, so util.js can't
 // be imported by path here. The host app (js/render/canvas.js) hands the same
 // util module over on the window before this module is imported.
 const {
-  pickColumns,
   formatValue,
   escapeHTML,
   clamp,
@@ -13,120 +18,267 @@ const {
   showTooltip,
   hideTooltip,
   tooltipForRow,
+  dataRoles,
+  statusTone,
+  deriveInsights,
 } = window.__elleryUtil;
 
 const MAX_BUBBLES = 300;
-const VIZ_COLORS = ['var(--viz-1)', 'var(--viz-2)', 'var(--viz-3)'];
+const CATEGORY_RAMP = ['var(--viz-1)', 'var(--viz-2)', 'var(--viz-3)', '#7e7e86', '#46464c'];
+const TONE_COLOR = { good: 'var(--viz-1)', warn: 'var(--warn)', bad: 'var(--danger)' };
 
 export function render(container, dataset) {
-  const picks = pickColumns(dataset);
+  const roles = dataRoles(dataset);
   const rows = dataset.rows.slice(0, MAX_BUBBLES);
+  const labelKey = roles.label.key;
+  const labelType = roles.label.type;
+  const catKey = roles.category ? roles.category.key : null;
+  const statusKey = roles.status ? roles.status.key : null;
+  const metricKey = roles.metric ? roles.metric.key : null;
 
-  // Radius scale: sqrt of value, normalized into [10, 58].
-  const values = rows.map((r) =>
-    picks.value && typeof r[picks.value.key] === 'number' ? Math.abs(r[picks.value.key]) : 1
-  );
-  const maxV = Math.max(...values, 1);
-  const minV = Math.min(...values);
-  const radii = values.map((v) => {
-    if (maxV === minV) return 26;
-    const t = Math.sqrt(v / maxV);
-    return 10 + t * 48;
-  });
-
-  const bubbles = packCircles(rows, radii);
-  const bounds = computeBounds(bubbles);
-  const vb = {
-    x: bounds.x - 30,
-    y: bounds.y - 30,
-    w: bounds.w + 60,
-    h: bounds.h + 60,
+  // Radius encodes the metric (sqrt so area ≈ value); flat when none exists.
+  const metricVals = rows.map((r) => (metricKey && typeof r[metricKey] === 'number' ? Math.abs(r[metricKey]) : 1));
+  const maxV = Math.max(...metricVals, 1);
+  const minV = Math.min(...metricVals);
+  const radiusOf = (v) => {
+    if (!metricKey || maxV === minV) return 24;
+    return 12 + Math.sqrt(v / maxV) * 40;
   };
 
-  const categories = picks.category
-    ? [...new Set(rows.map((r) => String(r[picks.category.key] ?? '—')))]
-    : [];
+  // Group by category (or a single implicit group).
+  const groupNames = catKey
+    ? [...new Set(rows.map((r) => String(r[catKey] ?? '—')))]
+    : ['All records'];
+  const catColor = (name) => CATEGORY_RAMP[groupNames.indexOf(name) % CATEGORY_RAMP.length];
 
+  // Pack each group locally, then lay groups out on a grid.
+  const groups = groupNames.map((name) => {
+    const items = rows
+      .map((row, idx) => ({ row, idx }))
+      .filter(({ row }) => (catKey ? String(row[catKey] ?? '—') === name : true))
+      .map(({ row, idx }) => ({ row, idx, r: radiusOf(metricVals[idx]) }));
+    const placed = packCircles(items);
+    const b = clusterBounds(placed);
+    return { name, placed, radius: Math.max(b.radius, 40) };
+  });
+
+  const cols = Math.ceil(Math.sqrt(groups.length));
+  const cell = Math.max(...groups.map((g) => g.radius)) * 2 + 96;
+  const bubbles = [];
+  const centroids = {};
+  groups.forEach((g, gi) => {
+    const cx = (gi % cols) * cell + cell / 2;
+    const cy = Math.floor(gi / cols) * cell + cell / 2;
+    centroids[g.name] = { x: cx, y: cy, top: cy - g.radius - 16 };
+    g.placed.forEach((p) => bubbles.push({ ...p, x: p.x + cx, y: p.y + cy, cat: g.name }));
+  });
+
+  const bounds = computeBounds(bubbles);
+  const vb = { x: bounds.x - 40, y: bounds.y - 50, w: bounds.w + 80, h: bounds.h + 90 };
+
+  /* ---------- DOM scaffold: map stage + summary panel ---------- */
+  const root = document.createElement('div');
+  root.className = 'insightmap';
+
+  const stage = document.createElement('div');
+  stage.className = 'im-stage';
   const wrap = document.createElement('div');
   wrap.className = 'viz-svg-wrap pannable';
   const svg = svgEl('svg', { viewBox: `${vb.x} ${vb.y} ${vb.w} ${vb.h}` });
-  svg.style.minHeight = '440px';
+  svg.style.minHeight = '460px';
   svg.style.aspectRatio = `${vb.w} / ${vb.h}`;
   wrap.appendChild(svg);
-
-  bubbles.forEach((b, i) => {
-    const colorIdx = picks.category
-      ? Math.max(0, categories.indexOf(String(b.row[picks.category.key] ?? '—')))
-      : i;
-    const color = VIZ_COLORS[colorIdx % VIZ_COLORS.length];
-
-    const g = svgEl('g');
-    const circle = svgEl('circle', {
-      cx: b.x,
-      cy: b.y,
-      r: b.r,
-      fill: color,
-      'fill-opacity': '0.18',
-      stroke: color,
-      'stroke-width': '1.5',
-    });
-    circle.classList.add('pop-node');
-    circle.style.animationDelay = `${Math.min(i * 0.02, 1.4)}s`;
-    g.appendChild(circle);
-
-    if (b.r > 18) {
-      const label = svgEl('text', {
-        x: b.x,
-        y: b.y + 4,
-        'text-anchor': 'middle',
-        fill: 'var(--text-1)',
-        'font-size': clamp(b.r / 3, 9, 14),
-        'font-family': 'var(--font-ui)',
-      });
-      let text = String(formatValue(b.row[picks.label.key], picks.label.type));
-      if (text.length > Math.floor(b.r / 3.2)) text = `${text.slice(0, Math.floor(b.r / 3.2))}…`;
-      label.textContent = text;
-      label.classList.add('pop-node');
-      label.style.animationDelay = circle.style.animationDelay;
-      g.appendChild(label);
-    }
-
-    g.style.cursor = 'pointer';
-    g.addEventListener('mousemove', (e) => {
-      circle.setAttribute('fill-opacity', '0.4');
-      showTooltip(
-        `<div class="tt-title">${escapeHTML(
-          formatValue(b.row[picks.label.key], picks.label.type)
-        )}</div>${tooltipForRow(b.row, dataset.columns)}`,
-        e.clientX,
-        e.clientY
-      );
-    });
-    g.addEventListener('mouseleave', () => {
-      circle.setAttribute('fill-opacity', '0.18');
-      hideTooltip();
-    });
-    svg.appendChild(g);
-  });
-
-  attachPanZoom(wrap, svg, vb);
+  stage.appendChild(wrap);
 
   const hint = document.createElement('div');
   hint.className = 'viz-hint';
-  hint.textContent = `${bubbles.length} bubbles · scroll to zoom · drag to pan · hover for details`;
-  wrap.appendChild(hint);
-  container.appendChild(wrap);
+  hint.textContent = `${bubbles.length} records · ${groupNames.length} ${groupNames.length === 1 ? 'group' : 'groups'} · click a node to trace its group · scroll to zoom · drag to pan`;
+  stage.appendChild(hint);
+  root.appendChild(stage);
+
+  root.appendChild(buildSummary(dataset, roles));
+  container.appendChild(root);
+
+  /* ---------- Hub links (shown on selection) ---------- */
+  const linksG = svgEl('g', { class: 'im-links' });
+  svg.appendChild(linksG);
+
+  // Group label captions.
+  groupNames.forEach((name) => {
+    const c = centroids[name];
+    const cap = svgEl('text', {
+      x: c.x, y: c.top, 'text-anchor': 'middle', class: 'im-cap',
+      fill: 'var(--text-3)', 'font-size': 13, 'font-family': 'var(--font-mono)',
+    });
+    cap.textContent = name;
+    svg.appendChild(cap);
+  });
+
+  /* ---------- Bubbles ---------- */
+  const nodes = [];
+  bubbles.forEach((b, i) => {
+    const tone = statusKey ? statusTone(b.row[statusKey]) : null;
+    const color = tone ? TONE_COLOR[tone] : catColor(b.cat);
+
+    const g = svgEl('g', { class: 'im-node' });
+    g.dataset.cat = b.cat;
+    g.dataset.idx = String(b.idx);
+
+    const circle = svgEl('circle', {
+      cx: b.x, cy: b.y, r: b.r, fill: color,
+      'fill-opacity': '0.18', stroke: color, 'stroke-width': '1.5',
+    });
+    circle.classList.add('pop-node');
+    circle.style.animationDelay = `${Math.min(i * 0.018, 1.3)}s`;
+    circle.dataset.baseR = String(b.r);
+    g.appendChild(circle);
+
+    if (b.r > 17) {
+      const t = svgEl('text', {
+        x: b.x, y: b.y + 4, 'text-anchor': 'middle', fill: 'var(--text-1)',
+        'font-size': clamp(b.r / 3, 9, 13), 'font-family': 'var(--font-ui)',
+        'pointer-events': 'none',
+      });
+      let text = String(formatValue(b.row[labelKey], labelType));
+      const cap = Math.floor(b.r / 3.1);
+      if (text.length > cap) text = `${text.slice(0, cap)}…`;
+      t.textContent = text;
+      t.classList.add('pop-node');
+      t.style.animationDelay = circle.style.animationDelay;
+      g.appendChild(t);
+    }
+
+    g.addEventListener('mousemove', (e) => {
+      if (!selectedCat) circle.setAttribute('fill-opacity', '0.42');
+      showTooltip(richTooltip(b.row, dataset, roles, tone), e.clientX, e.clientY);
+    });
+    g.addEventListener('mouseleave', () => {
+      if (!selectedCat) circle.setAttribute('fill-opacity', '0.18');
+      hideTooltip();
+    });
+    g.addEventListener('click', (e) => {
+      e.stopPropagation();
+      select(b.cat, g);
+    });
+
+    svg.appendChild(g);
+    nodes.push({ g, circle, cat: b.cat, x: b.x, y: b.y });
+  });
+
+  /* ---------- Selection: lift a group, dim the rest, draw hub links ---------- */
+  let selectedCat = null;
+
+  function select(cat, gEl) {
+    if (selectedCat === cat) return clearSelection();
+    selectedCat = cat;
+    root.classList.add('im-has-selection');
+    nodes.forEach((n) => {
+      const related = n.cat === cat;
+      n.g.classList.toggle('im-related', related);
+      n.g.classList.toggle('im-dim', !related);
+      n.g.classList.remove('im-selected');
+      n.circle.setAttribute('fill-opacity', related ? '0.34' : '0.18');
+    });
+    if (gEl) gEl.classList.add('im-selected');
+
+    // Hub-and-spoke links from each group member to the group centroid.
+    linksG.replaceChildren();
+    const c = centroids[cat];
+    nodes.filter((n) => n.cat === cat).forEach((n) => {
+      linksG.appendChild(svgEl('line', { x1: c.x, y1: c.y, x2: n.x, y2: n.y, class: 'im-link' }));
+    });
+    linksG.classList.add('im-links-on');
+    highlightSummary(cat);
+  }
+
+  function clearSelection() {
+    selectedCat = null;
+    root.classList.remove('im-has-selection');
+    nodes.forEach((n) => {
+      n.g.classList.remove('im-related', 'im-dim', 'im-selected');
+      n.circle.setAttribute('fill-opacity', '0.18');
+    });
+    linksG.replaceChildren();
+    linksG.classList.remove('im-links-on');
+    highlightSummary(null);
+  }
+
+  function highlightSummary(cat) {
+    root.querySelectorAll('.im-chip').forEach((chip) => {
+      chip.classList.toggle('active', cat != null && chip.dataset.cat === cat);
+    });
+  }
+
+  svg.addEventListener('click', clearSelection);
+  attachPanZoom(wrap, svg, vb);
+
+  // Clicking a category chip in the summary focuses that group too.
+  root.querySelector('.im-chips')?.addEventListener('click', (e) => {
+    const chip = e.target.closest('.im-chip');
+    if (chip) select(chip.dataset.cat, null);
+  });
 
   return () => hideTooltip();
 }
 
+/* ---------- Insight Summary panel (auto-generated) ---------- */
+
+function buildSummary(dataset, roles) {
+  const aside = document.createElement('aside');
+  aside.className = 'im-summary';
+
+  const insights = deriveInsights(dataset);
+  const list = insights
+    .map(
+      (o) => `
+      <li class="im-insight im-${o.tone}">
+        <span class="im-dot"></span>
+        <span class="im-insight-body">
+          <span class="im-insight-label">${escapeHTML(o.label)}</span>
+          <span class="im-insight-value">${escapeHTML(o.value)}</span>
+        </span>
+      </li>`
+    )
+    .join('');
+
+  // Category chips double as a legend and a selection control.
+  let chips = '';
+  if (roles.category) {
+    const ck = roles.category.key;
+    const names = [...new Set(dataset.rows.map((r) => String(r[ck] ?? '—')))];
+    chips = `<div class="im-chips">${names
+      .map((nm) => `<button class="im-chip" data-cat="${escapeHTML(nm)}">${escapeHTML(nm)}</button>`)
+      .join('')}</div>`;
+  }
+
+  const sizeLegend = roles.metric ? `Size · ${escapeHTML(roles.metric.label)}` : 'Size · uniform';
+  const colorLegend = roles.status
+    ? `Color · ${escapeHTML(roles.status.label)}`
+    : roles.category
+      ? `Color · ${escapeHTML(roles.category.label)}`
+      : 'Color · single';
+
+  aside.innerHTML = `
+    <div class="im-summary-head">
+      <h3>Insight Summary</h3>
+      <p class="im-summary-sub">${dataset.rows.length} records · ${dataset.columns.length} fields</p>
+    </div>
+    <div class="im-legend"><span>${sizeLegend}</span><span>${colorLegend}</span></div>
+    ${chips}
+    <ul class="im-insights">${list || '<li class="im-insight im-neutral"><span class="im-dot"></span><span class="im-insight-body"><span class="im-insight-label">No numeric signal detected</span><span class="im-insight-value">Add a value column to unlock insights</span></span></li>'}</ul>`;
+  return aside;
+}
+
+function richTooltip(row, dataset, roles, tone) {
+  const title = escapeHTML(formatValue(row[roles.label.key], roles.label.type));
+  const toneTag = tone ? `<span class="tt-tone tt-${tone}">${escapeHTML(String(row[roles.status.key]))}</span>` : '';
+  return `<div class="tt-title">${title}${toneTag}</div>${tooltipForRow(row, dataset.columns, 8)}`;
+}
+
 /* ---------- Naive circle packing: spiral search, O(n²) ---------- */
 
-function packCircles(rows, radii) {
-  const order = rows
-    .map((row, i) => ({ row, r: radii[i] }))
-    .sort((a, b) => b.r - a.r);
-
+function packCircles(items) {
+  const order = [...items].sort((a, b) => b.r - a.r);
   const placed = [];
   for (const item of order) {
     if (!placed.length) {
@@ -137,7 +289,7 @@ function packCircles(rows, radii) {
     for (let angle = 0, dist = item.r; dist < 4000 && !best; angle += 0.35) {
       dist += 0.55;
       const x = Math.cos(angle) * dist;
-      const y = Math.sin(angle) * dist * 0.72; // slightly elliptical field
+      const y = Math.sin(angle) * dist * 0.78;
       if (placed.every((p) => !overlaps(p, x, y, item.r))) best = { x, y };
     }
     placed.push({ ...item, ...(best || { x: 0, y: 0 }) });
@@ -148,7 +300,13 @@ function packCircles(rows, radii) {
 function overlaps(p, x, y, r) {
   const dx = p.x - x;
   const dy = p.y - y;
-  return dx * dx + dy * dy < (p.r + r + 3) * (p.r + r + 3);
+  return dx * dx + dy * dy < (p.r + r + 4) * (p.r + r + 4);
+}
+
+function clusterBounds(bubbles) {
+  let radius = 0;
+  for (const b of bubbles) radius = Math.max(radius, Math.hypot(b.x, b.y) + b.r);
+  return { radius };
 }
 
 function computeBounds(bubbles) {
@@ -175,8 +333,6 @@ function attachPanZoom(wrap, svg, initial) {
       const factor = e.deltaY > 0 ? 1.12 : 1 / 1.12;
       const newW = clamp(vb.w * factor, initial.w / 10, initial.w * 3);
       const scale = newW / vb.w;
-
-      // Zoom anchored at the cursor position.
       const rect = svg.getBoundingClientRect();
       const px = vb.x + ((e.clientX - rect.left) / rect.width) * vb.w;
       const py = vb.y + ((e.clientY - rect.top) / rect.height) * vb.h;

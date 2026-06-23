@@ -965,6 +965,125 @@ body[data-authed="false"] .app { visibility: hidden; }
 }
 
 
+/* ---------- Insight Map (Pro): grouped exploration + summary ---------- */
+.insightmap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: var(--sp-4);
+  align-items: start;
+}
+.im-stage { min-width: 0; }
+
+/* Nodes + selection states. Dimming/relating animates for a smooth focus. */
+.im-node { cursor: pointer; transition: opacity 0.28s ease; }
+.im-node circle { transition: fill-opacity 0.28s ease, stroke-width 0.2s ease; }
+.insightmap.im-has-selection .im-node.im-dim { opacity: 0.14; }
+.insightmap.im-has-selection .im-node.im-dim circle { filter: none; }
+.im-node.im-related { opacity: 1; }
+.im-node.im-selected circle { stroke-width: 2.6; }
+.im-cap { letter-spacing: 0.05em; }
+
+/* Hub links revealed when a group is selected. */
+.im-link {
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.im-links.im-links-on .im-link { opacity: 1; }
+
+/* Auto-generated summary panel. */
+.im-summary {
+  position: sticky;
+  top: var(--sp-3);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.015);
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.im-summary-head h3 {
+  margin: 0;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+}
+.im-summary-sub {
+  margin: 3px 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+}
+.im-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.im-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.im-chip {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 11px;
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+.im-chip:hover { border-color: var(--text-3); color: var(--text-1); }
+.im-chip.active { border-color: rgba(255, 255, 255, 0.6); color: var(--text-1); }
+
+.im-insights { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 11px; }
+.im-insight { display: flex; gap: 10px; align-items: flex-start; }
+.im-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex: none; background: var(--text-3); }
+.im-insight.im-good .im-dot { background: var(--viz-1); }
+.im-insight.im-warn .im-dot { background: var(--warn); }
+.im-insight.im-bad .im-dot { background: var(--danger); }
+.im-insight-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.im-insight-label {
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.im-insight-value { font-size: var(--fs-sm); color: var(--text-1); line-height: var(--lh-tight); }
+
+/* Status tag inside the rich tooltip. */
+.viz-tooltip .tt-tone {
+  margin-left: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.54rem;
+  letter-spacing: 0.06em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  color: var(--text-2);
+}
+.viz-tooltip .tt-good { color: var(--viz-1); border-color: rgba(255, 255, 255, 0.3); }
+.viz-tooltip .tt-warn { color: var(--warn); border-color: rgba(179, 161, 122, 0.45); }
+.viz-tooltip .tt-bad { color: var(--danger); border-color: rgba(201, 122, 122, 0.45); }
+
+@media (max-width: 860px) {
+  .insightmap { grid-template-columns: 1fr; }
+  .im-summary { position: static; }
+}
+
+
 /* ---------- Slide-embed tutorial (glassmorphic) ---------- */
 .tutorial-modal {
   width: min(560px, 100%);
