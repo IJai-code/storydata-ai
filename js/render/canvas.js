@@ -11,6 +11,7 @@ import { watermarkRequired, LAYOUTS } from '../tier/gates.js';
 import { api, API_BASE } from '../api.js';
 import { applyWatermark } from './watermark.js';
 import * as util from './util.js';
+import * as discovery from '../discovery/index.js';
 import * as timeline from './layouts/timeline.js';
 import * as cards from './layouts/cards.js';
 import * as nodes from './layouts/nodes.js';
@@ -31,6 +32,8 @@ const GATED_URLS = {
 // window so they share the exact same helpers as the bundled layouts. Assigned
 // at module load — before any gated import can run.
 window.__elleryUtil = util;
+// The Discovery Engine is the analysis layer gated visualizations read from.
+window.__elleryDiscovery = discovery;
 const SIMULATABLE = new Set(['map', 'nodes', 'timeline']);
 const gatedCache = new Map();
 

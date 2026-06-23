@@ -7,9 +7,10 @@
 // at a glance. A live Insight Summary panel — generated from the dataset, not
 // hardcoded — sits alongside the map.
 //
-// Delivered cross-origin from the backend's tier-gated route, so util.js can't
-// be imported by path here. The host app (js/render/canvas.js) hands the same
-// util module over on the window before this module is imported.
+// Delivered cross-origin from the backend's tier-gated route, so frontend
+// modules can't be imported by path here. The host app (js/render/canvas.js)
+// hands the rendering helpers and the Discovery Engine over on the window
+// before this module is imported.
 const {
   formatValue,
   escapeHTML,
@@ -18,17 +19,20 @@ const {
   showTooltip,
   hideTooltip,
   tooltipForRow,
-  dataRoles,
-  statusTone,
-  deriveInsights,
 } = window.__elleryUtil;
 
 const MAX_BUBBLES = 300;
 const CATEGORY_RAMP = ['var(--viz-1)', 'var(--viz-2)', 'var(--viz-3)', '#7e7e86', '#46464c'];
-const TONE_COLOR = { good: 'var(--viz-1)', warn: 'var(--warn)', bad: 'var(--danger)' };
+// Engine tone (ok|warn|critical) -> visual color + existing CSS class suffix.
+const TONE_COLOR = { ok: 'var(--viz-1)', warn: 'var(--warn)', critical: 'var(--danger)' };
+const TONE_CLASS = { ok: 'good', warn: 'warn', critical: 'bad', neutral: 'neutral' };
 
 export function render(container, dataset) {
-  const roles = dataRoles(dataset);
+  // The Discovery Engine is the single analysis pass: it supplies both the
+  // encoding roles (what to size/color/group by) and the summary discoveries.
+  const report = window.__elleryDiscovery.runDiscovery(dataset);
+  const roles = report.profile.roles;
+  const classifyStatus = report.profile.classifyStatus;
   const rows = dataset.rows.slice(0, MAX_BUBBLES);
   const labelKey = roles.label.key;
   const labelType = roles.label.type;
@@ -96,7 +100,7 @@ export function render(container, dataset) {
   stage.appendChild(hint);
   root.appendChild(stage);
 
-  root.appendChild(buildSummary(dataset, roles));
+  root.appendChild(buildSummary(report));
   container.appendChild(root);
 
   /* ---------- Hub links (shown on selection) ---------- */
@@ -117,7 +121,7 @@ export function render(container, dataset) {
   /* ---------- Bubbles ---------- */
   const nodes = [];
   bubbles.forEach((b, i) => {
-    const tone = statusKey ? statusTone(b.row[statusKey]) : null;
+    const tone = statusKey ? classifyStatus(b.row[statusKey]) : null;
     const color = tone ? TONE_COLOR[tone] : catColor(b.cat);
 
     const g = svgEl('g', { class: 'im-node' });
@@ -223,31 +227,32 @@ export function render(container, dataset) {
 
 /* ---------- Insight Summary panel (auto-generated) ---------- */
 
-function buildSummary(dataset, roles) {
+function buildSummary(report) {
   const aside = document.createElement('aside');
   aside.className = 'im-summary';
+  const roles = report.profile.roles;
 
-  const insights = deriveInsights(dataset);
-  const list = insights
-    .map(
-      (o) => `
-      <li class="im-insight im-${o.tone}">
+  // Render the engine's standardized Discovery objects — title + plain-language
+  // summary, tone mapped onto the existing dot styles.
+  const list = report.discoveries
+    .map((d) => {
+      const cls = TONE_CLASS[d.metadata.tone] || 'neutral';
+      return `
+      <li class="im-insight im-${cls}">
         <span class="im-dot"></span>
         <span class="im-insight-body">
-          <span class="im-insight-label">${escapeHTML(o.label)}</span>
-          <span class="im-insight-value">${escapeHTML(o.value)}</span>
+          <span class="im-insight-label">${escapeHTML(d.title)}</span>
+          <span class="im-insight-value">${escapeHTML(d.summary)}</span>
         </span>
-      </li>`
-    )
+      </li>`;
+    })
     .join('');
 
   // Category chips double as a legend and a selection control.
   let chips = '';
-  if (roles.category) {
-    const ck = roles.category.key;
-    const names = [...new Set(dataset.rows.map((r) => String(r[ck] ?? '—')))];
-    chips = `<div class="im-chips">${names
-      .map((nm) => `<button class="im-chip" data-cat="${escapeHTML(nm)}">${escapeHTML(nm)}</button>`)
+  if (roles.category && roles.category.stats.top) {
+    chips = `<div class="im-chips">${roles.category.stats.top
+      .map(([nm]) => `<button class="im-chip" data-cat="${escapeHTML(nm)}">${escapeHTML(nm)}</button>`)
       .join('')}</div>`;
   }
 
@@ -261,17 +266,19 @@ function buildSummary(dataset, roles) {
   aside.innerHTML = `
     <div class="im-summary-head">
       <h3>Insight Summary</h3>
-      <p class="im-summary-sub">${dataset.rows.length} records · ${dataset.columns.length} fields</p>
+      <p class="im-summary-sub">${report.meta.rowCount} records · ${report.meta.columnCount} fields · ${escapeHTML(report.domain.label)}</p>
     </div>
     <div class="im-legend"><span>${sizeLegend}</span><span>${colorLegend}</span></div>
     ${chips}
-    <ul class="im-insights">${list || '<li class="im-insight im-neutral"><span class="im-dot"></span><span class="im-insight-body"><span class="im-insight-label">No numeric signal detected</span><span class="im-insight-value">Add a value column to unlock insights</span></span></li>'}</ul>`;
+    <ul class="im-insights">${list || '<li class="im-insight im-neutral"><span class="im-dot"></span><span class="im-insight-body"><span class="im-insight-label">No signal detected</span><span class="im-insight-value">Add a numeric or status column to unlock insights</span></span></li>'}</ul>`;
   return aside;
 }
 
 function richTooltip(row, dataset, roles, tone) {
   const title = escapeHTML(formatValue(row[roles.label.key], roles.label.type));
-  const toneTag = tone ? `<span class="tt-tone tt-${tone}">${escapeHTML(String(row[roles.status.key]))}</span>` : '';
+  const toneTag = tone
+    ? `<span class="tt-tone tt-${TONE_CLASS[tone]}">${escapeHTML(String(row[roles.status.key]))}</span>`
+    : '';
   return `<div class="tt-title">${title}${toneTag}</div>${tooltipForRow(row, dataset.columns, 8)}`;
 }
 
