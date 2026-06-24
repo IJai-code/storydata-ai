@@ -539,7 +539,11 @@ function wireSaveShareExport() {
     }
     mp4Btn.disabled = true;
     const original = mp4Btn.textContent;
-    mp4Btn.textContent = story ? 'Recording your briefing…' : 'Recording 3s of physics…';
+    mp4Btn.textContent = story
+      ? 'Recording your briefing…'
+      : getState().layout === 'kinetic'
+        ? 'Recording 3s of physics…'
+        : 'Rendering MP4…';
     try {
       const result = await exportMP4(document.getElementById('canvas'), { story });
       if (result.ok) {
