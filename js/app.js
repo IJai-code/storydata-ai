@@ -8,6 +8,7 @@ import { initPanel, loadDemo } from './ui/panel.js';
 import { initPaywall, openPaywall } from './tier/paywall.js';
 import { initAuth } from './ui/auth.js';
 import { initTutorial } from './ui/tutorial.js';
+import { initWelcome } from './ui/welcome.js';
 import { initToasts, toast } from './ui/toast.js';
 import { api } from './api.js';
 
@@ -41,6 +42,7 @@ async function boot() {
   initCanvas(document.getElementById('canvas'), {
     gateDenied: () => openPaywall('layout-locked'),
   });
+  initWelcome(document.getElementById('welcomeHelp'));
 
   if (!session.ok) {
     toast(session.error || 'Could not reach the server — running with free-tier defaults.', 'error');

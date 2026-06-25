@@ -1084,6 +1084,142 @@ body[data-authed="false"] .app { visibility: hidden; }
 }
 
 
+/* ---------- First-run Welcome modal ---------- */
+/* Reuses .modal-overlay / .modal (glass, fade + scale-in, reduced-motion safe). */
+.welcome-modal { width: min(680px, 100%); }
+.welcome-body {
+  padding: var(--sp-6) var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.welcome-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.welcome-body #welcomeTitle {
+  margin: 8px 0 6px;
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: var(--lh-tight);
+}
+.welcome-sub {
+  margin: 0;
+  color: var(--text-1);
+  font-size: var(--fs-md);
+}
+.welcome-copy {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+}
+
+/* Featured demo — highlighted surface */
+.welcome-featured {
+  margin-top: var(--sp-2);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--sp-3) var(--sp-4);
+  padding: var(--sp-4);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.025);
+}
+.welcome-featured-icon { font-size: 1.8rem; line-height: 1; }
+.welcome-featured-text h3 {
+  margin: 0 0 4px;
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.welcome-featured-text p {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+}
+.welcome-cta { white-space: nowrap; }
+
+/* Coming soon — muted cards */
+.welcome-soon {
+  list-style: none;
+  margin: var(--sp-1) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-2);
+}
+.welcome-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--sp-3);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-md);
+  opacity: 0.82;
+}
+.welcome-card-icon { font-size: 1.1rem; line-height: 1; }
+.welcome-card-name { font-weight: 500; font-size: var(--fs-sm); color: var(--text-1); }
+.welcome-card-desc { font-size: var(--fs-xs); color: var(--text-3); line-height: 1.5; flex: 1; }
+.welcome-badge {
+  align-self: flex-start;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.54rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+/* Footer checklist */
+.welcome-foot {
+  margin-top: var(--sp-2);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--line-soft);
+}
+.welcome-foot-label {
+  display: block;
+  margin-bottom: 9px;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.welcome-check {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+.welcome-check li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--fs-xs);
+  color: var(--text-2);
+}
+.welcome-check li::before { content: "✓"; color: var(--text-1); font-weight: 600; }
+
+@media (max-width: 640px) {
+  .welcome-body { padding: var(--sp-5) var(--sp-4); }
+  .welcome-featured { grid-template-columns: 1fr; }
+  .welcome-cta { width: 100%; }
+  .welcome-soon { grid-template-columns: 1fr; }
+}
+
+
 /* ---------- Slide-embed tutorial (glassmorphic) ---------- */
 .tutorial-modal {
   width: min(560px, 100%);
