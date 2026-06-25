@@ -113,12 +113,17 @@ function renderGate(mode) {
     <div class="gate-card">
       <div class="gate-brand">
         <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
-               stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
-            <path d="M5 6.2h13.2"/>
-            <path d="M5 12h9.4"/>
-            <path d="M5 17.8h12"/>
-            <path d="M18.6 3.4 10.2 20.6"/>
+          <svg viewBox="0 0 64 64" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="ellery-mark-gate" x1="18%" y1="82%" x2="84%" y2="14%">
+                <stop offset="0" stop-color="#F6491D"/>
+                <stop offset="0.5" stop-color="#FF8A1E"/>
+                <stop offset="1" stop-color="#FFC24D"/>
+              </linearGradient>
+            </defs>
+            <circle cx="32" cy="32" r="28.5" fill="none" stroke="url(#ellery-mark-gate)" stroke-width="2.4" opacity="0.4"/>
+            <path d="M14 48 C 15 33 26 22 47 21 C 39 24 33 29 31 35 C 37 31 45 31 50 35 C 44 35 39 38 36 43 C 33 39 28 38 24 40 C 27 35 25 30 25 30 C 19 35 16 41 14 48 Z" fill="url(#ellery-mark-gate)"/>
+            <path d="M44 14 l1.3 3.4 3.4 1.3 -3.4 1.3 -1.3 3.4 -1.3 -3.4 -3.4 -1.3 3.4 -1.3 Z" fill="#FFE08A"/>
           </svg>
         </span>
         Ellery<em>AI</em>

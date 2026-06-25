@@ -124,6 +124,20 @@ function template() {
       <button class="modal-close welcome-close" type="button" aria-label="Close welcome">✕</button>
       <div class="welcome-body">
         <div class="welcome-head">
+          <span class="welcome-mark" aria-hidden="true">
+            <svg viewBox="0 0 64 64" width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="ellery-mark-welcome" x1="18%" y1="82%" x2="84%" y2="14%">
+                  <stop offset="0" stop-color="#F6491D"/>
+                  <stop offset="0.5" stop-color="#FF8A1E"/>
+                  <stop offset="1" stop-color="#FFC24D"/>
+                </linearGradient>
+              </defs>
+              <circle cx="32" cy="32" r="28.5" fill="none" stroke="url(#ellery-mark-welcome)" stroke-width="2.4" opacity="0.4"/>
+              <path d="M14 48 C 15 33 26 22 47 21 C 39 24 33 29 31 35 C 37 31 45 31 50 35 C 44 35 39 38 36 43 C 33 39 28 38 24 40 C 27 35 25 30 25 30 C 19 35 16 41 14 48 Z" fill="url(#ellery-mark-welcome)"/>
+              <path d="M44 14 l1.3 3.4 3.4 1.3 -3.4 1.3 -1.3 3.4 -1.3 -3.4 -3.4 -1.3 3.4 -1.3 Z" fill="#FFE08A"/>
+            </svg>
+          </span>
           <span class="welcome-kicker">Welcome</span>
           <h2 id="welcomeTitle">Welcome to Ellery</h2>
           <p id="welcomeSub" class="welcome-sub">Transform complex datasets into evidence-backed stories.</p>
