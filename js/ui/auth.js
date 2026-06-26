@@ -115,15 +115,18 @@ function renderGate(mode) {
         <span class="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 64 64" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <linearGradient id="ellery-mark-gate" x1="18%" y1="82%" x2="84%" y2="14%">
-                <stop offset="0" stop-color="#F6491D"/>
-                <stop offset="0.5" stop-color="#FF8A1E"/>
-                <stop offset="1" stop-color="#FFC24D"/>
+              <linearGradient id="ellery-mark-gate" x1="50%" y1="0%" x2="42%" y2="100%">
+                <stop offset="0" stop-color="#FFC24D"/>
+                <stop offset="0.45" stop-color="#FF7A1E"/>
+                <stop offset="1" stop-color="#F0451A"/>
               </linearGradient>
             </defs>
-            <circle cx="32" cy="32" r="28.5" fill="none" stroke="url(#ellery-mark-gate)" stroke-width="2.4" opacity="0.4"/>
-            <path d="M14 48 C 15 33 26 22 47 21 C 39 24 33 29 31 35 C 37 31 45 31 50 35 C 44 35 39 38 36 43 C 33 39 28 38 24 40 C 27 35 25 30 25 30 C 19 35 16 41 14 48 Z" fill="url(#ellery-mark-gate)"/>
-            <path d="M44 14 l1.3 3.4 3.4 1.3 -3.4 1.3 -1.3 3.4 -1.3 -3.4 -3.4 -1.3 3.4 -1.3 Z" fill="#FFE08A"/>
+            <g fill="url(#ellery-mark-gate)">
+              <path d="M33 5 C 31 11 32 16 36 20 C 31 18 26 20 24 25 C 22 18 26 9 33 5 Z"/>
+              <path d="M13 27 C 31 21 48 26 57 38 C 44 32 30 33 21 40 C 24 33 18 28 13 27 Z"/>
+              <path d="M16 38 C 30 34 43 38 51 49 C 40 43 30 45 23 51 C 26 44 21 39 16 38 Z"/>
+              <path d="M22 49 C 31 47 39 50 45 58 C 37 53 30 55 26 59 C 28 54 26 50 22 49 Z"/>
+            </g>
           </svg>
         </span>
         Ellery<em>AI</em>
