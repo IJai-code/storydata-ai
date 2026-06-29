@@ -1,27 +1,13 @@
-// Ellery Decision Engine — the standardized Decision object.
+// A Decision is the triage call on a relationship: how urgent, how much impact,
+// how solid the evidence is, how directly you can act, and whether you should
+// dig in first. It doesn't recommend anything and doesn't write new prose — it
+// grades. Frozen data, no UI, points at relationships/discoveries by id, never
+// re-opens the dataset. Same shape language as Discovery and Relationship.
 //
-// A Decision is a triage verdict over an existing relationship: how urgent it
-// is, how much impact it carries, how trustworthy the evidence is, how directly
-// it can be acted on, and whether it needs investigation first. It generates NO
-// recommendations and NO new prose — it assesses. Pure data: no DOM, no
-// rendering, no UI. It references relationships and discoveries by id and never
-// re-reads the raw dataset. This mirrors the Discovery / Relationship objects so
-// future Recommendation / Narrative engines consume one consistent shape.
-//
-// @typedef {Object} Decision
-// @property {string}   id
-// @property {string}   type
-// @property {string}   title
-// @property {string}   summary
-// @property {'low'|'medium'|'high'|'critical'} urgency
-// @property {'low'|'medium'|'high'}            impact
-// @property {number}   confidence            0..1 (evidence/confidence quality)
-// @property {number}   actionability         0..1 (how directly it can be acted on)
-// @property {boolean}  investigationRequired
-// @property {string[]} supportingRelationships  relationship ids
-// @property {string[]} supportingDiscoveries    discovery ids (the provenance chain)
-// @property {Object}   evidence
-// @property {Object}   metadata
+// Fields: id, type, title, summary, urgency (low|medium|high|critical), impact
+// (low|medium|high), confidence, actionability, investigationRequired,
+// supportingRelationships, supportingDiscoveries (the provenance chain),
+// evidence, metadata.
 
 export const URGENCY = Object.freeze({ LOW: 'low', MEDIUM: 'medium', HIGH: 'high', CRITICAL: 'critical' });
 export const IMPACT = Object.freeze({ LOW: 'low', MEDIUM: 'medium', HIGH: 'high' });
@@ -34,10 +20,8 @@ export const impactRank = (i) => IMPACT_RANK[i] || 0;
 
 const clamp01 = (n) => (Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 0);
 
-/**
- * Build a validated, immutable Decision. Throws on missing essentials or an
- * unknown urgency/impact band so a malformed rule fails loudly in development.
- */
+// Make a frozen Decision. Throws on a missing type/title or an urgency/impact
+// outside the known bands — better to fail loud than ship a bad verdict.
 export function createDecision({
   type,
   title,

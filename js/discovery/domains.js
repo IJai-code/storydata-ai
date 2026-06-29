@@ -1,17 +1,9 @@
-// Domain descriptors — the ONLY place domain-specific vocabulary lives.
-//
-// The engine and detectors stay domain-agnostic: they operate on semantic roles
-// (metric, category, status, quantity, price, name, identifier, temporal) and a
-// status classifier. A domain supplies the name-hints that map columns to roles,
-// the status vocabulary, and a metric-priority ordering. Retail is simply the
-// first supported domain; add another by appending to DOMAINS — no engine change.
-//
-// @typedef {Object} Domain
-// @property {string} id
-// @property {string} label
-// @property {Object<string, RegExp[]>} hints        role -> column-name patterns
-// @property {?{critical:RegExp[],warn:RegExp[],ok:RegExp[]}} statusVocab
-// @property {RegExp[]} metricPriority                ordered preference for the primary metric
+// All the domain-specific vocabulary lives here and only here. The engine and
+// detectors never hardcode "revenue" or "out of stock" — they work off semantic
+// roles (metric, category, status, quantity, price, name, identifier, temporal)
+// plus a status classifier. A domain just provides the name-hints that map
+// columns to those roles, a status vocabulary, and the order it prefers metrics
+// in. Retail happens to be first; another domain is one more entry in DOMAINS.
 
 const GENERIC = {
   id: 'generic',

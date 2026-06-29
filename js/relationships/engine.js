@@ -1,21 +1,10 @@
-// Relationship Engine orchestrator.
-//
-// runRelationships(discoveryReport) reads ONLY the report's discoveries (never
-// the raw dataset, never the profile's rows) and runs every registered rule to
-// surface higher-order relationships. Deterministic and read-only: the input
-// report is never mutated. Future Narrative / Recommendation engines consume the
-// returned relationships without importing or modifying this module.
+// runRelationships(discoveryReport): walk the discoveries the report already
+// produced and let the rules connect the dots. Read-only — it never opens the
+// raw dataset and never mutates the report it was handed.
 
 import { getRelationshipRules } from './registry.js';
 
 export const RELATIONSHIP_ENGINE_VERSION = '1.0.0';
-
-/**
- * @typedef {Object} RelationshipReport
- * @property {import('./relationship.js').Relationship[]} relationships  ranked desc by importance
- * @property {{discoveryCount:number, domain:Object, discoveryVersion:?string}} source
- * @property {{rules:string[], version:string}} meta
- */
 
 const emptyReport = () => ({
   relationships: [],
@@ -23,7 +12,6 @@ const emptyReport = () => ({
   meta: { rules: [], version: RELATIONSHIP_ENGINE_VERSION },
 });
 
-/** @returns {RelationshipReport} */
 export function runRelationships(discoveryReport) {
   if (!discoveryReport || !Array.isArray(discoveryReport.discoveries)) {
     return emptyReport();
@@ -31,7 +19,7 @@ export function runRelationships(discoveryReport) {
 
   const discoveries = discoveryReport.discoveries;
 
-  // Read-only query helpers over the discovery list — the only thing rules see.
+  // The only window a rule gets onto the data: a few lookups over the discoveries.
   const byType = (type) => discoveries.filter((d) => d.type === type);
   const byKeyPrefix = (prefix) => discoveries.filter((d) => String(d.metadata?.key || '').startsWith(prefix));
   const find = (predicate) => discoveries.find(predicate);
@@ -44,13 +32,13 @@ export function runRelationships(discoveryReport) {
       const found = rule.detect(ctx) || [];
       for (const rel of found) if (rel) relationships.push(rel);
     } catch (err) {
-      // One faulty rule must never break the whole report.
+      // same deal as discovery — a thrown rule shouldnt take the others with it
       // eslint-disable-next-line no-console
       console.warn(`[relationships] rule "${rule.name}" failed:`, err);
     }
   }
 
-  // Deterministic ranking: importance, then confidence, then stable id.
+  // same ordering as discoveries: importance, then confidence, then id
   relationships.sort(
     (a, b) =>
       b.importance - a.importance ||

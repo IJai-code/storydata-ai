@@ -1,6 +1,5 @@
-// Rule: concentration — value leans on a few records/groups.
-// Verdict: high impact (a lot rides on a little); medium urgency, rising to high
-// when concentration is severe. Actionable without investigation.
+// Value riding on a few records/groups. High impact (a lot leans on a little);
+// medium urgency, bumped to high when it's really lopsided. Act without digging.
 import { registerDecisionRule } from '../registry.js';
 import { createDecision, URGENCY, IMPACT } from '../decision.js';
 import { assess } from '../assess.js';

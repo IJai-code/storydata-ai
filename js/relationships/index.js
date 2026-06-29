@@ -1,10 +1,6 @@
-// Ellery Relationship Engine — public entry point.
-//
-// Importing this module registers the built-in relationship rules (side-effect
-// imports below) and exposes the engine API. To add a rule in future: drop a
-// file in ./detectors that calls registerRelationship(), then add a single
-// import line here. No other file changes — the engine, existing rules, and the
-// entire Discovery Engine stay untouched.
+// Public surface. Importing it registers the built-in rules (they pull
+// themselves in below) and re-exports the engine. New rule = new file in
+// ./detectors + one import line here; nothing else moves.
 
 import './detectors/concentration.js';
 import './detectors/inventory-exposure.js';

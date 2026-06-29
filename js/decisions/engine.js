@@ -1,22 +1,12 @@
-// Decision Engine orchestrator.
-//
-// runDecisions(discoveryReport, relationshipReport) reads ONLY those two
-// immutable reports (never the raw dataset) and runs every registered rule to
-// produce triage verdicts. Deterministic and read-only: neither input report is
-// mutated. This is the authoritative input future Recommendation / Narrative
-// engines consume — they read decisions without importing or modifying this.
+// runDecisions(discoveryReport, relationshipReport): take both reports, run the
+// rules, hand back triage verdicts. It only ever reads those two reports (no raw
+// dataset) and doesn't touch either one. Whatever recommends or narrates later
+// reads these decisions — this is the call they trust.
 
 import { getDecisionRules } from './registry.js';
 import { urgencyRank, impactRank } from './decision.js';
 
 export const DECISION_ENGINE_VERSION = '1.0.0';
-
-/**
- * @typedef {Object} DecisionReport
- * @property {import('./decision.js').Decision[]} decisions  ranked desc by urgency, then impact
- * @property {Object} source
- * @property {{rules:string[], version:string}} meta
- */
 
 const emptyReport = () => ({
   decisions: [],
@@ -30,7 +20,6 @@ const emptyReport = () => ({
   meta: { rules: [], version: DECISION_ENGINE_VERSION },
 });
 
-/** @returns {DecisionReport} */
 export function runDecisions(discoveryReport, relationshipReport) {
   const discoveries = Array.isArray(discoveryReport?.discoveries) ? discoveryReport.discoveries : [];
   const relationships = Array.isArray(relationshipReport?.relationships) ? relationshipReport.relationships : [];
@@ -51,13 +40,13 @@ export function runDecisions(discoveryReport, relationshipReport) {
       const found = rule.decide(ctx) || [];
       for (const d of found) if (d) decisions.push(d);
     } catch (err) {
-      // One faulty rule must never break the whole report.
+      // isolate each rule so one bad apple doesnt spoil the whole report
       // eslint-disable-next-line no-console
       console.warn(`[decisions] rule "${rule.name}" failed:`, err);
     }
   }
 
-  // Deterministic ranking: urgency, then impact, then confidence, then stable id.
+  // order: urgency first, then impact, then confidence, id to break ties
   decisions.sort(
     (a, b) =>
       urgencyRank(b.urgency) - urgencyRank(a.urgency) ||

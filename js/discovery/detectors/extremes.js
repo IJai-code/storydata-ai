@@ -1,4 +1,4 @@
-// Detector: extremes — the records that lead and trail on the primary metric.
+// Who's on top and who's at the bottom of the primary metric.
 import { registerDetector } from '../registry.js';
 import { createDiscovery, IMPORTANCE, TONE, formatNumber } from '../discovery.js';
 

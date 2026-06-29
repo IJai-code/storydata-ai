@@ -1,8 +1,7 @@
-// Rule: pricing-opportunity — strong margin paired with weak sales suggests room
-// to adjust price or promotion. This consumes a margin-flavoured discovery and a
-// low sales/units discovery if the Discovery Engine surfaces them. The current
-// Discovery Engine doesn't emit a dedicated margin/sales pair, so this rule
-// gracefully no-ops today — it's the modular slot, ready for when it does.
+// Good margin but soft sales = room to move on price or promo. It needs a
+// margin-ish discovery and a low-sales one to work with. The discovery layer
+// doesn't surface that pair yet, so for now this just stays quiet — the slot's
+// here for when it does.
 import { registerRelationship } from '../registry.js';
 import { createRelationship, TONE, formatNumber } from '../relationship.js';
 

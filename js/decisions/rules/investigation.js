@@ -1,6 +1,5 @@
-// Rule: needs-investigation — a weak/fragile signal flagged by the Relationship
-// Engine. Verdict: low urgency, low impact, investigation required, and low
-// actionability — look before acting.
+// A shaky signal the relationship layer already flagged. Low urgency, low impact,
+// needs a look, low actionability — basically: check it before trusting it.
 import { registerDecisionRule } from '../registry.js';
 import { createDecision, URGENCY, IMPACT } from '../decision.js';
 import { assess } from '../assess.js';

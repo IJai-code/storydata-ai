@@ -1,6 +1,5 @@
-// Rule: pricing-opportunity — an upside signal rather than a risk.
-// Verdict: low urgency (nothing is on fire), medium impact, actionable without
-// investigation. No-ops until the Relationship Engine surfaces the signal.
+// Upside rather than risk. Nothing's on fire, so low urgency; medium impact;
+// act without investigation. Stays quiet until the relationship layer feeds it.
 import { registerDecisionRule } from '../registry.js';
 import { createDecision, URGENCY, IMPACT } from '../decision.js';
 import { assess } from '../assess.js';

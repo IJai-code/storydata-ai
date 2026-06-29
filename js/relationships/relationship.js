@@ -1,24 +1,13 @@
-// Ellery Relationship Engine — the standardized Relationship object.
+// A Relationship ties two or more discoveries together into one bigger signal —
+// "revenue is concentrated", say. Like a Discovery it's just frozen data: no
+// DOM, no UI, and it never touches the raw dataset. It points at discoveries by
+// id and keeps the numbers it pulled from them. Same shape language as Discovery
+// on purpose, so the engines downstream only have to learn one.
 //
-// A Relationship is a higher-order finding: it connects two or more existing
-// discoveries into a single meaningful signal (e.g. "revenue is concentrated").
-// It is pure data — no DOM, no rendering, no UI. It never re-reads the raw
-// dataset; it only references discoveries by id and carries structured evidence
-// derived from their outputs. This mirrors the Discovery object on purpose, so
-// future Narrative / Recommendation engines consume one consistent shape.
-//
-// @typedef {Object} Relationship
-// @property {string}   id          Stable identifier (type + key).
-// @property {string}   type        Relationship family, e.g. 'concentration' | 'inventory-risk'.
-// @property {string}   title       Short human label.
-// @property {string}   summary     One-line plain-language statement.
-// @property {number}   confidence  0..1 deterministic certainty.
-// @property {number}   importance  0..1 ranking weight.
-// @property {string[]} supporting  Ids of the discoveries this was built from.
-// @property {Object}   evidence    Structured supporting data (values pulled from discoveries).
-// @property {Object}   metadata    { detector, tone, tags, ... } — hints, never required by the core.
+// Fields: id, type, title, summary, confidence, importance, supporting (the
+// discovery ids it was built from), evidence, metadata.
 
-// Importance bands (kept parallel to the Discovery Engine for comparable scoring).
+// Same bands as the Discovery Engine so the two scores line up.
 export const IMPORTANCE = Object.freeze({
   CRITICAL: 0.95,
   HIGH: 0.75,
@@ -36,10 +25,7 @@ export const TONE = Object.freeze({
 
 const clamp01 = (n) => (Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 0);
 
-/**
- * Build a validated, immutable Relationship. Throws on missing essentials so a
- * malformed rule fails loudly in development.
- */
+// Make a frozen Relationship; blows up early if a rule skipped type or title.
 export function createRelationship({
   type,
   title,
@@ -65,7 +51,7 @@ export function createRelationship({
   });
 }
 
-/** Deterministic, locale-stable number formatting for summaries. */
+// Same little number formatter the discovery side uses, kept local on purpose.
 export function formatNumber(v) {
   if (typeof v !== 'number' || !Number.isFinite(v)) return String(v ?? '—');
   const rounded = Math.abs(v) >= 100 ? Math.round(v) : Math.round(v * 100) / 100;

@@ -1,10 +1,6 @@
-// Ellery Discovery Engine — public entry point.
-//
-// Importing this module registers the built-in detectors (side-effect imports
-// below) and exposes the engine API. To add a detector in future: drop a file
-// in ./detectors that calls registerDetector(), then add a single import line
-// here. No other file changes — the engine, profiler, and existing detectors
-// stay untouched.
+// Public surface for the discovery engine. Importing this pulls in the built-in
+// detectors (they register themselves) and re-exports everything callers need.
+// Adding a detector later = drop a file in ./detectors and add one import below.
 
 import './detectors/extremes.js';
 import './detectors/central-tendency.js';

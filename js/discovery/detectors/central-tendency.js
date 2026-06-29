@@ -1,4 +1,4 @@
-// Detector: central tendency — the typical value of the key numeric columns.
+// The "typical" value — mean and median — for the main numeric columns.
 import { registerDetector } from '../registry.js';
 import { createDiscovery, IMPORTANCE, TONE, formatNumber } from '../discovery.js';
 

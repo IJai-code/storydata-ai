@@ -1,10 +1,6 @@
-// Ellery Decision Engine — public entry point.
-//
-// Importing this module registers the built-in decision rules (side-effect
-// imports below) and exposes the engine API. To add a rule in future: drop a
-// file in ./rules that calls registerDecisionRule(), then add a single import
-// line here. No other file changes — the engine, existing rules, and the
-// Discovery / Relationship Engines stay untouched.
+// Public surface. Importing it registers the built-in rules (the imports below
+// do that) and re-exports the engine. Another rule = another file under ./rules
+// plus one import line; the engines upstream don't care.
 
 import './rules/inventory-risk.js';
 import './rules/concentration.js';

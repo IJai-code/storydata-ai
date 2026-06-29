@@ -1,5 +1,5 @@
-// Detector: outliers — the single record that sits furthest from the mean on
-// the primary metric (|z| > 2). Confidence scales with how extreme it is.
+// The one record that sits furthest from the mean on the primary metric, if it's
+// past 2 sigma. The further out it is, the more confident we are about it.
 import { registerDetector } from '../registry.js';
 import { createDiscovery, IMPORTANCE, TONE, formatNumber } from '../discovery.js';
 

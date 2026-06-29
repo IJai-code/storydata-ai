@@ -1,22 +1,10 @@
-// Ellery Discovery Engine — the standardized Discovery object.
-//
-// A Discovery is a single, self-describing observation about a dataset. It is
-// pure data: it knows nothing about CSS, layouts, or components. Presentation
-// layers (and future Narrative / Recommendation engines) consume these objects;
-// they never reach back into the engine.
-//
-// @typedef {Object} Discovery
-// @property {string} id          Stable identifier (type + key) for dedupe/reference.
-// @property {string} type        Detector family, e.g. 'extreme' | 'outlier' | 'availability'.
-// @property {string} title       Short human label, e.g. 'Highest revenue'.
-// @property {string} summary     One-line plain-language statement.
-// @property {number} confidence  0..1 deterministic certainty.
-// @property {number} importance  0..1 ranking weight (engine sorts on this).
-// @property {Object} evidence    Structured supporting data (raw values, row indices, column keys).
-// @property {Object} metadata    { detector, columns, tone, tags, ... } — hints, never required by the core.
+// A Discovery is one observation about a dataset — plain, frozen data and
+// nothing else. Fields: id, type, title, summary, confidence, importance,
+// evidence, metadata. Whatever renders or narrates it later reads these; this
+// file has no idea any of that exists.
 
-// Suggested importance bands. Detectors may compute anything in [0,1]; these
-// keep scoring legible and comparable across detectors.
+// Importance bands. Detectors can use any value in [0,1]; these just keep the
+// numbers comparable between them.
 export const IMPORTANCE = Object.freeze({
   CRITICAL: 0.95,
   HIGH: 0.75,
@@ -25,7 +13,7 @@ export const IMPORTANCE = Object.freeze({
   MINOR: 0.15,
 });
 
-// Semantic severity, orthogonal to importance. Presentation maps these to color.
+// Severity — separate axis from importance. The UI turns it into colour.
 export const TONE = Object.freeze({
   CRITICAL: 'critical',
   WARN: 'warn',
@@ -35,10 +23,8 @@ export const TONE = Object.freeze({
 
 const clamp01 = (n) => (Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 0);
 
-/**
- * Build a validated, immutable Discovery. Throws on missing essentials so
- * malformed detectors fail loudly in development rather than silently.
- */
+// Build a frozen Discovery. We throw early (rather than coerce) if a detector
+// forgott type or title — a malformed finding downstream is way harder to trace.
 export function createDiscovery({
   type,
   title,
@@ -62,10 +48,8 @@ export function createDiscovery({
   });
 }
 
-/**
- * Deterministic, locale-stable number formatting for summaries. Kept inside the
- * engine so analysis never depends on the rendering layer's formatters.
- */
+// Our own number formatter for summaries — deterministic, and deliberately not
+// borrowed from the render layer.
 export function formatNumber(v) {
   if (typeof v !== 'number' || !Number.isFinite(v)) return String(v ?? '—');
   const rounded = Math.abs(v) >= 100 ? Math.round(v) : Math.round(v * 100) / 100;

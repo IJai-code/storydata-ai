@@ -1,9 +1,9 @@
-// Dataset profiling — the deterministic substrate every detector reads.
-//
-// Profiling computes per-column statistics and assigns each column a SEMANTIC
-// ROLE using the resolved domain's hints (falling back to type-based defaults).
-// This is the boundary that keeps detectors generic: they ask the profile for
-// "the metric" or "the status column", never for "the Revenue column".
+// The profile is what every detector actually reads. We crunch the per-column
+// stats once here (so each detector doesnt recompute them) and tag every column
+// with a role — metric, category, status, … — from the domain's hints, falling
+// back to the column type when there's no hint. That tag is the whole trick:
+// detectors say "the metric" instead of hardcoding "the Revenue column", which
+// is what keeps them domain-agnostic.
 
 import { resolveDomain } from './domains.js';
 
@@ -54,17 +54,8 @@ function hintRole(col, domain) {
   return null;
 }
 
-/**
- * Build a deterministic profile of the dataset.
- * @returns {{
- *   domain: {id:string,label:string},
- *   rowCount: number, columnCount: number,
- *   columns: Array<{key,label,type,role,stats}>,
- *   roles: Object<string, ?Object>,
- *   classifyStatus: (value:any)=>('critical'|'warn'|'ok'|null),
- *   statsByKey: Object<string, Object>
- * }}
- */
+// Returns { domain, rowCount, columnCount, columns, roles, classifyStatus,
+// statsByKey } — all derived once, deterministically, from the dataset.
 export function profileDataset(dataset) {
   const cols = dataset.columns;
   const rows = dataset.rows;

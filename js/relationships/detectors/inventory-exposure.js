@@ -1,7 +1,7 @@
-// Rule: inventory-risk — availability problems coincide with where the value
-// sits. Built from an availability "out of stock" (or quantity-depleted)
-// discovery plus the leading metric discovery (top category by metric, else the
-// single highest record). Surfaces "revenue is exposed to stockouts".
+// Stockouts landing right where the money is. Pairs an "out of stock" (or
+// quantity-depleted) discovery with whatever leads the metric — the top category,
+// or failing that the single biggest record. In short: revenue exposed to
+// stockouts.
 import { registerRelationship } from '../registry.js';
 import { createRelationship, TONE } from '../relationship.js';
 

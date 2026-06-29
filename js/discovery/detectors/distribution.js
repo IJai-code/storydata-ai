@@ -1,5 +1,5 @@
-// Detector: distribution — how records spread across the primary category, and
-// which group dominates the metric.
+// How records fan out across the main category — biggest group, how many
+// groups, and which group pulls the most weight on the metric.
 import { registerDetector } from '../registry.js';
 import { createDiscovery, IMPORTANCE, TONE, formatNumber } from '../discovery.js';
 

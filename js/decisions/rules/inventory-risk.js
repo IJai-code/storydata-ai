@@ -1,6 +1,5 @@
-// Rule: inventory-risk — supply exposure on the value leader.
-// Verdict: high impact (revenue at stake); urgency scales with how much is
-// unavailable; directly actionable, no investigation needed.
+// Supply exposure on whatever leads the metric. High impact — revenue's on the
+// line. Urgency rises with how much is unavailable. Act now, no digging needed.
 import { registerDecisionRule } from '../registry.js';
 import { createDecision, URGENCY, IMPACT } from '../decision.js';
 import { assess } from '../assess.js';

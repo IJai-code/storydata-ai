@@ -1,6 +1,5 @@
-// Rule: clustered-anomaly — several anomaly signals at once.
-// Verdict: medium urgency, medium impact, and investigation IS required (the
-// cluster points at an underlying cause that must be found before acting).
+// A cluster of anomalies. Call it medium/medium, and flag it for investigation —
+// there's a root cause to find before anyone acts on it.
 import { registerDecisionRule } from '../registry.js';
 import { createDecision, URGENCY, IMPACT } from '../decision.js';
 import { assess } from '../assess.js';

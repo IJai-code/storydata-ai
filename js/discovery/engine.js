@@ -1,22 +1,11 @@
-// Discovery Engine orchestrator.
-//
-// runDiscovery(dataset) profiles the data, runs every registered detector, and
-// returns a deterministic, ranked DiscoveryReport. It knows nothing about how
-// the report is displayed. Future Narrative / Recommendation engines consume the
-// returned discoveries + profile without importing or modifying this module.
+// runDiscovery(dataset): profile the data, let every detector look at it, and
+// hand back a ranked report. Nothing in here cares how the report is shown —
+// downstream layers just read what comes out.
 
 import { profileDataset } from './profile.js';
 import { getDetectors } from './registry.js';
 
 export const DISCOVERY_ENGINE_VERSION = '1.0.0';
-
-/**
- * @typedef {Object} DiscoveryReport
- * @property {import('./discovery.js').Discovery[]} discoveries  ranked desc by importance
- * @property {?Object} profile
- * @property {{id:string,label:string}} domain
- * @property {{rowCount:number,columnCount:number,detectors:string[],version:string}} meta
- */
 
 const emptyReport = () => ({
   discoveries: [],
@@ -25,7 +14,6 @@ const emptyReport = () => ({
   meta: { rowCount: 0, columnCount: 0, detectors: [], version: DISCOVERY_ENGINE_VERSION },
 });
 
-/** @returns {DiscoveryReport} */
 export function runDiscovery(dataset) {
   if (!dataset || !Array.isArray(dataset.columns) || !Array.isArray(dataset.rows) || !dataset.rows.length) {
     return emptyReport();
@@ -41,13 +29,14 @@ export function runDiscovery(dataset) {
       const found = detector.detect(ctx) || [];
       for (const d of found) if (d) discoveries.push(d);
     } catch (err) {
-      // One faulty detector must never break the whole report.
+      // isolate each detector — one blowing up shouldnt cost us every other
+      // signal too. we'd rather drop one finding than the whole report.
       // eslint-disable-next-line no-console
       console.warn(`[discovery] detector "${detector.name}" failed:`, err);
     }
   }
 
-  // Deterministic ranking: importance, then confidence, then stable id.
+  // rank by importance, then confidence, with id as a stable tiebreaker
   discoveries.sort(
     (a, b) =>
       b.importance - a.importance ||

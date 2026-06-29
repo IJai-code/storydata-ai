@@ -1,7 +1,6 @@
-// Detector: availability — supply risk read from a status column (preferred) or
-// a quantity column. Domain-agnostic: the status vocabulary comes from the
-// resolved domain via profile.classifyStatus; on a generic domain this detector
-// quietly falls back to quantity, or emits nothing.
+// Supply risk. Prefers a status column; falls back to a quantity column if
+// there's no status. The status wording isn't ours — it comes from the domain
+// via profile.classifyStatus, so on a plain dataset this just stays quiet.
 import { registerDetector } from '../registry.js';
 import { createDiscovery, IMPORTANCE, TONE, formatNumber } from '../discovery.js';
 

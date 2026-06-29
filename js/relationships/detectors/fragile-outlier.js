@@ -1,6 +1,5 @@
-// Rule: needs-investigation — an outlier discovery whose own confidence is weak.
-// A strong-looking anomaly with low confidence should prompt investigation, not
-// an automatic recommendation. Consumes outlier discoveries only.
+// An outlier the discovery layer wasn't very sure about. A shaky anomaly is a
+// "go look at this," not something to act on automatically. Only reads outliers.
 import { registerRelationship } from '../registry.js';
 import { createRelationship, TONE } from '../relationship.js';
 

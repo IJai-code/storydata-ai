@@ -1,8 +1,6 @@
-// Detector registry — the extension point.
-//
-// A detector is { name: string, detect(ctx) -> Discovery[] }, where
-// ctx = { dataset, profile }. Detectors self-register on import; adding a new
-// one never requires editing existing detectors or the engine.
+// Where detectors sign up. Each one is { name, detect(ctx) } and registers
+// itself on import, so adding a detector means adding a file — nothing here
+// has to change.
 
 const detectors = [];
 
@@ -10,12 +8,12 @@ export function registerDetector(detector) {
   if (!detector || typeof detector.detect !== 'function' || !detector.name) {
     throw new Error('registerDetector expects { name, detect(ctx) }');
   }
-  if (detectors.some((d) => d.name === detector.name)) return; // idempotent under repeated imports
+  if (detectors.some((d) => d.name === detector.name)) return; // already in — imports can run twice
   detectors.push(detector);
 }
 
-// Returned in a stable (name-sorted) order so a run is deterministic regardless
-// of import order; the engine still sorts results by importance.
+// Sorted by name so the run order is the same no matter how the imports land.
+// (Final discovery order is by importance anyway.)
 export function getDetectors() {
   return [...detectors].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 }

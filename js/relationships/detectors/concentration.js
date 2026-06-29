@@ -1,12 +1,15 @@
-// Rule: concentration — value (revenue/metric) leans heavily on a few records
-// or a single group. Built from existing discoveries: the category share from
-// the distribution "top-by-metric" discovery, and the max-vs-mean ratio from
-// the extreme + central-tendency discoveries.
+// "Too many eggs in one basket" — most of the metric riding on one group or a
+// handful of records. Two ways to spot it: the top group's share (from the
+// distribution discovery) and how far the single biggest record sits above the
+// average (extreme vs central-tendency).
 import { registerRelationship } from '../registry.js';
 import { createRelationship, IMPORTANCE, TONE, formatNumber } from '../relationship.js';
 
-const CATEGORY_SHARE_MIN = 35; // % of the metric total held by the top group
-const TOP_HEAVY_RATIO = 2.5; // top record value ÷ mean
+// These two thresholds are judgement calls, not science. 35% felt like the point
+// where "one group carries this" stops being noise, and 2.5x mean is roughly
+// where a single record starts to skew the picture. Tune if real data disagrees.
+const CATEGORY_SHARE_MIN = 35; // top group's share of the metric total
+const TOP_HEAVY_RATIO = 2.5; // biggest record ÷ mean
 
 registerRelationship({
   name: 'concentration',

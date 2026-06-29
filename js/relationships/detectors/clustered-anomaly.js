@@ -1,7 +1,6 @@
-// Rule: clustered-anomaly — several anomaly signals at once (statistical
-// outliers + availability flags) suggest one underlying issue rather than
-// isolated noise. If two or more anomaly discoveries reference the same column,
-// that shared column is highlighted. Needs at least two anomalies; otherwise no-op.
+// When a bunch of anomalies show up together — outliers plus availability flags
+// — it usually means one root cause, not a pile of unrelated noise. If two or
+// more of them point at the same column, we call that out. Under two: skip.
 import { registerRelationship } from '../registry.js';
 import { createRelationship, TONE } from '../relationship.js';
 
