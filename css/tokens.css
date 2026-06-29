@@ -16,6 +16,9 @@
 
   /* Single accent */
   --accent: #ffffff;
+  /* Brand ember — the logo's orange. Used sparingly (caret, focus glow) so the
+     editorial monochrome still leads and the mark isn't a stranger to the app. */
+  --brand: #ff7a1e;
 
   /* Semantic (kept deliberately muted) */
   --danger: #c97a7a;
@@ -77,4 +80,44 @@ html, body {
 :focus-visible {
   outline: 1px solid rgba(255, 255, 255, 0.6);
   outline-offset: 2px;
+}
+
+/* No blue flash when you tap a control on mobile. */
+html { -webkit-tap-highlight-color: transparent; }
+
+/* Thin, quiet scrollbars so the chrome doesn't fight the content. */
+.panel,
+.stage,
+.modal,
+textarea {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+.panel::-webkit-scrollbar,
+.stage::-webkit-scrollbar,
+.modal::-webkit-scrollbar,
+textarea::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.panel::-webkit-scrollbar-thumb,
+.stage::-webkit-scrollbar-thumb,
+.modal::-webkit-scrollbar-thumb,
+textarea::-webkit-scrollbar-thumb {
+  background: var(--line);
+  background-clip: padding-box;
+  border: 3px solid transparent; /* inset the thumb so it reads as a slim pill */
+  border-radius: 999px;
+}
+.panel::-webkit-scrollbar-thumb:hover,
+.stage::-webkit-scrollbar-thumb:hover,
+.modal::-webkit-scrollbar-thumb:hover,
+textarea::-webkit-scrollbar-thumb:hover {
+  background: var(--text-3);
+}
+.panel::-webkit-scrollbar-track,
+.stage::-webkit-scrollbar-track,
+.modal::-webkit-scrollbar-track,
+textarea::-webkit-scrollbar-track {
+  background: transparent;
 }

@@ -16,6 +16,8 @@
 }
 .btn:hover { background: #202023; }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+/* A hair of give on press — makes the buttons feel physical, not painted-on. */
+.btn:active:not(:disabled) { transform: translateY(0.5px); }
 
 /* Primary action: pure white on black — the single accent. */
 .btn-primary {
@@ -133,6 +135,7 @@ body[data-tier="pro"] .pro-tag { display: none; }
   border: none;
   outline: none;
   color: var(--text-1);
+  caret-color: var(--brand); /* warm blink — the only ember in the console */
   font-family: var(--font-mono);
   font-size: var(--fs-sm);
   line-height: 1.6;
@@ -438,6 +441,7 @@ body[data-tier="pro"] .layout-card.locked { opacity: 1; }
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   color: var(--text-1);
+  caret-color: var(--brand);
   font-family: var(--font-mono);
   font-size: var(--fs-md);
   padding: 11px 13px;
