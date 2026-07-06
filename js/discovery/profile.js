@@ -13,10 +13,18 @@ function numericStats(values) {
   const v = values.filter(isNum).slice().sort((a, b) => a - b);
   const count = v.length;
   if (!count) return { count: 0, missing: values.length, distinct: 0 };
-  const sum = v.reduce((a, b) => a + b, 0);
+
+  // two passes: sum first, then squared deviations (variance needs the mean
+  // anyway, no point being clever about it)
+  let sum = 0;
+  for (let i = 0; i < count; i++) sum += v[i];
   const mean = sum / count;
-  const median = count % 2 ? v[(count - 1) / 2] : (v[count / 2 - 1] + v[count / 2]) / 2;
-  const variance = v.reduce((a, b) => a + (b - mean) ** 2, 0) / count;
+  let sq = 0;
+  for (let i = 0; i < count; i++) sq += (v[i] - mean) ** 2;
+  const variance = sq / count;
+
+  const mid = count >> 1;
+  const median = count % 2 ? v[mid] : (v[mid - 1] + v[mid]) / 2;
   return {
     count,
     missing: values.length - count,

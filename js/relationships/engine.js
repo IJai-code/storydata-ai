@@ -29,8 +29,7 @@ export function runRelationships(discoveryReport) {
   const relationships = [];
   for (const rule of rules) {
     try {
-      const found = rule.detect(ctx) || [];
-      for (const rel of found) if (rel) relationships.push(rel);
+      for (const rel of rule.detect(ctx) || []) if (rel) relationships.push(rel);
     } catch (err) {
       // same deal as discovery — a thrown rule shouldnt take the others with it
       // eslint-disable-next-line no-console

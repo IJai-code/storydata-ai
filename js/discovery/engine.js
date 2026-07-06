@@ -27,7 +27,7 @@ export function runDiscovery(dataset) {
   for (const detector of detectors) {
     try {
       const found = detector.detect(ctx) || [];
-      for (const d of found) if (d) discoveries.push(d);
+      discoveries.push(...found.filter(Boolean));
     } catch (err) {
       // isolate each detector — one blowing up shouldnt cost us every other
       // signal too. we'd rather drop one finding than the whole report.

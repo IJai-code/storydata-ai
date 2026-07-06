@@ -4,6 +4,10 @@
 import { registerDetector } from '../registry.js';
 import { createDiscovery, IMPORTANCE, TONE, formatNumber } from '../discovery.js';
 
+// grammar helpers so the summaries read right at 1 vs many
+const recordsAre = (k) => (k === 1 ? 'record is' : 'records are');
+const recordsHave = (k) => (k === 1 ? 'record has' : 'records have');
+
 registerDetector({
   name: 'availability',
   detect({ dataset, profile }) {
@@ -28,7 +32,7 @@ registerDetector({
           createDiscovery({
             type: 'availability',
             title: 'Out of stock',
-            summary: `${critical} of ${n} ${critical === 1 ? 'record is' : 'records are'} unavailable.`,
+            summary: `${critical} of ${n} ${recordsAre(critical)} unavailable.`,
             importance: IMPORTANCE.CRITICAL * (0.6 + 0.4 * (critical / n)),
             confidence: 1,
             evidence: { column: status.key, count: critical, total: n },
@@ -41,7 +45,7 @@ registerDetector({
           createDiscovery({
             type: 'availability',
             title: 'Low / limited',
-            summary: `${warn} ${warn === 1 ? 'record is' : 'records are'} running low or limited.`,
+            summary: `${warn} ${recordsAre(warn)} running low or limited.`,
             importance: IMPORTANCE.HIGH * (0.6 + 0.4 * (warn / n)),
             confidence: 1,
             evidence: { column: status.key, count: warn, total: n },
@@ -82,7 +86,7 @@ registerDetector({
           createDiscovery({
             type: 'availability',
             title: `${qty.label} depleted`,
-            summary: `${zeros} ${zeros === 1 ? 'record has' : 'records have'} zero ${ql}.`,
+            summary: `${zeros} ${recordsHave(zeros)} zero ${ql}.`,
             importance: IMPORTANCE.CRITICAL * (0.6 + 0.4 * (zeros / n)),
             confidence: 1,
             evidence: { column: qty.key, count: zeros, total: n },
@@ -95,7 +99,7 @@ registerDetector({
           createDiscovery({
             type: 'availability',
             title: 'Low-stock warning',
-            summary: `${low} ${low === 1 ? 'record is' : 'records are'} below ${threshold} ${ql}.`,
+            summary: `${low} ${recordsAre(low)} below ${threshold} ${ql}.`,
             importance: IMPORTANCE.HIGH,
             confidence: 1,
             evidence: { column: qty.key, count: low, threshold },

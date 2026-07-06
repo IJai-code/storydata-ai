@@ -20,6 +20,16 @@ const emptyReport = () => ({
   meta: { rules: [], version: DECISION_ENGINE_VERSION },
 });
 
+// Urgency runs the board; impact, confidence, and finally id settle the rest.
+function byVerdict(a, b) {
+  return (
+    urgencyRank(b.urgency) - urgencyRank(a.urgency) ||
+    impactRank(b.impact) - impactRank(a.impact) ||
+    b.confidence - a.confidence ||
+    (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
+  );
+}
+
 export function runDecisions(discoveryReport, relationshipReport) {
   const discoveries = Array.isArray(discoveryReport?.discoveries) ? discoveryReport.discoveries : [];
   const relationships = Array.isArray(relationshipReport?.relationships) ? relationshipReport.relationships : [];
@@ -46,14 +56,7 @@ export function runDecisions(discoveryReport, relationshipReport) {
     }
   }
 
-  // order: urgency first, then impact, then confidence, id to break ties
-  decisions.sort(
-    (a, b) =>
-      urgencyRank(b.urgency) - urgencyRank(a.urgency) ||
-      impactRank(b.impact) - impactRank(a.impact) ||
-      b.confidence - a.confidence ||
-      (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
-  );
+  decisions.sort(byVerdict);
 
   return {
     decisions,
