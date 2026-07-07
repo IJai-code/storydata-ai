@@ -83,22 +83,18 @@ async function render(state) {
   if (!state.dataset) {
     canvasEl.innerHTML = `
       <div class="empty-state">
-        <h1>Welcome to Ellery Studio.</h1>
-        <p class="empty-credit">Designed &amp; Engineered by Ishaan Jha.</p>
-        <p>Ellery transforms complex data objects into kinetic, physics-driven
-           intelligence layouts you can interrogate by hand.</p>
+        <h1>Start with your data.</h1>
+        <p>Ellery reads structured data, finds what matters, and renders it as an
+           interactive story you can present.</p>
         <div class="empty-steps">
-          <h2>How to start</h2>
+          <h2>How it works</h2>
           <ul>
-            <li>Paste or drop your file into the input console on the left.</li>
-            <li>Interact: tap a sort button to watch your rows re-order themselves, drag
-                one card onto another to compare them, or click a card to make it the
-                baseline everything else is measured against.</li>
-            <li>Export: click ‘Export Dynamic MP4’ to record a live re-ranking loop —
-                a free, ready-to-drop presentation slide asset.</li>
+            <li>Paste or drop a file in the panel on the left.</li>
+            <li>Sort, compare, and pin records on the board.</li>
+            <li>Export an MP4 or PNG for your deck.</li>
           </ul>
         </div>
-        <button class="btn btn-primary" data-action="load-demo">Try it with demo data →</button>
+        <button class="btn btn-primary" data-action="load-demo">Load sample data</button>
       </div>`;
     return;
   }

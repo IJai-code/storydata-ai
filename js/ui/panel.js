@@ -227,7 +227,7 @@ function readFile(file, rawInput) {
 async function runIngest(raw, { quiet = false } = {}) {
   if (ingesting) return;
   if (!raw || !raw.trim()) {
-    toast('Nothing to ingest — paste some data first.', 'warn');
+    toast('Load data first.', 'warn');
     return;
   }
 
@@ -246,9 +246,9 @@ async function runIngest(raw, { quiet = false } = {}) {
     const { dataset } = result;
     if (!quiet) {
       toast(
-        `${dataset.rows.length}${
+        `Dataset loaded — ${dataset.rows.length}${
           dataset.truncated ? ` of ${dataset.meta.totalRows}` : ''
-        } rows ingested · ${dataset.columns.length} columns detected.`
+        } rows, ${dataset.columns.length} columns.`
       );
       for (const w of (result.warnings || []).slice(0, 2)) toast(w, 'warn');
     }
@@ -412,7 +412,7 @@ function wireStory() {
 
 async function generateStory() {
   if (!getState().dataset) {
-    toast('Ingest some data first — there is nothing to brief on yet.', 'warn');
+    toast('Load data first.', 'warn');
     return;
   }
   // Story Mode lives on Kinetic Rank — route there if needed, then build.
@@ -428,12 +428,12 @@ async function generateStory() {
   const scenes = sys.autoStory();
   const cls = sys.classify();
   setState({ story: { scenes, type: { label: cls.label, reason: cls.reason } } });
-  toast(`${cls.label} detected — ${scenes.length}-scene briefing. Press Play or export an MP4.`);
+  toast(`Briefing assembled — ${scenes.length} scenes. ${cls.label}.`);
 }
 
 function setStoryPlayingUI(playing) {
   const btn = document.getElementById('storyPlayBtn');
-  if (btn) btn.textContent = playing ? '■ Stop' : '▶ Play briefing';
+  if (btn) btn.textContent = playing ? 'Stop' : 'Play briefing';
 }
 
 function renderStoryList() {
@@ -485,7 +485,7 @@ function wireSimulation() {
     const next = !getState().simulation;
     setState({ simulation: next });
     if (next && !simulationSupported(getState().layout)) {
-      toast('Live changes flow on the Insight Map, Mindmap, and Timeline — switch to one to watch.', 'warn');
+      toast('Simulation runs on the Insight Map, Mindmap, and Timeline layouts.', 'warn');
     }
   });
   syncSimToggle();
@@ -497,9 +497,9 @@ function syncSimToggle() {
   btn.classList.toggle('active', simulation);
   btn.querySelector('.sim-label').textContent = simulation
     ? simulationSupported(layout)
-      ? 'Live — data is moving'
-      : 'Armed — switch to Insight Map, Mindmap, or Timeline'
-    : 'Send live pulses through the story';
+      ? 'Simulation running'
+      : 'On — switch to Insight Map, Mindmap, or Timeline'
+    : 'Run simulation';
 }
 
 /* ---------- Save locally / share / export ---------- */
@@ -509,7 +509,7 @@ function wireSaveShareExport() {
 
   document.getElementById('shareBtn').addEventListener('click', async () => {
     if (!getState().dataset) {
-      toast('Ingest some data first — there is nothing to share yet.', 'warn');
+      toast('Load data first.', 'warn');
       return;
     }
     const btn = document.getElementById('shareBtn');
@@ -517,7 +517,7 @@ function wireSaveShareExport() {
     try {
       const result = await exportSharePreview();
       if (result.ok) {
-        toast('Share preview downloaded — post it anywhere.');
+        toast('Share file saved.');
       } else {
         toast(result.error || 'Share failed.', 'error');
       }
@@ -529,7 +529,7 @@ function wireSaveShareExport() {
   const mp4Btn = document.getElementById('mp4Btn');
   mp4Btn.addEventListener('click', async () => {
     if (!getState().dataset) {
-      toast('Ingest some data first — there is nothing to record yet.', 'warn');
+      toast('Load data first.', 'warn');
       return;
     }
     const story = getState().story?.scenes || null;
@@ -539,23 +539,15 @@ function wireSaveShareExport() {
     }
     mp4Btn.disabled = true;
     const original = mp4Btn.textContent;
-    mp4Btn.textContent = story
-      ? 'Recording your briefing…'
-      : getState().layout === 'kinetic'
-        ? 'Recording 3s of physics…'
-        : 'Rendering MP4…';
+    mp4Btn.textContent = story ? 'Recording briefing…' : 'Recording…';
     try {
       const result = await exportMP4(document.getElementById('canvas'), { story });
       if (result.ok) {
-        toast(
-          `${result.format.toUpperCase()} ${story ? 'briefing ' : ''}captured${
-            result.stamped ? ' — stamped with Ellery attribution.' : ' — clean, deck-ready.'
-          }`
-        );
+        toast(`${result.format.toUpperCase()} saved.`);
         // Safari/Firefox can't record H.264; WebM won't drop into Keynote or
         // PowerPoint directly, so flag it rather than letting the import fail.
         if (result.format === 'webm') {
-          toast('Heads up: this browser saved WebM — Google Slides accepts it, but Keynote/PowerPoint need an MP4 (try Chrome or convert it).', 'warn', 6500);
+          toast('Saved as WebM. Google Slides accepts it; PowerPoint and Keynote need MP4 (use Chrome).', 'warn', 6500);
         }
       } else {
         toast(result.error || 'Recording failed.', 'error');
@@ -574,7 +566,7 @@ function wireSaveShareExport() {
     }
     const { dataset, layout } = getState();
     if (!dataset) {
-      toast('Ingest some data first — there is nothing to export yet.', 'warn');
+      toast('Load data first.', 'warn');
       return;
     }
     linkBtn.disabled = true;
@@ -591,7 +583,7 @@ function wireSaveShareExport() {
       a.download = `ellery-${layout}-briefing.html`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-      toast('Interactive briefing exported — host or embed it anywhere.');
+      toast('Interactive file saved.');
     } finally {
       linkBtn.disabled = false;
     }
@@ -600,7 +592,7 @@ function wireSaveShareExport() {
   const pngBtn = document.getElementById('pngBtn');
   pngBtn.addEventListener('click', async () => {
     if (!getState().dataset) {
-      toast('Ingest some data first — there is nothing to export yet.', 'warn');
+      toast('Load data first.', 'warn');
       return;
     }
     pngBtn.disabled = true;
@@ -627,14 +619,14 @@ function wireSaveShareExport() {
       return;
     }
     if (!getState().dataset) {
-      toast('Ingest some data first — there is nothing to export yet.', 'warn');
+      toast('Load data first.', 'warn');
       return;
     }
     exportBtn.disabled = true;
     try {
       const result = await exportCleanCode();
       if (result.ok) {
-        toast('Clean code exported — embed it anywhere.');
+        toast('HTML saved.');
       } else if (result.status === 403) {
         openPaywall('export');
       } else {
@@ -679,7 +671,7 @@ function writeSaved(list) {
 function saveStory() {
   const { dataset, layout } = getState();
   if (!dataset) {
-    toast('Ingest some data first — there is nothing to save yet.', 'warn');
+    toast('Load data first.', 'warn');
     return;
   }
   const list = readSaved();
@@ -758,9 +750,13 @@ function syncLocks() {
   // A downgrade must not leave a Pro layout live on the canvas.
   if (!layoutAllowed(getState().layout)) setState({ layout: 'kinetic' });
   if (getState().simulation && !simulationAllowed()) setState({ simulation: false });
+  // The topbar tier badge was removed during the preview (everyone is Pro);
+  // guard so this keeps working if it ever returns.
   const badge = document.getElementById('tierBadge');
-  badge.textContent = pro ? 'PRO' : 'FREE';
-  badge.className = `tier-badge ${pro ? 'pro' : 'free'}`;
+  if (badge) {
+    badge.textContent = pro ? 'PRO' : 'FREE';
+    badge.className = `tier-badge ${pro ? 'pro' : 'free'}`;
+  }
   // The upgrade CTA is now a static "Included in Preview" status pill, so it
   // stays visible in every tier during the Early Access period.
   document.getElementById('upgradeBtn').style.display = '';

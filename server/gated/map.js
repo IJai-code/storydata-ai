@@ -265,7 +265,7 @@ function buildSummary(report) {
 
   aside.innerHTML = `
     <div class="im-summary-head">
-      <h3>Insight Summary</h3>
+      <h3>Findings</h3>
       <p class="im-summary-sub">${report.meta.rowCount} records · ${report.meta.columnCount} fields · ${escapeHTML(report.domain.label)}</p>
     </div>
     <div class="im-legend"><span>${sizeLegend}</span><span>${colorLegend}</span></div>

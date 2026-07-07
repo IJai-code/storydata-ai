@@ -7,10 +7,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 var(--sp-5);
-  background: rgba(11, 11, 12, 0.78);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-0);
+  border-bottom: 1px solid var(--line-soft);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -50,12 +48,10 @@
   height: calc(100vh - var(--topbar-h) - var(--banner-h, 0px));
 }
 
-/* ---- Left control panel: glassmorphic studio console ---- */
+/* ---- Left control panel ---- */
 .panel {
-  background: rgba(15, 15, 16, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-1);
+  border-right: 1px solid var(--line-soft);
   overflow-y: auto;
   padding: var(--sp-5) var(--sp-4);
   display: flex;
@@ -76,29 +72,12 @@
   line-height: var(--lh-tight);
 }
 
-.step-num {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1px solid var(--line);
-  color: var(--text-2);
-  font-size: 0.6rem;
-  font-family: var(--font-mono);
-}
-
 /* ---- Right canvas stage ---- */
 .stage {
   overflow-y: auto;
   scroll-behavior: smooth;
   scroll-padding-top: var(--sp-4);
-  /* Faint atmospheric light so the glass surfaces have depth to refract. */
-  background:
-    radial-gradient(900px 480px at 78% -8%, rgba(255, 255, 255, 0.045), transparent 65%),
-    radial-gradient(700px 420px at 8% 108%, rgba(255, 255, 255, 0.03), transparent 60%),
-    var(--bg-0);
+  background: var(--bg-0);
 }
 
 .canvas {

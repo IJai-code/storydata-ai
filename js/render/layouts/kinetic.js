@@ -22,19 +22,8 @@ export function render(container, dataset) {
   controls.className = 'kinetic-controls';
   wrap.appendChild(controls);
 
-  // Plain-English guide so the result of every gesture is understood.
-  const guide = document.createElement('div');
-  guide.className = 'kinetic-guide';
-  guide.innerHTML = `
-    <div><span>Sort</span>Press a pulse to reorder the cards by that field — the further a card
-    travels, the more its position changes between orderings.</div>
-    <div><span>Compare</span>Drag one card onto another to see the exact difference between
-    them, and how many times larger one is.</div>
-    <div><span>Baseline</span>Click a card to make it your baseline — every other card then
-    shows how far above (+) or below (−) it sits. Click it again to clear.</div>
-    <div><span>Read</span>Hover any card to see its full, untruncated details.</div>`;
-  wrap.appendChild(guide);
-
+  // The gesture guide lives in the hint line below the board; a second
+  // full-width explainer here said the same things twice.
   const canvas = document.createElement('canvas');
   canvas.className = 'kinetic-canvas';
   wrap.appendChild(canvas);

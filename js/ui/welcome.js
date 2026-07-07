@@ -141,58 +141,24 @@ function template() {
               </g>
             </svg>
           </span>
-          <span class="welcome-kicker">Welcome</span>
-          <h2 id="welcomeTitle">Welcome to Ellery</h2>
-          <p id="welcomeSub" class="welcome-sub">Transform complex datasets into evidence-backed stories.</p>
+          <h2 id="welcomeTitle">Ellery</h2>
+          <p id="welcomeSub" class="welcome-sub">From raw data to evidence-backed stories.</p>
         </div>
 
-        <p class="welcome-copy">Ellery helps you understand complex datasets through deterministic
-          discovery, interactive visualizations, and presentation-ready exports.</p>
-        <p class="welcome-copy">Unlike traditional AI tools that simply summarize spreadsheets, Ellery
-          first analyzes your data, discovers meaningful patterns, and then helps you communicate those
-          discoveries visually.</p>
+        <p class="welcome-copy">Ellery reads structured data, finds what matters, and turns it into
+          interactive, presentation-ready stories. Every finding is deterministic and traceable to
+          the rows that produced it.</p>
 
         <div class="welcome-featured">
-          <div class="welcome-featured-icon" aria-hidden="true">📦</div>
           <div class="welcome-featured-text">
-            <h3>Product Catalog</h3>
-            <p>A realistic retail inventory dataset demonstrating automatic profiling, Insight Map,
-              Kinetic Rank, Timeline, Mind Map, Data Cards, PNG export, and MP4 export.</p>
+            <h3>Product catalog</h3>
+            <p>A sample retail inventory — 24 products across six categories. The fastest way
+              to see Ellery work.</p>
           </div>
-          <button id="welcomeTryCatalog" class="btn btn-primary welcome-cta" type="button">Try Product Catalog</button>
+          <button id="welcomeTryCatalog" class="btn btn-primary welcome-cta" type="button">Load sample</button>
         </div>
 
-        <ul class="welcome-soon" aria-label="Coming soon datasets">
-          <li class="welcome-card">
-            <span class="welcome-card-icon" aria-hidden="true">🚀</span>
-            <span class="welcome-card-name">NASA Telemetry</span>
-            <span class="welcome-card-desc">Explore spacecraft telemetry, mission events, and engineering discoveries.</span>
-            <span class="welcome-badge">Coming Soon</span>
-          </li>
-          <li class="welcome-card">
-            <span class="welcome-card-icon" aria-hidden="true">🏥</span>
-            <span class="welcome-card-name">Healthcare Operations</span>
-            <span class="welcome-card-desc">Operational analytics and patient-flow storytelling.</span>
-            <span class="welcome-badge">Coming Soon</span>
-          </li>
-          <li class="welcome-card">
-            <span class="welcome-card-icon" aria-hidden="true">🌍</span>
-            <span class="welcome-card-name">Climate &amp; Earth Science</span>
-            <span class="welcome-card-desc">Environmental monitoring and scientific exploration.</span>
-            <span class="welcome-badge">Coming Soon</span>
-          </li>
-        </ul>
-
-        <div class="welcome-foot">
-          <span class="welcome-foot-label">Current release includes</span>
-          <ul class="welcome-check">
-            <li>Discovery Engine</li>
-            <li>Interactive Insight Map</li>
-            <li>Five visualization modes</li>
-            <li>Universal PNG export</li>
-            <li>Universal MP4 export</li>
-          </ul>
-        </div>
+        <p class="welcome-credit">Designed and engineered by Ishaan Jha.</p>
       </div>
     </div>`;
 }

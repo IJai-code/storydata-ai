@@ -131,13 +131,13 @@ function renderGate(mode) {
         </span>
         Ellery<em>AI</em>
       </div>
-      <h1>One-Click Visual Intelligence</h1>
-      <p class="gate-sub">Raw data in. A quiet, interactive data story out.</p>
+      <h1>Understand your data.</h1>
+      <p class="gate-sub">Deterministic analysis, interactive layouts, presentation-ready exports.</p>
 
       <ol class="gate-steps" aria-label="How Ellery works">
-        <li><span>01</span>Drop raw CSV, JSON, or meeting notes — Ellery cleans and maps it</li>
-        <li><span>02</span>Pick a story layout: timeline, card grid, or branching mindmap</li>
-        <li><span>03</span>Share a preview, or export clean HTML &amp; slide-ready files</li>
+        <li><span>01</span>Load a CSV, JSON, or text file</li>
+        <li><span>02</span>Review the findings and pick a layout</li>
+        <li><span>03</span>Export a slide, MP4, or interactive file</li>
       </ol>
 
       <form id="gateForm" novalidate>
@@ -157,15 +157,14 @@ function renderGate(mode) {
         </div>
         <div class="checkout-error" id="gateError"></div>
         <button type="submit" class="btn btn-primary btn-wide" id="gateSubmit">
-          ${signup ? 'Create free account' : 'Log in'}
+          ${signup ? 'Create account' : 'Log in'}
         </button>
         <p class="checkout-note">Preview build — accounts are simulated in this browser only.
         Your details stay on this device and are never sent to a server.</p>
       </form>
       <button class="auth-switch" id="gateSwitch">
-        ${signup ? 'Already have an account? Log in' : 'New to Ellery? Create a free account'}
+        ${signup ? 'Already have an account? Log in' : 'New to Ellery? Create an account'}
       </button>
-      <footer class="panel-credit gate-credit">Ellery Studio — Designed &amp; Engineered by Ishaan Jha</footer>
     </div>`;
 
   gateEl.querySelector('#gateSwitch').addEventListener('click', () =>

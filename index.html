@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ellery AI — Turn raw data into data stories</title>
+  <title>Ellery — evidence-backed data stories</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/animations.css">
-  <link rel="stylesheet" href="css/depth.css">
 </head>
 <body>
   <header class="topbar">
@@ -34,17 +33,15 @@
     </div>
     <div class="topbar-right">
       <button id="welcomeHelp" class="auth-link" type="button">About</button>
-      <button id="embedHelp" class="auth-link">How to Embed in Slides</button>
-      <span id="tierBadge" class="tier-badge free">FREE</span>
+      <button id="embedHelp" class="auth-link">Embed in slides</button>
       <div id="authArea" class="auth-area"></div>
-      <button id="upgradeBtn" class="btn btn-ghost preview-pill" type="button">Included in Preview</button>
+      <button id="upgradeBtn" class="btn btn-ghost preview-pill" type="button">Preview</button>
     </div>
   </header>
 
   <div id="previewBanner" class="preview-banner" role="status">
-    <span class="preview-banner-text">🎉 <strong>Early Access Preview:</strong> All Pro features are
-      currently unlocked for everyone while Ellery is in active development. Paid subscriptions will
-      launch later.</span>
+    <span class="preview-banner-text">Early access preview — all features are currently
+      unlocked while Ellery is in development.</span>
     <button id="previewBannerClose" class="preview-banner-close" type="button"
       aria-label="Dismiss announcement">✕</button>
   </div>
@@ -54,19 +51,19 @@
   <div class="app">
     <aside class="panel" id="panel">
       <section class="panel-section">
-        <h2><span class="step-num">1</span> Drop your data</h2>
+        <h2>Data</h2>
         <div id="dropzone" class="dropzone">
           <textarea id="rawInput" spellcheck="false"
-            placeholder="Paste CSV, JSON, or raw notes here — or drop a file on me."></textarea>
+            placeholder="Paste CSV, JSON, or text — or drop a file."></textarea>
           <div class="dropzone-hint">CSV · TSV · JSON · plain text</div>
         </div>
         <div class="row-actions">
-          <button id="visualizeBtn" class="btn btn-primary">Visualize →</button>
+          <button id="visualizeBtn" class="btn btn-primary">Visualize</button>
           <button id="fileBtn" class="btn btn-ghost">File…</button>
           <input type="file" id="fileInput" accept=".csv,.tsv,.json,.txt" hidden>
         </div>
         <div class="example-row">
-          <span class="example-label">Examples</span>
+          <span class="example-label">Samples</span>
           <button class="example-link" data-demo="catalog">Product catalog</button>
           <button class="example-link" data-demo="startup">Startup metrics</button>
           <button class="example-link" data-demo="mission">Mission operations</button>
@@ -76,51 +73,41 @@
       </section>
 
       <section class="panel-section">
-        <h2><span class="step-num">2</span> Pick a story layout</h2>
+        <h2>Layout</h2>
         <div class="layout-grid" id="layoutGrid"></div>
       </section>
 
       <section class="panel-section" id="storySection">
-        <h2><span class="step-num">3</span> Briefing</h2>
-        <button id="storyGenBtn" class="btn btn-primary btn-wide">Generate Briefing</button>
-        <p class="story-help">Ellery reads your data type, then authors a narrated briefing —
-          an opening card, the key findings, and a closing summary. Drag to reorder, ✕ to remove a step.</p>
+        <h2>Briefing</h2>
+        <button id="storyGenBtn" class="btn btn-primary btn-wide">Produce briefing</button>
+        <p class="story-help">Ellery reads the data, then assembles a narrated briefing:
+          opening, key findings, summary. Reorder or remove steps before playing.</p>
         <div id="storyType" class="story-type" hidden></div>
         <div id="storyList" class="story-list"></div>
         <div class="row-actions" id="storyActions" hidden>
-          <button id="storyPlayBtn" class="btn btn-ghost btn-wide">▶ Play briefing</button>
+          <button id="storyPlayBtn" class="btn btn-ghost btn-wide">Play briefing</button>
         </div>
       </section>
 
       <section class="panel-section" id="simSection">
-        <h2><span class="step-num">4</span> Live Simulation <span class="pro-tag">PRO</span></h2>
+        <h2>Simulation</h2>
         <button id="simToggle" class="btn btn-ghost btn-wide sim-toggle">
-          <span class="sim-dot"></span><span class="sim-label">Send live pulses through the story</span>
+          <span class="sim-dot"></span><span class="sim-label">Run simulation</span>
         </button>
       </section>
 
       <section class="panel-section">
-        <h2><span class="step-num">5</span> Save &amp; ship</h2>
+        <h2>Export</h2>
         <div class="row-actions">
           <button id="saveBtn" class="btn btn-ghost">Save</button>
-          <button id="shareBtn" class="btn btn-ghost">Share preview</button>
+          <button id="shareBtn" class="btn btn-ghost">Share</button>
         </div>
-        <button id="mp4Btn" class="btn btn-ghost btn-wide ship-export">
-          Export Dynamic MP4 for Slides
-        </button>
-        <button id="pngBtn" class="btn btn-ghost btn-wide ship-export">
-          Export PNG for Slides
-        </button>
-        <button id="linkBtn" class="btn btn-ghost btn-wide ship-export">
-          Export Interactive Presentation Link <span class="pro-tag">PRO</span>
-        </button>
-        <button id="exportBtn" class="btn btn-primary btn-wide ship-export">
-          Export Clean Code <span class="pro-tag">PRO</span>
-        </button>
+        <button id="mp4Btn" class="btn btn-ghost btn-wide ship-export">Export MP4</button>
+        <button id="pngBtn" class="btn btn-ghost btn-wide ship-export">Export PNG</button>
+        <button id="linkBtn" class="btn btn-ghost btn-wide ship-export">Interactive export</button>
+        <button id="exportBtn" class="btn btn-primary btn-wide ship-export">Export HTML</button>
         <div id="savedList" class="saved-list"></div>
       </section>
-
-      <footer class="panel-credit">Ellery Studio — Designed &amp; Engineered by Ishaan Jha</footer>
     </aside>
 
     <main class="stage">
@@ -133,7 +120,6 @@
   <div id="tutorialRoot"></div>
 
   <script src="js/render/kinetic-engine.js"></script>
-  <script src="js/ui/depth.js"></script>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

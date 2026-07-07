@@ -70,13 +70,13 @@
 .draw-path {
   stroke-dasharray: var(--path-len, 600);
   stroke-dashoffset: var(--path-len, 600);
-  animation: path-draw 1.1s cubic-bezier(0.3, 0, 0.2, 1) forwards;
+  animation: path-draw 0.7s cubic-bezier(0.3, 0, 0.2, 1) forwards;
 }
 .pop-node {
   opacity: 0;
   transform-box: fill-box;
   transform-origin: center;
-  animation: node-pop 0.5s cubic-bezier(0.2, 0.6, 0.2, 1) forwards;
+  animation: node-pop 0.3s cubic-bezier(0.2, 0.6, 0.2, 1) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
