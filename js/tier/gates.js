@@ -39,6 +39,28 @@ export const LAYOUTS = {
   },
 };
 
+// While the Early Access preview is on, the server grants Pro to every session.
+// If the session can't be fetched (cold/asleep backend, offline), the client
+// must NOT fall back to a locked free tier — that would gate features the
+// server would happily allow, which reads as "the Pro buttons are broken".
+// This mirrors the server's grant locally. Flip to false when paid tiers return.
+export const EARLY_ACCESS_PREVIEW = true;
+
+// The session the UI assumes when Early Access is on and the server is silent.
+// Same shape /api/session returns for a Pro session.
+export function previewSession() {
+  return {
+    ok: true,
+    tier: 'pro',
+    price: 12.99,
+    maxRows: null,
+    layouts: ['kinetic', 'timeline', 'cards', 'nodes', 'map'],
+    watermark: false,
+    export: true,
+    simulation: true,
+  };
+}
+
 // Pull the authoritative session from the server into UI state.
 // Accepts an already-fetched session payload (e.g. a checkout response)
 // to avoid a second round-trip.

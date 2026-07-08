@@ -1,7 +1,7 @@
 // Ellery AI — entry point. Fetches the authoritative session from the
 // server, then wires the store to the panel, canvas, paywall, and auth.
 
-import { refreshSession } from './tier/gates.js';
+import { refreshSession, EARLY_ACCESS_PREVIEW, previewSession } from './tier/gates.js';
 import { setState } from './state.js';
 import { initCanvas } from './render/canvas.js';
 import { initPanel, loadDemo } from './ui/panel.js';
@@ -22,6 +22,22 @@ async function boot() {
   // its height is applied even if the backend is slow or unreachable.
   initPreviewBanner();
 
+  // Bring the workspace up FIRST, before touching the network. The panel and
+  // canvas read tier/limits from the store and re-sync whenever those change,
+  // so a slow or sleeping backend can never leave the UI half-wired with dead
+  // buttons — it just starts on defaults and unlocks a moment later.
+  initPanel();
+  initCanvas(document.getElementById('canvas'), {
+    gateDenied: () => openPaywall('layout-locked'),
+  });
+  initWelcome(document.getElementById('welcomeHelp'));
+
+  // Delegated actions from dynamically rendered content (e.g. empty state).
+  document.addEventListener('click', (e) => {
+    const action = e.target.closest('[data-action]')?.dataset.action;
+    if (action === 'load-demo') loadDemo();
+  });
+
   const session = await refreshSession();
 
   // Early Access Preview: every Pro feature is unlocked for everyone while
@@ -36,23 +52,13 @@ async function boot() {
       cvv: '123',
     });
     if (unlock.ok) await refreshSession(unlock);
+  } else if (!session.ok && EARLY_ACCESS_PREVIEW) {
+    // Backend unreachable/asleep. During Early Access the server grants Pro to
+    // everyone, so mirror that rather than locking Pro features behind a wall.
+    await refreshSession(previewSession());
+  } else if (!session.ok) {
+    toast(session.error || 'Could not reach the server — running with free-tier defaults.', 'warn');
   }
-
-  initPanel();
-  initCanvas(document.getElementById('canvas'), {
-    gateDenied: () => openPaywall('layout-locked'),
-  });
-  initWelcome(document.getElementById('welcomeHelp'));
-
-  if (!session.ok) {
-    toast(session.error || 'Could not reach the server — running with free-tier defaults.', 'error');
-  }
-
-  // Delegated actions from dynamically rendered content (e.g. empty state).
-  document.addEventListener('click', (e) => {
-    const action = e.target.closest('[data-action]')?.dataset.action;
-    if (action === 'load-demo') loadDemo();
-  });
 
   // Hidden developer override — intentionally not in the UI. From the
   // browser console, run:  __elleryDevReset()  (drops the session to free
