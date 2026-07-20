@@ -4,7 +4,7 @@
 import { refreshSession, EARLY_ACCESS_PREVIEW, previewSession } from './tier/gates.js';
 import { setState } from './state.js';
 import { initCanvas } from './render/canvas.js';
-import { initPanel, loadDemo } from './ui/panel.js';
+import { initPanel, loadDemo, openSavedCase } from './ui/panel.js';
 import { initPaywall, openPaywall } from './tier/paywall.js';
 import { initAuth } from './ui/auth.js';
 import { initTutorial } from './ui/tutorial.js';
@@ -58,6 +58,14 @@ async function boot() {
     await refreshSession(previewSession());
   } else if (!session.ok) {
     toast(session.error || 'Could not reach the server — running with free-tier defaults.', 'warn');
+  }
+
+  // Opened from the Cases dashboard with ?case=<id>? Restore it now that the
+  // tier is known, so a Pro-only saved lens is allowed, then clean the URL.
+  const caseId = new URLSearchParams(location.search).get('case');
+  if (caseId) {
+    openSavedCase(caseId);
+    history.replaceState(null, '', location.pathname);
   }
 
   // Hidden developer override — intentionally not in the UI. From the

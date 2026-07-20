@@ -3,123 +3,144 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ellery — evidence-backed data stories</title>
+  <title>Ellery — the reasoning engine for your data</title>
+  <meta name="description" content="Ellery reads your data, reasons about it deterministically, and shows you the findings — every one traceable to the exact cells that prove it.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/tokens.css">
-  <link rel="stylesheet" href="css/layout.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 64 64" width="21" height="21" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="ellery-mark-nav" x1="50%" y1="0%" x2="42%" y2="100%">
-              <stop offset="0" stop-color="#FFC24D"/>
-              <stop offset="0.45" stop-color="#FF7A1E"/>
-              <stop offset="1" stop-color="#F0451A"/>
-            </linearGradient>
-          </defs>
-          <g fill="url(#ellery-mark-nav)">
+  <nav class="site-nav">
+    <div class="container site-nav-inner">
+      <a class="site-brand" href="index.html">
+        <svg viewBox="0 0 64 64" width="20" height="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs><linearGradient id="mk" x1="50%" y1="0%" x2="42%" y2="100%">
+            <stop offset="0" stop-color="#FFC24D"/><stop offset="0.45" stop-color="#FF7A1E"/><stop offset="1" stop-color="#F0451A"/>
+          </linearGradient></defs>
+          <g fill="url(#mk)">
             <path d="M33 5 C 31 11 32 16 36 20 C 31 18 26 20 24 25 C 22 18 26 9 33 5 Z"/>
             <path d="M13 27 C 31 21 48 26 57 38 C 44 32 30 33 21 40 C 24 33 18 28 13 27 Z"/>
             <path d="M16 38 C 30 34 43 38 51 49 C 40 43 30 45 23 51 C 26 44 21 39 16 38 Z"/>
             <path d="M22 49 C 31 47 39 50 45 58 C 37 53 30 55 26 59 C 28 54 26 50 22 49 Z"/>
           </g>
-        </svg>
-      </span>Ellery<em>AI</em>
+        </svg>Ellery
+      </a>
+      <div class="site-nav-links" id="navLinks">
+        <a class="site-nav-link" href="#how">How it works</a>
+        <a class="site-nav-link" href="docs.html">Docs</a>
+        <a class="site-nav-link" href="changelog.html">Changelog</a>
+        <a class="site-nav-link" href="pricing.html">Pricing</a>
+        <a class="site-nav-link" href="about.html">About</a>
+      </div>
+      <div class="site-nav-spacer"></div>
+      <div class="site-nav-cta" id="navCta">
+        <a class="btn btn-ghost btn-sm" href="login.html">Sign in</a>
+        <a class="btn btn-primary btn-sm" href="app/">Open Ellery</a>
+      </div>
+      <button class="site-nav-toggle" id="navToggle" aria-label="Menu">☰</button>
     </div>
-    <div class="topbar-right">
-      <button id="welcomeHelp" class="auth-link" type="button">About</button>
-      <button id="embedHelp" class="auth-link">Embed in slides</button>
-      <div id="authArea" class="auth-area"></div>
-      <button id="upgradeBtn" class="btn btn-ghost preview-pill" type="button">Preview</button>
+  </nav>
+
+  <header class="hero">
+    <div class="container hero-inner">
+      <span class="kicker">Evidence-backed data analysis</span>
+      <h1>Understand <em style="font-style:normal;color:var(--text-3)">why</em>, not just what.</h1>
+      <p class="lead">Ellery reads your data, reasons about it deterministically, and opens
+        with the findings — not a blank chart. Every conclusion can be pulled apart, all the
+        way down to the exact cells and the fingerprinted snapshot that prove it.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" href="app/">Open Ellery</a>
+        <a class="btn btn-ghost btn-lg" href="#how">See how it works</a>
+      </div>
+      <p class="hero-note">No install. Works with CSV, TSV, JSON, or plain text. Early access — everything unlocked.</p>
     </div>
   </header>
 
-  <div id="previewBanner" class="preview-banner" role="status">
-    <span class="preview-banner-text">Early access preview — all features are currently
-      unlocked while Ellery is in development.</span>
-    <button id="previewBannerClose" class="preview-banner-close" type="button"
-      aria-label="Dismiss announcement">✕</button>
-  </div>
-
-  <div id="gate" class="gate" aria-label="Sign in to Ellery"></div>
-
-  <div class="app">
-    <aside class="panel" id="panel">
-      <section class="panel-section">
-        <h2>Data</h2>
-        <div id="dropzone" class="dropzone">
-          <textarea id="rawInput" spellcheck="false"
-            placeholder="Paste CSV, JSON, or text — or drop a file."></textarea>
-          <div class="dropzone-hint">CSV · TSV · JSON · plain text</div>
+  <section class="section" id="how">
+    <div class="container">
+      <div class="section-head">
+        <span class="kicker">The difference</span>
+        <h2>A reasoning engine, not a chart generator.</h2>
+        <p>Most tools hand you a canvas and make you go looking for the story. Ellery does the
+          reasoning first, states what it found in plain language, and treats visualizations as
+          lenses onto the same conclusions.</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="feature">
+          <span class="feature-step">01 · Findings first</span>
+          <h3>It opens with the answer</h3>
+          <p>Load data and Ellery presents a ranked Case File — the important findings, in
+            plain English, before you touch a single chart.</p>
         </div>
-        <div class="row-actions">
-          <button id="visualizeBtn" class="btn btn-primary">Visualize</button>
-          <button id="fileBtn" class="btn btn-ghost">File…</button>
-          <input type="file" id="fileInput" accept=".csv,.tsv,.json,.txt" hidden>
+        <div class="feature">
+          <span class="feature-step">02 · The Pull</span>
+          <h3>Every finding is provable</h3>
+          <p>Click a finding and follow it down through its evidence, derivation, policy and
+            confidence to the originating cells. Reasoning you can inspect, not just read.</p>
         </div>
-        <div class="example-row">
-          <span class="example-label">Samples</span>
-          <button class="example-link" data-demo="catalog">Product catalog</button>
-          <button class="example-link" data-demo="startup">Startup metrics</button>
-          <button class="example-link" data-demo="mission">Mission operations</button>
-          <button class="example-link" data-demo="research">Research data</button>
+        <div class="feature">
+          <span class="feature-step">03 · Deterministic</span>
+          <h3>Same data, same result</h3>
+          <p>No model in the truth path. Findings are a pure function of evidence and policy,
+            fingerprinted to a snapshot — reproducible by construction.</p>
         </div>
-        <div id="schemaChips" class="schema-chips"></div>
-      </section>
+      </div>
+    </div>
+  </section>
 
-      <section class="panel-section">
-        <h2>Layout</h2>
-        <div class="layout-grid" id="layoutGrid"></div>
-      </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="kicker">The Pull</span>
+        <h2>Grab a sentence. Follow it to the numbers.</h2>
+        <p>A finding is not text — it is an object. Pulling one peels back the reasoning layer
+          by layer until it terminates at fingerprinted ground.</p>
+      </div>
+      <div class="chain">
+        <div class="chain-step"><span class="chain-num">01</span><span class="chain-name">Finding</span><span class="chain-desc">the claim, in plain language</span></div>
+        <div class="chain-step"><span class="chain-num">02</span><span class="chain-name">Evidence</span><span class="chain-desc">the exact inputs Ellery read</span></div>
+        <div class="chain-step"><span class="chain-num">03</span><span class="chain-name">Derivation</span><span class="chain-desc">how evidence became the conclusion</span></div>
+        <div class="chain-step"><span class="chain-num">04</span><span class="chain-name">Policy</span><span class="chain-desc">the rule and threshold applied</span></div>
+        <div class="chain-step"><span class="chain-num">05</span><span class="chain-name">Records</span><span class="chain-desc">the originating rows and raw cells</span></div>
+        <div class="chain-step"><span class="chain-num">06</span><span class="chain-name">Ground</span><span class="chain-desc">the fingerprinted snapshot it came from</span></div>
+      </div>
+    </div>
+  </section>
 
-      <section class="panel-section" id="storySection">
-        <h2>Briefing</h2>
-        <button id="storyGenBtn" class="btn btn-primary btn-wide">Produce briefing</button>
-        <p class="story-help">Ellery reads the data, then assembles a narrated briefing:
-          opening, key findings, summary. Reorder or remove steps before playing.</p>
-        <div id="storyType" class="story-type" hidden></div>
-        <div id="storyList" class="story-list"></div>
-        <div class="row-actions" id="storyActions" hidden>
-          <button id="storyPlayBtn" class="btn btn-ghost btn-wide">Play briefing</button>
-        </div>
-      </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="kicker">Lenses</span>
+        <h2>One understanding, many views.</h2>
+        <p>Kinetic ranking, timelines, card grids, branching mindmaps, and a zoomable insight
+          map are all lenses onto the same Case File — and any of them will spotlight the exact
+          rows behind a finding.</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="feature"><h3>Kinetic Rank</h3><p>Physics-driven ranking, comparison, and baselines.</p></div>
+        <div class="feature"><h3>Timeline</h3><p>Order events and read change over time.</p></div>
+        <div class="feature"><h3>Cards</h3><p>One record per card, the numbers up front.</p></div>
+        <div class="feature"><h3>Mindmap</h3><p>Hierarchy and grouping as a branching tree.</p></div>
+        <div class="feature"><h3>Insight Map</h3><p>A grouped, zoomable field with a live summary.</p></div>
+        <div class="feature"><h3>Exports</h3><p>MP4, PNG, standalone HTML, and interactive links for your deck.</p></div>
+      </div>
+    </div>
+  </section>
 
-      <section class="panel-section" id="simSection">
-        <h2>Simulation</h2>
-        <button id="simToggle" class="btn btn-ghost btn-wide sim-toggle">
-          <span class="sim-dot"></span><span class="sim-label">Run simulation</span>
-        </button>
-      </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-head" style="margin-bottom:var(--sp-4)">
+        <h2>Bring your data. Get the case.</h2>
+        <p>Start with a sample or drop in your own file. Everything is unlocked during early access.</p>
+      </div>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" href="app/">Open Ellery</a>
+        <a class="btn btn-ghost btn-lg" href="docs.html">Read the docs</a>
+      </div>
+    </div>
+  </section>
 
-      <section class="panel-section">
-        <h2>Export</h2>
-        <div class="row-actions">
-          <button id="saveBtn" class="btn btn-ghost">Save</button>
-          <button id="shareBtn" class="btn btn-ghost">Share</button>
-        </div>
-        <button id="mp4Btn" class="btn btn-ghost btn-wide ship-export">Export MP4</button>
-        <button id="pngBtn" class="btn btn-ghost btn-wide ship-export">Export PNG</button>
-        <button id="linkBtn" class="btn btn-ghost btn-wide ship-export">Interactive export</button>
-        <button id="exportBtn" class="btn btn-primary btn-wide ship-export">Export HTML</button>
-        <div id="savedList" class="saved-list"></div>
-      </section>
-    </aside>
-
-    <main class="stage">
-      <div id="canvas" class="canvas" aria-live="polite"></div>
-    </main>
-  </div>
-
-  <div id="toastRoot" class="toast-root" aria-live="polite"></div>
-  <div id="modalRoot"></div>
-  <div id="tutorialRoot"></div>
-
-  <script src="js/render/kinetic-engine.js"></script>
-  <script type="module" src="js/app.js"></script>
+  <div id="siteFooter"></div>
+  <script type="module" src="js/site.js"></script>
 </body>
 </html>

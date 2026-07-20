@@ -16,9 +16,9 @@ const TRIGGER_COPY = {
     sub: 'A normally-Pro layout — and it’s yours during the preview.',
   },
   simulation: {
-    kicker: 'Live Simulation',
-    headline: 'Watch your data flow — in real time.',
-    sub: 'Live Simulation Mode sends glowing pulses down every data pathway of your mindmaps and timelines.',
+    kicker: 'Simulation',
+    headline: 'Animate change across a layout.',
+    sub: 'Simulation Mode plays change through the Insight Map, Mindmap, and Timeline — an advanced view for exploring movement in the data.',
   },
   'row-cap': {
     kicker: 'Unlimited rows',
@@ -78,15 +78,15 @@ export function openPaywall(trigger = 'upgrade', detail = {}) {
             <p class="paywall-sub">${copy.sub}</p>
             <ul>
               <li>Unlimited rows — no ${capLabel}-row ceiling</li>
-              <li>Deep, zoomable Insight Map layout</li>
-              <li>Live Simulation Mode — glowing data pulses in real time</li>
-              <li>Zero watermarks anywhere — including clean MP4 captures</li>
-              <li>Interactive Presentation Link — live physics in one file</li>
-              <li>Export Clean Code — embed-ready standalone HTML</li>
+              <li>Insight Map layout with grouped findings</li>
+              <li>Simulation Mode — animate change across a layout</li>
+              <li>No watermark — including clean MP4 captures</li>
+              <li>Interactive export — the live board in one file</li>
+              <li>Clean HTML export — a self-contained standalone file</li>
             </ul>
           </div>
           <div class="checkout preview-pane">
-            <div class="paywall-kicker">🎉 Early Access Preview</div>
+            <div class="paywall-kicker">Early Access Preview</div>
             <h2 class="preview-pane-title">All Pro features, unlocked for everyone.</h2>
             <p class="paywall-sub">No card, no checkout. Everything is currently included while
             Ellery is in active development — paid subscriptions will launch later.</p>

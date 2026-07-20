@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing — Ellery</title>
+  <meta name="description" content="Ellery pricing. Everything is unlocked during early access.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="container site-nav-inner">
+      <a class="site-brand" href="index.html">
+        <svg viewBox="0 0 64 64" width="20" height="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs><linearGradient id="mk" x1="50%" y1="0%" x2="42%" y2="100%">
+            <stop offset="0" stop-color="#FFC24D"/><stop offset="0.45" stop-color="#FF7A1E"/><stop offset="1" stop-color="#F0451A"/>
+          </linearGradient></defs>
+          <g fill="url(#mk)">
+            <path d="M33 5 C 31 11 32 16 36 20 C 31 18 26 20 24 25 C 22 18 26 9 33 5 Z"/>
+            <path d="M13 27 C 31 21 48 26 57 38 C 44 32 30 33 21 40 C 24 33 18 28 13 27 Z"/>
+            <path d="M16 38 C 30 34 43 38 51 49 C 40 43 30 45 23 51 C 26 44 21 39 16 38 Z"/>
+            <path d="M22 49 C 31 47 39 50 45 58 C 37 53 30 55 26 59 C 28 54 26 50 22 49 Z"/>
+          </g>
+        </svg>Ellery
+      </a>
+      <div class="site-nav-links" id="navLinks">
+        <a class="site-nav-link" href="index.html#how">How it works</a>
+        <a class="site-nav-link" href="docs.html">Docs</a>
+        <a class="site-nav-link" href="changelog.html">Changelog</a>
+        <a class="site-nav-link" href="pricing.html">Pricing</a>
+        <a class="site-nav-link" href="about.html">About</a>
+      </div>
+      <div class="site-nav-spacer"></div>
+      <div class="site-nav-cta" id="navCta"></div>
+      <button class="site-nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container hero-inner">
+      <span class="kicker">Pricing</span>
+      <h1>Simple, while it lasts.</h1>
+      <p class="lead">Ellery is in early access, so every feature — including the ones marked
+        Pro — is unlocked for everyone. Paid plans arrive when the product leaves preview.</p>
+    </div>
+  </header>
+
+  <section class="section" style="border-top:none;padding-top:0">
+    <div class="container">
+      <div class="tiers">
+        <div class="tier">
+          <span class="tier-badge">Always free</span>
+          <div class="tier-name">Free</div>
+          <div class="tier-price">$0</div>
+          <ul>
+            <li>Findings Case File on every dataset</li>
+            <li>The Pull — trace any finding to the cell</li>
+            <li>Kinetic, Timeline, Cards, and Mindmap lenses</li>
+            <li>PNG and MP4 export (with a small watermark)</li>
+            <li>Deterministic, on-device analysis</li>
+          </ul>
+          <a class="btn btn-ghost" href="app/">Open Ellery</a>
+        </div>
+        <div class="tier tier-pro">
+          <span class="tier-badge">Included in preview</span>
+          <div class="tier-name">Pro</div>
+          <div class="tier-price">$12.99<small> / mo · later</small></div>
+          <ul>
+            <li>Everything in Free</li>
+            <li>Insight Map lens with live summary</li>
+            <li>Unlimited rows — no cap</li>
+            <li>Watermark-free exports</li>
+            <li>Interactive presentation links & clean HTML</li>
+          </ul>
+          <a class="btn btn-primary" href="app/">Unlocked now — try it</a>
+        </div>
+      </div>
+      <p class="hero-note" style="margin-top:var(--sp-4)">During early access there is no checkout and
+        no card required. Tier limits are enforced server-side; nothing here can be bypassed from the browser.</p>
+    </div>
+  </section>
+
+  <div id="siteFooter"></div>
+  <script type="module" src="js/site.js"></script>
+</body>
+</html>

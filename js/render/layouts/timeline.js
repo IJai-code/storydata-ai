@@ -5,22 +5,25 @@ import { pickColumns, formatValue, escapeHTML } from '../util.js';
 
 export function render(container, dataset) {
   const picks = pickColumns(dataset);
-  let rows = [...dataset.rows];
+  // Carry each row's original dataset index so The Pull can spotlight it even
+  // after the timeline re-sorts by date.
+  let rows = dataset.rows.map((row, index) => ({ row, index }));
 
   if (picks.date) {
-    rows.sort((a, b) => String(a[picks.date.key]).localeCompare(String(b[picks.date.key])));
+    rows.sort((a, b) => String(a.row[picks.date.key]).localeCompare(String(b.row[picks.date.key])));
   }
 
   const max = picks.value
-    ? Math.max(...rows.map((r) => Math.abs(r[picks.value.key] ?? 0)), 1)
+    ? Math.max(...rows.map(({ row }) => Math.abs(row[picks.value.key] ?? 0)), 1)
     : 1;
 
   const tl = document.createElement('div');
   tl.className = 'tl';
 
-  rows.forEach((row, i) => {
+  rows.forEach(({ row, index }, i) => {
     const item = document.createElement('div');
     item.className = `tl-item ${i % 2 === 0 ? 'left' : 'right'}`;
+    item.dataset.idx = String(index);
 
     const date = picks.date ? formatValue(row[picks.date.key], 'date') : '';
     const label = formatValue(row[picks.label.key], picks.label.type);

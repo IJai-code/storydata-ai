@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation — Ellery</title>
+  <meta name="description" content="How Ellery works: findings, the Pull, lenses, exports, and determinism.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="container site-nav-inner">
+      <a class="site-brand" href="index.html">
+        <svg viewBox="0 0 64 64" width="20" height="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs><linearGradient id="mk" x1="50%" y1="0%" x2="42%" y2="100%">
+            <stop offset="0" stop-color="#FFC24D"/><stop offset="0.45" stop-color="#FF7A1E"/><stop offset="1" stop-color="#F0451A"/>
+          </linearGradient></defs>
+          <g fill="url(#mk)">
+            <path d="M33 5 C 31 11 32 16 36 20 C 31 18 26 20 24 25 C 22 18 26 9 33 5 Z"/>
+            <path d="M13 27 C 31 21 48 26 57 38 C 44 32 30 33 21 40 C 24 33 18 28 13 27 Z"/>
+            <path d="M16 38 C 30 34 43 38 51 49 C 40 43 30 45 23 51 C 26 44 21 39 16 38 Z"/>
+            <path d="M22 49 C 31 47 39 50 45 58 C 37 53 30 55 26 59 C 28 54 26 50 22 49 Z"/>
+          </g>
+        </svg>Ellery
+      </a>
+      <div class="site-nav-links" id="navLinks">
+        <a class="site-nav-link" href="index.html#how">How it works</a>
+        <a class="site-nav-link" href="docs.html">Docs</a>
+        <a class="site-nav-link" href="changelog.html">Changelog</a>
+        <a class="site-nav-link" href="pricing.html">Pricing</a>
+        <a class="site-nav-link" href="about.html">About</a>
+      </div>
+      <div class="site-nav-spacer"></div>
+      <div class="site-nav-cta" id="navCta"></div>
+      <button class="site-nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <header class="hero" style="padding-bottom:var(--sp-4)">
+    <div class="container hero-inner">
+      <span class="kicker">Documentation</span>
+      <h1>How Ellery works.</h1>
+      <p class="lead">A short tour of the model: load data, read the findings, pull one apart,
+        inspect it through a lens, and export the result.</p>
+    </div>
+  </header>
+
+  <section class="section" style="border-top:none;padding-top:0">
+    <div class="container docs">
+      <aside class="docs-nav">
+        <a href="#start">Getting started</a>
+        <a href="#findings">The Case File</a>
+        <a href="#pull">The Pull</a>
+        <a href="#lenses">Lenses</a>
+        <a href="#export">Exporting</a>
+        <a href="#determinism">Determinism</a>
+      </aside>
+      <div class="prose">
+        <h2 id="start">Getting started</h2>
+        <p>Open the <a class="link" href="app/">workspace</a> and load data — paste CSV, TSV, JSON
+          or plain text into the panel, drop a file, or pick a sample. Ellery detects the format,
+          types every column, and immediately opens the <strong>Case File</strong>.</p>
+        <p>There is no chart to configure first. Analysis happens on load, on your device.</p>
+
+        <h2 id="findings">The Case File</h2>
+        <p>The Case File is a ranked list of findings in plain language: extremes, outliers,
+          concentration, availability, distribution, and central tendency. The most important
+          finding leads as a headline. When the data is calm, Ellery says so rather than
+          inventing drama.</p>
+        <p>Findings are the product. Visualizations are just ways to inspect them.</p>
+
+        <h2 id="pull">The Pull</h2>
+        <p>Every finding is an object you can follow down. Click one and the Case File descends
+          through the reasoning until it reaches fingerprinted ground:</p>
+        <ul>
+          <li><strong>Finding</strong> — the claim, in plain language.</li>
+          <li><strong>Evidence</strong> — the exact inputs the detector read.</li>
+          <li><strong>Derivation</strong> — how that evidence became the conclusion.</li>
+          <li><strong>Policy</strong> — the rule and threshold applied, with its source.</li>
+          <li><strong>Confidence</strong> — the value and how it was set.</li>
+          <li><strong>Records</strong> — the originating rows; open one for its raw cells.</li>
+          <li><strong>Ground</strong> — the content <code>fingerprint</code> of the snapshot.</li>
+        </ul>
+        <p>From a trace, <em>See it plotted</em> spotlights the exact rows in any lens — the
+          visualization becomes a microscope, not a destination.</p>
+
+        <h2 id="lenses">Lenses</h2>
+        <p>The lens bar at the top of the workspace switches between views of the same Case File:</p>
+        <ul>
+          <li><strong>Kinetic Rank</strong> — physics-driven ranking and comparison.</li>
+          <li><strong>Timeline</strong> — order and change over time.</li>
+          <li><strong>Cards</strong> — one record per card.</li>
+          <li><strong>Mindmap</strong> — hierarchy and grouping.</li>
+          <li><strong>Insight Map</strong> — a grouped, zoomable field with a live summary.</li>
+        </ul>
+        <p>A traced finding stays lit as you move between lenses, so you can view the same
+          evidence through each.</p>
+
+        <h2 id="export">Exporting</h2>
+        <p>Any lens exports to <strong>MP4</strong> or <strong>PNG</strong> for slides, to a
+          self-contained <strong>HTML</strong> file, or to an <strong>interactive link</strong>
+          that carries the live board. In PowerPoint, Google Slides, and Keynote, drop the MP4 in
+          and set it to loop — the in-app <em>Embed in slides</em> guide has the exact steps.</p>
+
+        <h2 id="determinism">Determinism</h2>
+        <p>There is no model in the truth path. A finding is a pure function of evidence and
+          policy, so the same data under the same policy always yields the same findings — and
+          the same snapshot fingerprint. That reproducibility is the whole point: trust attaches
+          to a re-runnable procedure, not to whoever produced the chart.</p>
+      </div>
+    </div>
+  </section>
+
+  <div id="siteFooter"></div>
+  <script type="module" src="js/site.js"></script>
+</body>
+</html>

@@ -15,9 +15,11 @@ const state = {
     simulation: false,
   },
   dataset: null,            // { columns, rows, meta, truncated }
-  layout: 'kinetic',
+  layout: 'findings',       // home surface: the Discovery Engine's conclusions
+
   simulation: false,        // Live Simulation Mode toggle (Pro)
   story: null,              // Data Story Mode: { scenes: [{type, sel, mode}] } or null
+  focus: null,              // The Pull: a traced finding { id, rowIndices, columns, ... } or null
   ui: { paywallTrigger: null },
 };
 

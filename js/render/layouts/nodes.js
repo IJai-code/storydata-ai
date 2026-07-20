@@ -61,7 +61,7 @@ export function render(container, dataset) {
       drawPath(svg, branchX, branch.y, leafX, y, color, d, 1.2);
 
       const node = drawNode(svg, leafX, y, 4.5, color, d + 0.2);
-      drawLabel(
+      const label = drawLabel(
         svg,
         leafX + 12,
         y + 4,
@@ -71,6 +71,15 @@ export function render(container, dataset) {
         'start',
         '11'
       );
+      // Tag real records (not the "+N more" placeholder) so The Pull can
+      // spotlight this leaf. indexOf is reference-based and stable per row.
+      if (!row.__more) {
+        const oi = dataset.rows.indexOf(row);
+        if (oi >= 0) {
+          node.dataset.idx = String(oi);
+          label.dataset.idx = String(oi);
+        }
+      }
 
       // Hover hit area larger than the dot itself.
       const hit = svgEl('circle', { cx: leafX, cy: y, r: 12, fill: 'transparent' });

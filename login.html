@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in — Ellery</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="container site-nav-inner">
+      <a class="site-brand" href="index.html">
+        <svg viewBox="0 0 64 64" width="20" height="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs><linearGradient id="mk" x1="50%" y1="0%" x2="42%" y2="100%">
+            <stop offset="0" stop-color="#FFC24D"/><stop offset="0.45" stop-color="#FF7A1E"/><stop offset="1" stop-color="#F0451A"/>
+          </linearGradient></defs>
+          <g fill="url(#mk)">
+            <path d="M33 5 C 31 11 32 16 36 20 C 31 18 26 20 24 25 C 22 18 26 9 33 5 Z"/>
+            <path d="M13 27 C 31 21 48 26 57 38 C 44 32 30 33 21 40 C 24 33 18 28 13 27 Z"/>
+            <path d="M16 38 C 30 34 43 38 51 49 C 40 43 30 45 23 51 C 26 44 21 39 16 38 Z"/>
+            <path d="M22 49 C 31 47 39 50 45 58 C 37 53 30 55 26 59 C 28 54 26 50 22 49 Z"/>
+          </g>
+        </svg>Ellery
+      </a>
+      <div class="site-nav-spacer"></div>
+      <a class="site-nav-link" href="index.html">← Back to home</a>
+    </div>
+  </nav>
+
+  <main class="auth-wrap">
+    <div class="auth-card">
+      <span class="kicker">Ellery workspace</span>
+      <h1 id="authTitle">Create your account</h1>
+      <p class="auth-sub" id="authSub">Save your cases and pick up where you left off.</p>
+      <form id="authForm" novalidate>
+        <div class="field" id="nameField">
+          <label for="fName">Name</label>
+          <input id="fName" autocomplete="name" placeholder="Ada Lovelace">
+        </div>
+        <div class="field">
+          <label for="fEmail">Email</label>
+          <input id="fEmail" type="email" autocomplete="email" placeholder="you@studio.com">
+        </div>
+        <div class="field">
+          <label for="fPass">Password</label>
+          <input id="fPass" type="password" autocomplete="new-password" placeholder="At least 8 characters">
+        </div>
+        <div class="auth-error" id="authError"></div>
+        <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center" id="authSubmit" type="submit">Create account</button>
+        <p class="auth-note">Preview build — accounts are simulated in this browser only. Your
+          details stay on this device and are never sent to a server.</p>
+      </form>
+      <button class="auth-switch" id="authSwitch">Already have an account? Sign in</button>
+    </div>
+  </main>
+
+  <script type="module" src="js/auth-page.js"></script>
+</body>
+</html>

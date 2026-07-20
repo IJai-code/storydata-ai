@@ -7,34 +7,34 @@ import { getState, setState } from '../state.js';
 import { api } from '../api.js';
 
 export const LAYOUTS = {
+  findings: {
+    name: 'Findings',
+    desc: 'What Ellery concluded',
+    pro: false,
+  },
   kinetic: {
     name: 'Kinetic Rank',
-    desc: 'Sort pulses, compare, baseline pinning',
-    icon: '∿',
+    desc: 'Rank and compare records',
     pro: false,
   },
   timeline: {
-    name: 'Interactive Timeline',
-    desc: 'Scroll-driven story beats',
-    icon: '⟟',
+    name: 'Timeline',
+    desc: 'Order events over time',
     pro: false,
   },
   cards: {
-    name: 'Data Card Grid',
-    desc: 'Structured animated stat cards',
-    icon: '▦',
+    name: 'Cards',
+    desc: 'One card per record',
     pro: false,
   },
   nodes: {
-    name: 'Branching Mindmap',
-    desc: 'Animated data node pathways',
-    icon: '⌥',
+    name: 'Mindmap',
+    desc: 'Hierarchy and grouping',
     pro: false,
   },
   map: {
     name: 'Insight Map',
-    desc: 'Deep zoomable bubble field',
-    icon: '◉',
+    desc: 'Grouped field with summary',
     pro: true,
   },
 };
@@ -95,6 +95,9 @@ export function maxRows() {
 }
 
 export function layoutAllowed(key) {
+  // Findings is the home surface — the Discovery Engine runs client-side and is
+  // never gated. Everything else defers to the server's per-session layout list.
+  if (key === 'findings') return true;
   return getState().limits.layouts.includes(key);
 }
 

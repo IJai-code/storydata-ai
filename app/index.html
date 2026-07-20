@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ellery — Workspace</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/animations.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../cases.html" title="Your cases">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="21" height="21" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="ellery-mark-nav" x1="50%" y1="0%" x2="42%" y2="100%">
+              <stop offset="0" stop-color="#FFC24D"/>
+              <stop offset="0.45" stop-color="#FF7A1E"/>
+              <stop offset="1" stop-color="#F0451A"/>
+            </linearGradient>
+          </defs>
+          <g fill="url(#ellery-mark-nav)">
+            <path d="M33 5 C 31 11 32 16 36 20 C 31 18 26 20 24 25 C 22 18 26 9 33 5 Z"/>
+            <path d="M13 27 C 31 21 48 26 57 38 C 44 32 30 33 21 40 C 24 33 18 28 13 27 Z"/>
+            <path d="M16 38 C 30 34 43 38 51 49 C 40 43 30 45 23 51 C 26 44 21 39 16 38 Z"/>
+            <path d="M22 49 C 31 47 39 50 45 58 C 37 53 30 55 26 59 C 28 54 26 50 22 49 Z"/>
+          </g>
+        </svg>
+      </span>Ellery
+    </a>
+    <div class="topbar-right">
+      <a href="../cases.html" class="auth-link">Cases</a>
+      <button id="welcomeHelp" class="auth-link" type="button">About</button>
+      <button id="embedHelp" class="auth-link">Embed in slides</button>
+      <div id="authArea" class="auth-area"></div>
+      <button id="upgradeBtn" class="preview-pill" type="button">Preview</button>
+    </div>
+  </header>
+
+  <div id="previewBanner" class="preview-banner" role="status">
+    <span class="preview-banner-text">Early access preview — all features are currently
+      unlocked while Ellery is in development.</span>
+    <button id="previewBannerClose" class="preview-banner-close" type="button"
+      aria-label="Dismiss announcement">✕</button>
+  </div>
+
+  <div class="app">
+    <aside class="panel" id="panel">
+      <section class="panel-section">
+        <h2>Data</h2>
+        <div id="dropzone" class="dropzone">
+          <textarea id="rawInput" spellcheck="false"
+            placeholder="Paste CSV, JSON, or text — or drop a file."></textarea>
+          <div class="dropzone-hint">CSV · TSV · JSON · plain text</div>
+        </div>
+        <div class="row-actions">
+          <button id="visualizeBtn" class="btn btn-primary">Visualize</button>
+          <button id="fileBtn" class="btn btn-ghost">File…</button>
+          <input type="file" id="fileInput" accept=".csv,.tsv,.json,.txt" hidden>
+        </div>
+        <div class="example-row">
+          <span class="example-label">Samples</span>
+          <button class="example-link" data-demo="catalog">Product catalog</button>
+          <button class="example-link" data-demo="startup">Startup metrics</button>
+          <button class="example-link" data-demo="mission">Mission operations</button>
+          <button class="example-link" data-demo="research">Research data</button>
+        </div>
+        <div id="schemaChips" class="schema-chips"></div>
+      </section>
+
+      <section class="panel-section">
+        <h2>Export</h2>
+        <button id="mp4Btn" class="btn btn-primary btn-wide">Export MP4</button>
+        <div class="export-grid">
+          <button id="pngBtn" class="btn btn-ghost">PNG</button>
+          <button id="linkBtn" class="btn btn-ghost">Interactive</button>
+          <button id="exportBtn" class="btn btn-ghost">HTML</button>
+          <button id="shareBtn" class="btn btn-ghost">Share</button>
+        </div>
+        <div class="export-util">
+          <button id="saveBtn" class="btn btn-quiet">Save to this device</button>
+        </div>
+        <div id="savedList" class="saved-list"></div>
+      </section>
+
+      <section class="panel-section panel-section-advanced" id="storySection">
+        <h2>Briefing</h2>
+        <button id="storyGenBtn" class="btn btn-ghost btn-wide">Produce briefing</button>
+        <p class="story-help">Turn the findings into a narrated sequence — opening,
+          key findings, summary. Reorder or remove steps before playing.</p>
+        <div id="storyType" class="story-type" hidden></div>
+        <div id="storyList" class="story-list"></div>
+        <div class="row-actions" id="storyActions" hidden>
+          <button id="storyPlayBtn" class="btn btn-ghost btn-wide">Play briefing</button>
+        </div>
+      </section>
+
+      <section class="panel-section panel-section-advanced" id="simSection">
+        <h2>Simulation</h2>
+        <button id="simToggle" class="sim-toggle btn-wide" type="button">
+          <span class="sim-dot"></span><span class="sim-label">Run simulation</span>
+        </button>
+      </section>
+    </aside>
+
+    <main class="stage">
+      <div id="lensBar" class="lens-bar" hidden></div>
+      <div id="pullBar" class="pull-bar" hidden></div>
+      <div id="canvas" class="canvas" aria-live="polite"></div>
+    </main>
+  </div>
+
+  <div id="toastRoot" class="toast-root" aria-live="polite"></div>
+  <div id="modalRoot"></div>
+  <div id="tutorialRoot"></div>
+
+  <script src="../js/render/kinetic-engine.js"></script>
+  <script type="module" src="../js/app.js"></script>
+</body>
+</html>

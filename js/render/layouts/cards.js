@@ -18,6 +18,7 @@ export function render(container, dataset) {
   dataset.rows.forEach((row, i) => {
     const card = document.createElement('div');
     card.className = 'data-card';
+    card.dataset.idx = String(i); // lets The Pull spotlight this exact record
     card.style.animationDelay = `${Math.min(i * 45, 1200)}ms`;
 
     const statHTML = picks.value

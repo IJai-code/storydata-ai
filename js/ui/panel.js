@@ -167,6 +167,13 @@ export function initPanel() {
   renderStoryList();
 }
 
+// Restore a saved case by id (used by the Cases dashboard via ?case=). Called
+// from app boot AFTER the session resolves, so a Pro-only saved lens (e.g. the
+// Insight Map) is allowed when we set it rather than downgraded to the default.
+export function openSavedCase(id) {
+  loadStory(Number(id));
+}
+
 /* ---------- Ingestion ---------- */
 
 function wireIngestion() {
@@ -302,13 +309,15 @@ function renderSchemaChips(dataset) {
 /* ---------- Layout picker ---------- */
 
 function buildLayoutPicker() {
+  // Lens selection now lives in the canvas lens bar (js/render/canvas.js), so
+  // the panel no longer carries a layout picker. Guard for its absence.
   const grid = document.getElementById('layoutGrid');
+  if (!grid) return;
   grid.innerHTML = Object.entries(LAYOUTS)
     .map(
       ([key, meta]) => `
       <button class="layout-card${meta.pro ? ' locked' : ''}" data-layout="${key}">
         ${meta.pro ? '<span class="lock">PRO</span>' : ''}
-        <span class="layout-icon">${meta.icon}</span>
         <span class="layout-name">${meta.name}</span>
         <span class="layout-desc">${meta.desc}</span>
       </button>`

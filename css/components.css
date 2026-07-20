@@ -1,23 +1,25 @@
 /* Ellery AI — components. Monochrome, hairline borders, quiet motion. */
 
-/* ---------- Buttons ---------- */
+/* ---------- Buttons ----------
+   Three weights, one clear ladder of importance:
+   .btn-primary  loud   — the single obvious action on a surface
+   .btn-ghost    medium — bordered, muted, present but not competing
+   .btn-quiet    faint  — borderless text action that nearly disappears */
 .btn {
   font-family: var(--font-ui);
   font-size: var(--fs-sm);
   font-weight: 500;
   line-height: var(--lh-tight);
-  padding: 9px 16px;
+  padding: 7px 13px;
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
   color: var(--text-1);
   background: var(--bg-3);
 }
 .btn:hover { background: #202023; }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-/* A hair of give on press — makes the buttons feel physical, not painted-on. */
-.btn:active:not(:disabled) { transform: translateY(0.5px); }
 
 /* Primary action: pure white on black — the single accent. */
 .btn-primary {
@@ -29,10 +31,19 @@
 
 .btn-ghost {
   background: transparent;
-  border-color: var(--line);
+  border-color: var(--line-soft);
   color: var(--text-2);
 }
-.btn-ghost:hover { border-color: var(--text-3); color: var(--text-1); background: transparent; }
+.btn-ghost:hover { border-color: var(--line); color: var(--text-1); background: transparent; }
+
+/* Tertiary: text only, recedes into the surface until hovered. */
+.btn-quiet {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-3);
+  padding: 6px 8px;
+}
+.btn-quiet:hover { color: var(--text-1); background: transparent; }
 
 .btn-wide { width: 100%; }
 
@@ -42,20 +53,27 @@
   margin-top: var(--sp-3);
   flex-wrap: wrap;
 }
+/* [hidden] must still win over the flex display above. */
+.row-actions[hidden] { display: none; }
 
-/* ---------- Topbar controls / pro tags ---------- */
+/* ---------- Topbar controls ---------- */
+/* Secondary nav recedes: plain sentence-case text, low contrast, no boxes.
+   The workspace — not the chrome — should hold the eye. */
 .topbar .auth-link {
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  transition: color 0.18s ease;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-3);
+  transition: color 0.14s ease;
 }
+.topbar .auth-link:hover { color: var(--text-1); }
 .topbar .auth-name {
-  font-size: 0.62rem;
-  letter-spacing: 0.08em;
+  font-size: var(--fs-sm);
+  letter-spacing: 0;
 }
 .topbar .auth-avatar {
-  transition: border-color 0.18s ease;
+  transition: border-color 0.14s ease;
 }
 .topbar .auth-user:hover .auth-avatar {
   border-color: var(--text-1);
@@ -65,16 +83,17 @@
 /* ---------- Dropzone ---------- */
 .dropzone {
   position: relative;
-  border: 1px dashed var(--line);
+  border: 1px solid var(--line-soft);
   border-radius: var(--radius-md);
-  background: var(--bg-1);
-  transition: border-color 0.2s;
+  background: var(--bg-0);
+  transition: border-color 0.15s;
 }
-.dropzone.dragover { border-color: var(--text-2); }
+.dropzone:focus-within { border-color: var(--line); }
+.dropzone.dragover { border-color: var(--text-2); background: rgba(255, 255, 255, 0.02); }
 .dropzone textarea {
   display: block;
   width: 100%;
-  min-height: 132px;
+  min-height: 92px;
   resize: vertical;
   background: transparent;
   border: none;
@@ -83,39 +102,35 @@
   caret-color: var(--brand); /* warm blink — the only ember in the console */
   font-family: var(--font-mono);
   font-size: var(--fs-sm);
-  line-height: 1.6;
-  padding: var(--sp-3);
+  line-height: 1.55;
+  padding: var(--sp-3) var(--sp-3) var(--sp-2);
 }
 /* Read-only format indicator — flat label, no border affordance. */
 .dropzone-hint {
-  font-size: 0.62rem;
-  letter-spacing: 0.04em;
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.02em;
   color: var(--text-3);
-  padding: 6px var(--sp-3) 9px;
+  padding: 0 var(--sp-3) var(--sp-2);
   font-family: var(--font-mono);
   user-select: none;
 }
 
-/* ---------- Schema chips ---------- */
-/* Terminal schema ledger: one column entry per row, generous air. */
+/* ---------- Schema readout ---------- */
+/* Not a card — a quiet column ledger that belongs to the panel. The row
+   count leads (typography carries the hierarchy); column types recede. */
 .schema-chips {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
   margin-top: var(--sp-3);
 }
-.schema-chips:not(:empty) {
-  padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.015);
-}
-/* Chips are read-only indicators, not buttons: flat microscopic text,
-   no backgrounds, borders, or hover affordances. */
 .chip {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
   font-family: var(--font-mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.04em;
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.02em;
   padding: 1px 0;
   background: none;
   border: none;
@@ -124,108 +139,586 @@
   user-select: none;
 }
 .chip strong { color: var(--text-2); font-weight: 500; }
-.chip.chip-count { color: var(--text-1); }
 .chip.chip-warn { color: var(--warn); }
-.chip {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  letter-spacing: 0.06em;
-}
+/* Row count: the one number that leads this block. */
 .chip.chip-count {
-  padding-bottom: 7px;
+  justify-content: flex-start;
+  gap: 6px;
+  align-items: baseline;
+  color: var(--text-3);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  letter-spacing: 0;
+  padding-bottom: var(--sp-2);
+  margin-bottom: var(--sp-1);
   border-bottom: 1px solid var(--line-soft);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+}
+.chip.chip-count strong {
+  color: var(--text-1);
+  font-weight: 600;
+  font-size: var(--fs-lg);
 }
 
 /* ---------- Layout picker ---------- */
+/* A single selectable list, not a grid of floating cards. Names lead; the
+   one-line purpose recedes; the active row is marked by a fill and a left
+   accent, so selection reads instantly without borders around everything. */
 .layout-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--sp-2);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 .layout-card {
   position: relative;
+  display: block;
   text-align: left;
   background: transparent;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-md);
-  padding: var(--sp-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 10px 8px 12px;
   cursor: pointer;
   color: var(--text-2);
-  transition: border-color 0.18s;
+  transition: background 0.14s ease, color 0.14s ease;
   line-height: var(--lh-tight);
 }
-.layout-card:hover { border-color: var(--line); }
+/* Left accent rail — invisible until active, so no chrome on the resting state. */
+.layout-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 7px;
+  bottom: 7px;
+  width: 2px;
+  border-radius: 2px;
+  background: transparent;
+  transition: background 0.14s ease;
+}
+.layout-card:hover { background: rgba(255, 255, 255, 0.03); color: var(--text-1); }
 .layout-card.active {
-  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-1);
 }
-.layout-card .layout-icon {
-  font-size: 1rem;
-  display: block;
-  margin-bottom: 8px;
+.layout-card.active::before { background: var(--accent); }
+.layout-card .layout-name { font-weight: 500; font-size: var(--fs-sm); display: block; }
+.layout-card .layout-desc {
+  font-size: var(--fs-2xs);
   color: var(--text-3);
+  line-height: 1.35;
+  display: block;
+  margin-top: 1px;
 }
-.layout-card.active .layout-icon { color: var(--text-1); }
-.layout-card .layout-name { font-weight: 500; font-size: var(--fs-sm); display: block; margin-bottom: 2px; }
-.layout-card .layout-desc { font-size: var(--fs-xs); color: var(--text-3); line-height: 1.4; display: block; }
 .layout-card .lock {
   position: absolute;
-  top: 9px;
-  right: 9px;
-  font-size: 0.56rem;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  font-size: 0.54rem;
   font-family: var(--font-mono);
   letter-spacing: 0.1em;
   color: var(--text-3);
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  padding: 1px 5px;
 }
-.layout-card.locked { opacity: 0.6; }
+.layout-card.locked { opacity: 0.55; }
 body[data-tier="pro"] .layout-card .lock { display: none; }
 body[data-tier="pro"] .layout-card.locked { opacity: 1; }
 
 /* ---------- Canvas empty state ---------- */
+/* Deliberately quiet. The first action lives in the panel on the left, so the
+   stage stays a calm placeholder, not a second pitch competing for the eye. */
 .empty-state {
-  height: 70vh;
+  min-height: 60vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  text-align: center;
+  text-align: left;
   gap: var(--sp-3);
+  max-width: 460px;
 }
 .empty-state h1 {
-  font-size: var(--fs-hero);
+  font-size: var(--fs-xl);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
   margin: 0;
   color: var(--text-1);
   line-height: var(--lh-tight);
 }
 .empty-state p {
-  color: var(--text-2);
-  max-width: 440px;
-  margin: 0 0 var(--sp-2);
+  color: var(--text-3);
+  max-width: 420px;
+  margin: 0;
   font-size: var(--fs-md);
+  line-height: var(--lh-body);
+}
+.empty-state .empty-cta {
+  margin-top: var(--sp-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-/* ---------- Story header on canvas ---------- */
-.story-head {
-  margin-bottom: var(--sp-6);
+/* ---------- Lens bar (tabs onto one Case File) ----------
+   Findings is home; every visualization is a lens on the same understanding.
+   Lives above #canvas (never inside it), so lenses never leak into exports. */
+.lens-bar {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0 var(--sp-6);
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--bg-0);
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
-.story-head h1 {
-  margin: 0 0 6px;
+.lens-bar[hidden] { display: none; }
+.lens-tab {
+  background: none;
+  border: none;
+  border-bottom: 1.5px solid transparent;
+  color: var(--text-3);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  padding: 11px 11px;
+  margin-bottom: -1px;
+  cursor: pointer;
+  transition: color 0.14s ease, border-color 0.14s ease;
+}
+.lens-tab:hover { color: var(--text-1); }
+.lens-tab.active { color: var(--text-1); border-bottom-color: var(--accent); }
+/* Findings is the anchor tab — a hair more presence than the lenses. */
+.lens-tab:first-child { font-weight: 600; }
+.lens-tab.locked::after {
+  content: "PRO";
+  margin-left: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+}
+body[data-tier="pro"] .lens-tab.locked::after { display: none; }
+
+/* ---------- Lens loading (gated fetch on a cold backend) ---------- */
+.lens-loading {
+  min-height: 40vh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  animation: lens-loading-pulse 1.4s ease-in-out infinite;
+}
+@keyframes lens-loading-pulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.9; } }
+
+/* ---------- Findings / Case File (the home surface) ----------
+   A reading column, not a chart. Ellery's conclusions lead; the row that
+   produced each one is one lens-click away. */
+.casefile { max-width: 700px; }
+.case-header { margin-bottom: var(--sp-5); }
+.case-kicker {
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: var(--sp-3);
+}
+.case-headline {
+  margin: 0 0 var(--sp-3);
   font-size: var(--fs-xl);
   font-weight: 600;
   letter-spacing: -0.015em;
   line-height: var(--lh-tight);
+  color: var(--text-1);
+}
+.case-meta {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.02em;
+  color: var(--text-3);
+}
+.case-findings {
+  list-style: none;
+  margin: var(--sp-5) 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.finding {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--line-soft);
+}
+.finding-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex: none;
+  background: var(--text-3);
+}
+.finding-good .finding-dot { background: var(--viz-1); }
+.finding-warn .finding-dot { background: var(--warn); }
+.finding-bad .finding-dot { background: var(--danger); }
+.finding-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.finding-title {
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.finding-text {
+  font-size: var(--fs-md);
+  color: var(--text-1);
+  line-height: var(--lh-body);
+}
+.case-empty { color: var(--text-3); font-size: var(--fs-md); margin: var(--sp-4) 0; }
+.case-lenses {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--line-soft);
+}
+.case-lenses-label {
+  display: block;
+  margin-bottom: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.case-lens-row { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+.case-lens {
+  background: transparent;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: border-color 0.14s ease, color 0.14s ease;
+}
+.case-lens:hover { border-color: var(--line); color: var(--text-1); }
+
+/* ---------- The Pull: a finding is an object you can follow down ---------- */
+/* Resting state is calm; the affordance appears on hover so findings read as
+   text until you reach for one. */
+.case-pull { cursor: pointer; }
+.finding.case-pull { border-radius: var(--radius-sm); transition: background 0.14s ease; }
+.finding.case-pull:hover { background: rgba(255, 255, 255, 0.03); }
+.pull-cue {
+  margin-left: auto;
+  align-self: center;
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  opacity: 0;
+  transition: opacity 0.14s ease;
+}
+.case-pull:hover .pull-cue { opacity: 1; }
+
+/* The lead finding is a headline you can also pull. */
+button.case-headline {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text-1);
+}
+button.case-headline .pull-cue { display: inline-block; margin: 0 0 0 10px; vertical-align: middle; }
+
+/* ---------- The Trace: claim → evidence → rows → lens, as a descent ----------
+   A single left rail with a marker per layer, so it reads as peeling down
+   through the reasoning rather than opening a panel. */
+.trace-back {
+  background: none;
+  border: none;
+  padding: 4px 0;
+  margin-bottom: var(--sp-4);
+  color: var(--text-3);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: color 0.14s ease;
+}
+.trace-back:hover { color: var(--text-1); }
+
+.trace-layer {
+  position: relative;
+  padding: 0 0 var(--sp-5) var(--sp-5);
+  margin-left: 4px;
+  border-left: 1px solid var(--line);
+}
+.trace-layer:last-child { border-left-color: transparent; padding-bottom: 0; }
+.trace-step {
+  position: relative;
+  display: block;
+  margin-bottom: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+/* Marker sitting on the rail. */
+.trace-step::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--sp-5) - 4px);
+  top: 3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-3);
+}
+.trace-claim .trace-step::before { background: var(--accent); }
+
+.trace-title {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 6px;
+}
+.trace-summary {
+  margin: 0;
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: var(--lh-tight);
+  color: var(--text-1);
+}
+.trace-because {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-md);
+  color: var(--text-1);
+  line-height: var(--lh-body);
+}
+.ev-fields { display: flex; flex-wrap: wrap; gap: 6px 8px; }
+.ev-field {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 3px 9px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+}
+.ev-k { color: var(--text-3); letter-spacing: 0.04em; }
+.ev-v { color: var(--text-1); }
+
+.trace-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.trace-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  padding: 7px 0;
+  border-top: 1px solid var(--line-soft);
+}
+.trace-row:first-child { border-top: none; }
+.trace-name { font-size: var(--fs-sm); color: var(--text-1); min-width: 140px; }
+.trace-cell {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+}
+.tc-k { color: var(--text-3); letter-spacing: 0.04em; }
+.tc-v { color: var(--text-1); }
+.trace-more { padding: 8px 0 0; font-size: var(--fs-xs); color: var(--text-3); }
+.trace-hint { text-transform: none; letter-spacing: 0; color: var(--text-3); font-family: var(--font-ui); }
+
+/* Derivation · Policy · Confidence — how evidence + policy became the claim. */
+.trace-formula {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--text-1);
+  line-height: 1.6;
+}
+.trace-rule { margin: 0 0 6px; font-size: var(--fs-md); color: var(--text-1); line-height: var(--lh-body); }
+.policy-meta { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: baseline; }
+.policy-param {
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  color: var(--text-1);
+  padding: 2px 8px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+}
+.policy-source { font-family: var(--font-mono); font-size: var(--fs-2xs); color: var(--text-3); }
+.trace-conf { margin: 0; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.conf-value {
+  font-family: var(--font-mono);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--text-1);
+}
+.conf-note { font-size: var(--fs-sm); color: var(--text-3); }
+
+/* Records open to their raw cells + fingerprint — the addressable floor. */
+.trace-row-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 7px 0;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+.trace-row-head:hover .trace-name { color: var(--accent); }
+.trace-fp {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  color: var(--text-3);
+  letter-spacing: 0.04em;
+}
+.trace-raw {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.015);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px 16px;
+}
+.trace-raw[hidden] { display: none; }
+.raw-cell { display: flex; justify-content: space-between; gap: 10px; font-family: var(--font-mono); font-size: var(--fs-2xs); }
+.raw-cell dt { color: var(--text-3); margin: 0; }
+.raw-cell dd { margin: 0; color: var(--text-2); text-align: right; }
+.raw-cell.is-decisive dt { color: var(--text-2); }
+.raw-cell.is-decisive dd { color: var(--text-1); }
+.raw-origin {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line-soft);
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  color: var(--text-3);
+  letter-spacing: 0.03em;
+}
+
+/* Ground — the fingerprinted snapshot, the terminal of the descent. */
+.trace-ground .trace-step::before { background: var(--brand); }
+.ground-line { margin: 0 0 var(--sp-3); font-size: var(--fs-md); color: var(--text-1); }
+.ground-fields {
+  margin: 0 0 var(--sp-3);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 6px 16px;
+}
+.ground-fields div { display: flex; justify-content: space-between; gap: 10px; padding: 4px 0; border-bottom: 1px solid var(--line-soft); }
+.ground-fields dt { margin: 0; font-family: var(--font-mono); font-size: var(--fs-2xs); letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); }
+.ground-fields dd { margin: 0; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--text-1); }
+.ground-law {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 2px solid var(--brand);
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  line-height: var(--lh-body);
+}
+
+/* Lens footer — the outward microscope, offered after the descent hits ground. */
+.trace-lenses { margin-top: var(--sp-5); padding-top: var(--sp-4); border-top: 1px solid var(--line-soft); }
+.trace-lenses-label {
+  display: block;
+  margin-bottom: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+/* ---------- Tracing bar (shown on a lens while following a finding) ---------- */
+.pull-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 7px var(--sp-6);
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--line-soft);
+  font-size: var(--fs-sm);
+}
+.pull-bar[hidden] { display: none; }
+.pull-bar-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.pull-bar-finding {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-1);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+.pull-bar-finding:hover { text-decoration: underline; text-underline-offset: 3px; }
+.pull-bar-count { font-family: var(--font-mono); font-size: var(--fs-2xs); color: var(--text-3); }
+.pull-bar-clear {
+  margin-left: auto;
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: color 0.14s ease;
+}
+.pull-bar-clear:hover { color: var(--text-1); }
+
+/* ---------- The spotlight: the lens becomes a microscope ---------- */
+.pull-active .pull-dim { opacity: 0.12; transition: opacity 0.22s ease; }
+.pull-lit { transition: opacity 0.22s ease; }
+.data-card.pull-lit { border-color: rgba(255, 255, 255, 0.5); }
+.tl-item.pull-lit .tl-card { border-color: rgba(255, 255, 255, 0.5); }
+
+/* ---------- Story header on canvas ---------- */
+.story-head {
+  margin-bottom: var(--sp-4);
+}
+.story-head h1 {
+  margin: 0 0 4px;
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: var(--lh-tight);
 }
 .story-head .story-meta {
   font-family: var(--font-mono);
-  font-size: var(--fs-xs);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.02em;
   color: var(--text-3);
 }
 
@@ -566,33 +1059,57 @@ body[data-tier="pro"] .layout-card.locked { opacity: 1; }
   border-top: 1px solid var(--line-soft);
 }
 
-/* ---------- Live Simulation toggle ---------- */
+/* ---------- Export grouping ---------- */
+/* One loud action (MP4), a tidy grid of quiet alternates, a near-invisible
+   utility — instead of a wall of equal-weight buttons. */
+.export-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+.export-util {
+  margin-top: 6px;
+  display: flex;
+}
+.export-util .btn-quiet { padding-left: 0; }
+
+/* ---------- Advanced sections (Briefing, Simulation) ---------- */
+/* Present, but clearly downstream of the core Upload → Layout → Export path. */
+.panel-section-advanced h2 { color: var(--text-3); opacity: 0.85; }
+
+/* ---------- Live Simulation toggle (advanced, deliberately quiet) ---------- */
 .sim-toggle {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
+  gap: 9px;
   text-align: left;
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+  transition: background 0.14s ease, color 0.14s ease;
 }
+.sim-toggle:hover { color: var(--text-1); background: rgba(255, 255, 255, 0.03); }
 .sim-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--text-3);
   flex: none;
-  transition: background 0.2s, box-shadow 0.2s;
+  transition: background 0.15s;
 }
-.sim-toggle.active {
-  border-color: rgba(255, 255, 255, 0.45);
-  color: var(--text-1);
-}
-.sim-toggle.active .sim-dot {
-  background: var(--accent);
-  animation: pulse-glow 2.2s ease-in-out infinite;
-}
+.sim-toggle.active { color: var(--text-1); }
+.sim-toggle.active .sim-dot { background: var(--accent); }
 body[data-tier="free"] #simSection .sim-toggle { opacity: 0.7; }
 
-.ship-export { margin-top: var(--sp-2); }
+.ship-export { margin-top: 6px; }
 
 /* ---------- Saved stories ---------- */
 .saved-list {
@@ -605,15 +1122,15 @@ body[data-tier="free"] #simSection .sim-toggle { opacity: 0.7; }
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 6px 8px;
   background: transparent;
-  border: 1px solid var(--line-soft);
+  border: none;
   border-radius: var(--radius-sm);
   font-size: var(--fs-xs);
   cursor: pointer;
-  transition: border-color 0.15s;
+  transition: background 0.14s ease;
 }
-.saved-item:hover { border-color: var(--line); }
+.saved-item:hover { background: rgba(255, 255, 255, 0.03); }
 .saved-name {
   flex: 1;
   color: var(--text-1);
@@ -806,41 +1323,9 @@ body[data-authed="false"] .app { visibility: hidden; }
 
 /* ---------- Onboarding empty state ---------- */
 .empty-state {
-  transition: opacity 0.24s ease;
+  transition: opacity 0.16s ease;
 }
 .empty-state.fading { opacity: 0; }
-.empty-steps {
-  margin: var(--sp-2) 0 var(--sp-3);
-  padding: var(--sp-3) var(--sp-4);
-  border-top: 1px solid var(--line-soft);
-  border-bottom: 1px solid var(--line-soft);
-  text-align: left;
-  max-width: 480px;
-}
-.empty-steps h2 {
-  margin: 0 0 10px;
-  font-size: var(--fs-xs);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--text-3);
-}
-.empty-steps ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.empty-steps li {
-  font-size: var(--fs-sm);
-  color: var(--text-2);
-  display: flex;
-  gap: 10px;
-  line-height: 1.55;
-}
-.empty-steps li::before { content: "—"; color: var(--text-3); flex: none; }
 
 
 
@@ -1137,30 +1622,31 @@ body[data-authed="false"] .app { visibility: hidden; }
 
 /* ---------- Data Story panel ---------- */
 .story-help {
-  margin: 10px 0 0;
-  font-size: 0.62rem;
-  line-height: 1.55;
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-2xs);
+  line-height: 1.5;
   color: var(--text-3);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 .story-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 1px;
   margin-top: var(--sp-3);
 }
 .story-scene {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 7px 10px;
-  border: 1px solid var(--line-soft);
+  padding: 6px 8px;
   border-radius: var(--radius-sm);
   font-size: var(--fs-xs);
+  transition: background 0.14s ease;
 }
+.story-scene:hover { background: rgba(255, 255, 255, 0.03); }
 .story-idx {
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: var(--fs-2xs);
   color: var(--text-3);
   width: 14px;
   flex: none;
@@ -1206,74 +1692,86 @@ body[data-authed="false"] .app { visibility: hidden; }
 /* ---------- Example dataset links (multi-domain demos) ---------- */
 .example-row {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   flex-wrap: wrap;
-  gap: 6px 10px;
+  gap: 4px 12px;
   margin-top: var(--sp-3);
 }
 .example-label {
-  font-family: var(--font-mono);
-  font-size: 0.56rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.02em;
   color: var(--text-3);
+  margin-right: 2px;
 }
 .example-link {
   background: none;
   border: none;
-  padding: 2px 0;
+  padding: 1px 0;
   color: var(--text-2);
   font-family: var(--font-ui);
   font-size: var(--fs-xs);
   cursor: pointer;
-  border-bottom: 1px solid var(--line);
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.14s;
 }
-.example-link:hover { color: var(--text-1); border-color: var(--text-3); }
+.example-link:hover { color: var(--text-1); }
 
-/* ---------- Early Access Preview banner ---------- */
+/* ---------- Early Access Preview banner (slim, informational) ---------- */
 .preview-banner {
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: 9px var(--sp-5);
-  background: rgba(255, 255, 255, 0.04);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: var(--fs-sm);
-  color: var(--text-2);
+  padding: 5px var(--sp-4);
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--line-soft);
+  font-size: var(--fs-2xs);
+  color: var(--text-3);
   line-height: var(--lh-tight);
 }
 .preview-banner[hidden] { display: none; }
 .preview-banner-text { flex: 1; }
-.preview-banner-text strong { color: var(--text-1); font-weight: 600; }
+.preview-banner-text strong { color: var(--text-2); font-weight: 500; }
 .preview-banner-close {
   flex: none;
   background: none;
   border: none;
   color: var(--text-3);
   cursor: pointer;
-  font-size: 0.8rem;
-  padding: 4px 7px;
+  font-size: 0.72rem;
+  padding: 2px 6px;
   border-radius: var(--radius-sm);
-  transition: color 0.18s ease;
+  transition: color 0.14s ease;
 }
 .preview-banner-close:hover { color: var(--text-1); }
 @media (max-width: 640px) {
-  .preview-banner { padding: 8px var(--sp-4); font-size: var(--fs-xs); }
+  .preview-banner { padding: 5px var(--sp-4); }
 }
 
 /* ---------- Preview access pill (replaces the upgrade CTA) ---------- */
-/* A quiet status chip, not a call to action — payments arrive post-preview. */
+/* A quiet status marker, not a call to action — payments arrive post-preview.
+   No box: a faint dot + label, so it reads as status, not a button. */
 .preview-pill {
-  cursor: default;
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  padding: 7px 13px;
-  color: var(--text-2);
-  border-color: var(--line);
+  cursor: pointer;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  padding: 4px 2px;
+  color: var(--text-3);
+  background: transparent;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
-.preview-pill:hover { border-color: var(--line); color: var(--text-2); background: transparent; }
+.preview-pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand);
+  opacity: 0.8;
+}
+.preview-pill:hover { color: var(--text-1); background: transparent; }
 
 /* ---------- Early Access modal: plan summary (replaces checkout) ---------- */
 .preview-pane { display: flex; flex-direction: column; }
