@@ -159,68 +159,6 @@
   font-size: var(--fs-lg);
 }
 
-/* ---------- Layout picker ---------- */
-/* A single selectable list, not a grid of floating cards. Names lead; the
-   one-line purpose recedes; the active row is marked by a fill and a left
-   accent, so selection reads instantly without borders around everything. */
-.layout-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-.layout-card {
-  position: relative;
-  display: block;
-  text-align: left;
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 8px 10px 8px 12px;
-  cursor: pointer;
-  color: var(--text-2);
-  transition: background 0.14s ease, color 0.14s ease;
-  line-height: var(--lh-tight);
-}
-/* Left accent rail — invisible until active, so no chrome on the resting state. */
-.layout-card::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 7px;
-  bottom: 7px;
-  width: 2px;
-  border-radius: 2px;
-  background: transparent;
-  transition: background 0.14s ease;
-}
-.layout-card:hover { background: rgba(255, 255, 255, 0.03); color: var(--text-1); }
-.layout-card.active {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-1);
-}
-.layout-card.active::before { background: var(--accent); }
-.layout-card .layout-name { font-weight: 500; font-size: var(--fs-sm); display: block; }
-.layout-card .layout-desc {
-  font-size: var(--fs-2xs);
-  color: var(--text-3);
-  line-height: 1.35;
-  display: block;
-  margin-top: 1px;
-}
-.layout-card .lock {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  font-size: 0.54rem;
-  font-family: var(--font-mono);
-  letter-spacing: 0.1em;
-  color: var(--text-3);
-}
-.layout-card.locked { opacity: 0.55; }
-body[data-tier="pro"] .layout-card .lock { display: none; }
-body[data-tier="pro"] .layout-card.locked { opacity: 1; }
-
 /* ---------- Canvas empty state ---------- */
 /* Deliberately quiet. The first action lives in the panel on the left, so the
    stage stays a calm placeholder, not a second pitch competing for the eye. */
@@ -1109,7 +1047,6 @@ button.case-headline .pull-cue { display: inline-block; margin: 0 0 0 10px; vert
 .sim-toggle.active .sim-dot { background: var(--accent); }
 body[data-tier="free"] #simSection .sim-toggle { opacity: 0.7; }
 
-.ship-export { margin-top: 6px; }
 
 /* ---------- Saved stories ---------- */
 .saved-list {
@@ -1236,83 +1173,21 @@ body[data-tier="free"] #simSection .sim-toggle { opacity: 0.7; }
 }
 .auth-switch:hover { color: var(--text-1); }
 
+/* On a phone the topbar must not push the page sideways. The identity chip
+   collapses to its avatar, and the two modal triggers step out — both are
+   reachable elsewhere (About lives on the site, Embed in slides in the docs). */
 @media (max-width: 640px) {
   .auth-name { display: none; }
+  .topbar #welcomeHelp,
+  .topbar #embedHelp { display: none; }
 }
 
-/* ---------- Auth gate (mandatory landing) ---------- */
-.gate {
-  position: fixed;
-  top: var(--topbar-h);
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 100;
-  background: var(--bg-0);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow-y: auto;
-  padding: var(--sp-5) var(--sp-4);
-}
-body[data-authed="true"] .gate { display: none; }
+/* ---------- Unauthenticated guard ----------
+   Sign-in is a page now (login.html); js/ui/auth.js redirects there. These two
+   rules stay to keep the workspace from flashing in the moment before the
+   redirect lands — everything else that styled the old in-app gate is gone. */
 body[data-authed="false"] .topbar-right { visibility: hidden; }
 body[data-authed="false"] .app { visibility: hidden; }
-
-.gate-card {
-  width: min(420px, 100%);
-  margin: auto;
-  text-align: left;
-}
-.gate-brand {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  font-weight: 600;
-  font-size: var(--fs-lg);
-  margin-bottom: var(--sp-5);
-}
-.gate-brand em { font-style: normal; color: var(--text-3); font-weight: 400; }
-.gate-card h1 {
-  margin: 0 0 8px;
-  font-size: var(--fs-hero);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: var(--lh-tight);
-}
-.gate-sub {
-  margin: 0 0 var(--sp-4);
-  color: var(--text-2);
-  font-size: var(--fs-md);
-}
-
-/* Microscopic onboarding block */
-.gate-steps {
-  list-style: none;
-  margin: 0 0 var(--sp-5);
-  padding: var(--sp-3) 0;
-  border-top: 1px solid var(--line-soft);
-  border-bottom: 1px solid var(--line-soft);
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-}
-.gate-steps li {
-  display: flex;
-  gap: 12px;
-  align-items: baseline;
-  font-size: var(--fs-xs);
-  color: var(--text-2);
-  letter-spacing: 0.01em;
-  line-height: 1.55;
-}
-.gate-steps li span {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: var(--text-3);
-  letter-spacing: 0.12em;
-  flex: none;
-}
 
 /* ---------- Kinetic Canvas ---------- */
 .kinetic-wrap canvas {

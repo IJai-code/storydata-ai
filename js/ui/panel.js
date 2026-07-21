@@ -140,7 +140,6 @@ let ingesting = false;
 
 export function initPanel() {
   wireIngestion();
-  buildLayoutPicker();
   wireStory();
   wireSimulation();
   wireSaveShareExport();
@@ -158,7 +157,6 @@ export function initPanel() {
     }
     if (changed.includes('story')) renderStoryList();
     if (changed.includes('layout') || changed.includes('simulation')) {
-      markActiveLayout(state.layout);
       syncSimToggle();
     }
   });
@@ -304,44 +302,6 @@ function renderSchemaChips(dataset) {
     chips.push(`<span class="chip">+${dataset.columns.length - 6} more</span>`);
   }
   el.innerHTML = chips.join('');
-}
-
-/* ---------- Layout picker ---------- */
-
-function buildLayoutPicker() {
-  // Lens selection now lives in the canvas lens bar (js/render/canvas.js), so
-  // the panel no longer carries a layout picker. Guard for its absence.
-  const grid = document.getElementById('layoutGrid');
-  if (!grid) return;
-  grid.innerHTML = Object.entries(LAYOUTS)
-    .map(
-      ([key, meta]) => `
-      <button class="layout-card${meta.pro ? ' locked' : ''}" data-layout="${key}">
-        ${meta.pro ? '<span class="lock">PRO</span>' : ''}
-        <span class="layout-name">${meta.name}</span>
-        <span class="layout-desc">${meta.desc}</span>
-      </button>`
-    )
-    .join('');
-
-  grid.addEventListener('click', (e) => {
-    const card = e.target.closest('[data-layout]');
-    if (!card) return;
-    const key = card.dataset.layout;
-    if (!layoutAllowed(key)) {
-      openPaywall('layout-locked');
-      return;
-    }
-    setState({ layout: key });
-  });
-
-  markActiveLayout(getState().layout);
-}
-
-function markActiveLayout(layout) {
-  document.querySelectorAll('.layout-card').forEach((el) => {
-    el.classList.toggle('active', el.dataset.layout === layout);
-  });
 }
 
 /* ---------- Data Story Mode ----------

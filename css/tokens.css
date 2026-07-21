@@ -9,10 +9,13 @@
   --line: #2a2a2c;
   --line-soft: #1f1f21;
 
-  /* Text */
+  /* Text. --text-3 carries most of the small labels (finding titles, evidence
+     keys, metadata, nav at rest), so it has to clear WCAG AA 4.5:1 at 10–11px —
+     the old #6e6e73 sat at 3.8:1 and was the hardest text in the product to
+     read, which is a poor look for software about legible reasoning. */
   --text-1: #f5f5f7;
   --text-2: #a0a0a6;
-  --text-3: #6e6e73;
+  --text-3: #8b8b91;
 
   /* Single accent */
   --accent: #ffffff;

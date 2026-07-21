@@ -245,11 +245,6 @@ a { color: inherit; text-decoration: none; }
   cursor: pointer; transition: border-color 0.14s ease, background 0.14s ease; position: relative;
 }
 .case-card:hover { border-color: var(--line); }
-.case-new {
-  display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
-  border-style: dashed; color: var(--text-2); min-height: 128px;
-}
-.case-new .plus { font-size: 1.4rem; line-height: 1; margin-bottom: 8px; color: var(--text-2); }
 .case-name { font-weight: 600; font-size: var(--fs-md); letter-spacing: -0.01em; margin-bottom: 6px; }
 .case-meta { font-family: var(--font-mono); font-size: var(--fs-2xs); color: var(--text-3); letter-spacing: 0.03em; }
 .case-sub { margin-top: 10px; font-size: var(--fs-xs); color: var(--text-3); }
