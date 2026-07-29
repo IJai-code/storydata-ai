@@ -2,25 +2,20 @@
 // server, then wires the store to the panel, canvas, paywall, and auth.
 
 import { refreshSession, EARLY_ACCESS_PREVIEW, previewSession } from './tier/gates.js';
-import { setState } from './state.js';
+import { setState, subscribe } from './state.js';
 import { initCanvas } from './render/canvas.js';
 import { initPanel, loadDemo, openSavedCase } from './ui/panel.js';
 import { initPaywall, openPaywall } from './tier/paywall.js';
 import { initAuth } from './ui/auth.js';
 import { initTutorial } from './ui/tutorial.js';
-import { initWelcome } from './ui/welcome.js';
 import { initToasts, toast } from './ui/toast.js';
 import { api } from './api.js';
 
 async function boot() {
   initToasts(document.getElementById('toastRoot'));
   initPaywall(document.getElementById('modalRoot'));
-  initAuth({ gate: document.getElementById('gate'), area: document.getElementById('authArea') });
+  initAuth({ area: document.getElementById('authArea') });
   initTutorial(document.getElementById('tutorialRoot'), document.getElementById('embedHelp'));
-
-  // Independent of the network — render/measure the banner before any await so
-  // its height is applied even if the backend is slow or unreachable.
-  initPreviewBanner();
 
   // Bring the workspace up FIRST, before touching the network. The panel and
   // canvas read tier/limits from the store and re-sync whenever those change,
@@ -30,12 +25,21 @@ async function boot() {
   initCanvas(document.getElementById('canvas'), {
     gateDenied: () => openPaywall('layout-locked'),
   });
-  initWelcome(document.getElementById('welcomeHelp'));
 
   // Delegated actions from dynamically rendered content (e.g. empty state).
   document.addEventListener('click', (e) => {
     const action = e.target.closest('[data-action]')?.dataset.action;
     if (action === 'load-demo') loadDemo();
+  });
+
+  // Refresh must never lose the investigation. The working session — the same
+  // shape a saved case carries, plus the active trace — mirrors to this device
+  // on every change and is restored before the network is even consulted.
+  restoreWorkingSession();
+  subscribe((state, changed) => {
+    if (changed.some((k) => ['dataset', 'layout', 'story', 'focus'].includes(k))) {
+      persistWorkingSession(state);
+    }
   });
 
   const session = await refreshSession();
@@ -79,7 +83,6 @@ async function boot() {
         const result = await api.devReset();
         if (!result.ok) return result.error || 'reset failed';
         await refreshSession(result);
-        setState({ simulation: false });
         toast('Back on the free tier — funnel reset.', 'warn');
         return 'ok — session is free tier';
       },
@@ -88,28 +91,49 @@ async function boot() {
   }
 }
 
-// Early Access banner: dismissible, with its height fed to the layout so the
-// fixed-height workspace below it never overflows the viewport.
-function initPreviewBanner() {
-  const banner = document.getElementById('previewBanner');
-  if (!banner) return;
-  const DISMISS_KEY = 'ellery_preview_banner_dismissed';
+/* ---------- Working-session persistence ---------- */
+
+const SESSION_KEY = 'ellery_session';
+
+function persistWorkingSession(state) {
   try {
-    if (localStorage.getItem(DISMISS_KEY) === '1') banner.hidden = true;
-  } catch { /* ignore storage errors */ }
+    if (!state.dataset) {
+      localStorage.removeItem(SESSION_KEY);
+      return;
+    }
+    localStorage.setItem(
+      SESSION_KEY,
+      JSON.stringify({
+        dataset: state.dataset,
+        layout: state.layout,
+        story: state.story,
+        focus: state.focus,
+      })
+    );
+  } catch {
+    /* storage full — refresh-safety degrades gracefully, nothing else breaks */
+  }
+}
 
-  const measure = () => {
-    const h = banner.hidden ? 0 : banner.offsetHeight;
-    document.documentElement.style.setProperty('--banner-h', `${h}px`);
-  };
-  measure();
-  window.addEventListener('resize', measure);
-
-  document.getElementById('previewBannerClose')?.addEventListener('click', () => {
-    banner.hidden = true;
-    try { localStorage.setItem(DISMISS_KEY, '1'); } catch { /* ignore */ }
-    measure();
-  });
+function restoreWorkingSession() {
+  let saved = null;
+  try {
+    saved = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+  } catch {
+    return;
+  }
+  if (!saved?.dataset) return;
+  // Two steps: setting the dataset alone first lets the "new dataset" handlers
+  // (which clear any stale story/trace) fire harmlessly; the lens, trace, and
+  // briefing then land on the next tick, exactly as the user left them.
+  setState({ dataset: saved.dataset });
+  setTimeout(() => {
+    setState({
+      layout: saved.layout || 'findings',
+      focus: saved.focus || null,
+      story: saved.story || null,
+    });
+  }, 0);
 }
 
 if (document.readyState === 'loading') {

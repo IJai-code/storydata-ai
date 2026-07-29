@@ -15,15 +15,10 @@ const TRIGGER_COPY = {
     headline: 'The deep, zoomable Insight Map.',
     sub: 'A normally-Pro layout — and it’s yours during the preview.',
   },
-  simulation: {
-    kicker: 'Simulation',
-    headline: 'Animate change across a layout.',
-    sub: 'Simulation Mode plays change through the Insight Map, Mindmap, and Timeline — an advanced view for exploring movement in the data.',
-  },
   'row-cap': {
-    kicker: 'Unlimited rows',
-    headline: 'Render every row of your data.',
-    sub: 'No row ceiling during the preview — every record is visualized.',
+    kicker: 'Unlimited records',
+    headline: 'Analyze every record in your data.',
+    sub: 'No record ceiling during the preview — the whole dataset is read.',
   },
   interactive: {
     kicker: 'Interactive export',
@@ -64,7 +59,7 @@ export function openPaywall(trigger = 'upgrade', detail = {}) {
   const copy = TRIGGER_COPY[trigger] || TRIGGER_COPY.upgrade;
   const headline =
     trigger === 'row-cap' && detail.totalRows
-      ? `Your data has ${detail.totalRows.toLocaleString()} rows — all of them render in the preview.`
+      ? `Your data has ${detail.totalRows.toLocaleString()} records — all of them are read in the preview.`
       : copy.headline;
 
   modalRoot.innerHTML = `
@@ -77,9 +72,8 @@ export function openPaywall(trigger = 'upgrade', detail = {}) {
             <h2 id="paywallTitle">${headline}</h2>
             <p class="paywall-sub">${copy.sub}</p>
             <ul>
-              <li>Unlimited rows — no ${capLabel}-row ceiling</li>
+              <li>Unlimited records — no ${capLabel}-record ceiling</li>
               <li>Insight Map layout with grouped findings</li>
-              <li>Simulation Mode — animate change across a layout</li>
               <li>No watermark — including clean MP4 captures</li>
               <li>Interactive export — the live board in one file</li>
               <li>Clean HTML export — a self-contained standalone file</li>

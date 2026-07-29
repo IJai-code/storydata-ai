@@ -20,15 +20,6 @@ import { formatValue, escapeHTML } from '../util.js';
 
 const TONE_CLASS = { ok: 'good', warn: 'warn', critical: 'bad', neutral: 'neutral' };
 
-// Lenses offered from a trace, ordered by how well each inspects the evidence.
-const LENSES = [
-  ['map', 'Insight Map'],
-  ['cards', 'Cards'],
-  ['timeline', 'Timeline'],
-  ['nodes', 'Mindmap'],
-  ['kinetic', 'Kinetic Rank'],
-];
-
 export function render(container, dataset) {
   const report = buildReport(dataset);
   const focus = getState().focus;
@@ -101,10 +92,13 @@ function renderTrace(focus, dataset, report) {
   root.className = 'casefile trace';
 
   const because = explain(focus);
+  // Raw evidence values can be long floats (e.g. a z-score); cap displayed
+  // precision to 3 decimals so the chips read cleanly next to the rounded ones.
+  const showNum = (v) => formatValue(Number.isInteger(v) ? v : Math.round(v * 1000) / 1000, 'number');
   const evidenceFields = Object.entries(focus.evidence)
     .filter(([, v]) => v != null && typeof v !== 'object')
     .map(([k, v]) => `<div class="ev-field"><span class="ev-k">${escapeHTML(k)}</span>
-      <span class="ev-v">${escapeHTML(typeof v === 'number' ? formatValue(v, 'number') : String(v))}</span></div>`)
+      <span class="ev-v">${escapeHTML(typeof v === 'number' ? showNum(v) : String(v))}</span></div>`)
     .join('');
 
   // The rows layer descends one step further: each record opens to its full raw
@@ -209,13 +203,6 @@ function renderTrace(focus, dataset, report) {
         </dl>
         <p class="ground-law">Conclusion = f( evidence, policy ). Re-run this snapshot under the
           same policy and the finding reproduces exactly.</p>
-      </div>
-    </div>
-
-    <div class="trace-lenses">
-      <span class="trace-lenses-label">See it plotted</span>
-      <div class="case-lens-row">
-        ${LENSES.map(([key, name]) => `<button class="case-lens" data-goto-layout="${key}">${name}</button>`).join('')}
       </div>
     </div>`;
 

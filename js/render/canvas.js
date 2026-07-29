@@ -1,10 +1,9 @@
 // Canvas orchestrator: owns the renderer lifecycle, watermark injection,
-// Live Simulation lifecycle, and the export/share document requests.
+// and the export/share document requests.
 //
 // Free layouts (timeline, cards, mindmap) are bundled; the Insight Map
-// renderer and the Live Simulation engine are fetched on demand from
-// /gated/, which the server only serves to Pro sessions — a free browser
-// never receives the premium code at all.
+// renderer is fetched on demand from /gated/, which the server only serves
+// to Pro sessions — a free browser never receives the premium code at all.
 
 import { subscribe, getState, setState } from '../state.js';
 import { watermarkRequired, LAYOUTS, layoutAllowed } from '../tier/gates.js';
@@ -27,7 +26,6 @@ const LOCAL_RENDERERS = { findings, kinetic, timeline, cards, nodes };
 // Pages origin and 404.
 const GATED_URLS = {
   map: `${API_BASE}/gated/map.js`,
-  simulation: `${API_BASE}/gated/simulation.js`,
 };
 
 // Because the gated modules load cross-origin, their own imports can't resolve
@@ -37,14 +35,17 @@ const GATED_URLS = {
 window.__elleryUtil = util;
 // The Discovery Engine is the analysis layer gated visualizations read from.
 window.__elleryDiscovery = discovery;
-const SIMULATABLE = new Set(['map', 'nodes', 'timeline']);
 const gatedCache = new Map();
+
+// Entrance motion celebrates arrival, once: each lens animates its first
+// render of a dataset, and every revisit is immediate. Reset on new data.
+let animatedLenses = new Set();
+let animatedDataset = null;
 
 let canvasEl = null;
 let lensBar = null;
 let pullBar = null;
 let cleanup = null;
-let simCleanup = null;
 let renderToken = 0;
 let onGateDenied = () => {};
 
@@ -92,7 +93,7 @@ export function initCanvas(el, { gateDenied } = {}) {
       setState({ focus: null });
       return;
     }
-    if (changed.some((k) => ['dataset', 'layout', 'tier', 'limits', 'simulation', 'focus'].includes(k))) {
+    if (changed.some((k) => ['dataset', 'layout', 'tier', 'limits', 'focus'].includes(k))) {
       render(state);
     }
   });
@@ -135,10 +136,6 @@ function renderLensBar(state) {
     .join('');
 }
 
-export function simulationSupported(layout) {
-  return SIMULATABLE.has(layout);
-}
-
 // The live Kinetic Rank engine instance, if the kinetic layout is mounted.
 // Data Story Mode (camera + scenes) lives on this engine.
 export function getKineticSystem() {
@@ -147,7 +144,6 @@ export function getKineticSystem() {
 
 async function render(state) {
   const token = ++renderToken;
-  stopSimulation();
   if (cleanup) {
     cleanup();
     cleanup = null;
@@ -199,20 +195,27 @@ async function render(state) {
   }
 
   const { dataset, layout } = state;
-  const meta = LAYOUTS[layout];
 
-  // Findings is the Case File — it carries its own header. Every other lens
-  // gets a title/meta head, which also becomes the exported artifact's title.
+  // Findings carries its own header. Every other lens gets the dataset's shape
+  // only — the lens bar above already names the view, so repeating it here (and
+  // in the export) said the chart's type where the data's identity belongs.
   if (layout !== 'findings') {
     const head = document.createElement('div');
     head.className = 'story-head';
     head.innerHTML = `
-      <h1>${meta.name}</h1>
       <div class="story-meta">${dataset.rows.length}${
         dataset.truncated ? ` of ${dataset.meta.totalRows}` : ''
-      } rows · ${dataset.columns.length} columns · source: ${dataset.meta.format}</div>`;
+      } records · ${dataset.columns.length} fields · source: ${dataset.meta.format}</div>`;
     canvasEl.appendChild(head);
   }
+
+  // First render of this lens for this dataset animates; revisits are instant.
+  if (animatedDataset !== dataset) {
+    animatedDataset = dataset;
+    animatedLenses = new Set();
+  }
+  canvasEl.classList.toggle('no-anim', animatedLenses.has(layout));
+  animatedLenses.add(layout);
 
   cleanup = renderer.render(canvasEl, dataset) || null;
 
@@ -221,24 +224,7 @@ async function render(state) {
   // (Kinetic) expose no row elements, so applyFocus no-ops there gracefully.
   if (state.focus && layout !== 'findings') applyFocus(canvasEl, state.focus);
 
-  if (state.simulation && SIMULATABLE.has(layout)) {
-    const sim = await resolveGated('simulation');
-    if (token !== renderToken) return;
-    if (sim) {
-      simCleanup = sim.start(canvasEl, layout) || null;
-    } else {
-      onGateDenied('simulation');
-    }
-  }
-
   if (watermarkRequired()) applyWatermark(canvasEl);
-}
-
-function stopSimulation() {
-  if (simCleanup) {
-    simCleanup();
-    simCleanup = null;
-  }
 }
 
 async function resolveGated(key) {

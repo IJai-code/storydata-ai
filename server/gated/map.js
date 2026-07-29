@@ -96,7 +96,7 @@ export function render(container, dataset) {
 
   const hint = document.createElement('div');
   hint.className = 'viz-hint';
-  hint.textContent = `${bubbles.length} records · ${groupNames.length} ${groupNames.length === 1 ? 'group' : 'groups'} · click a node to trace its group · scroll to zoom · drag to pan`;
+  hint.textContent = `${bubbles.length} records · ${groupNames.length} ${groupNames.length === 1 ? 'group' : 'groups'}`;
   stage.appendChild(hint);
   root.appendChild(stage);
 
@@ -133,7 +133,7 @@ export function render(container, dataset) {
       'fill-opacity': '0.18', stroke: color, 'stroke-width': '1.5',
     });
     circle.classList.add('pop-node');
-    circle.style.animationDelay = `${Math.min(i * 0.018, 1.3)}s`;
+    circle.style.animationDelay = `${Math.min(i * 0.006, 0.25)}s`;
     circle.dataset.baseR = String(b.r);
     g.appendChild(circle);
 
@@ -265,7 +265,7 @@ function buildSummary(report) {
 
   aside.innerHTML = `
     <div class="im-summary-head">
-      <h3>Findings</h3>
+      <h3>Analysis</h3>
       <p class="im-summary-sub">${report.meta.rowCount} records · ${report.meta.columnCount} fields · ${escapeHTML(report.domain.label)}</p>
     </div>
     <div class="im-legend"><span>${sizeLegend}</span><span>${colorLegend}</span></div>

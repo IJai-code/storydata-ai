@@ -14,7 +14,6 @@ import { tierOf, limitsFor, rowCapFor, validateSandboxCard } from './tier.js';
 import { buildExportDocument, buildInteractiveDocument } from './export.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const GATED_DIR = path.join(__dirname, 'gated');
 const PORT = Number(process.env.PORT) || 4173;
 
@@ -159,8 +158,8 @@ app.get('/gated/:file', (req, res) => {
 });
 
 /* ---------- Static frontend ---------- */
-
-app.use(express.static(PUBLIC_DIR, { index: 'index.html' }));
+// The frontend is served by GitHub Pages, not Express. This backend is
+// API-only; any non-API path falls through to the 404 handler below.
 
 /* ---------- Errors ---------- */
 

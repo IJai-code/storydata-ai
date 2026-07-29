@@ -32,8 +32,8 @@
   <main class="auth-wrap">
     <div class="auth-card">
       <span class="kicker">Ellery workspace</span>
-      <h1 id="authTitle">Create your account</h1>
-      <p class="auth-sub" id="authSub">Save your cases and pick up where you left off.</p>
+      <h1 id="authTitle">Set up your workspace</h1>
+      <p class="auth-sub" id="authSub">Your cases live on this device.</p>
       <form id="authForm" novalidate>
         <div class="field" id="nameField">
           <label for="fName">Name</label>
@@ -43,16 +43,11 @@
           <label for="fEmail">Email</label>
           <input id="fEmail" type="email" autocomplete="email" placeholder="you@studio.com">
         </div>
-        <div class="field">
-          <label for="fPass">Password</label>
-          <input id="fPass" type="password" autocomplete="new-password" placeholder="At least 8 characters">
-        </div>
         <div class="auth-error" id="authError"></div>
-        <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center" id="authSubmit" type="submit">Create account</button>
-        <p class="auth-note">Preview build — accounts are simulated in this browser only. Your
-          details stay on this device and are never sent to a server.</p>
+        <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center" id="authSubmit" type="submit">Continue</button>
+        <p class="auth-note">Nothing is sent to a server — your name and email only label this
+          workspace on this device.</p>
       </form>
-      <button class="auth-switch" id="authSwitch">Already have an account? Sign in</button>
     </div>
   </main>
 

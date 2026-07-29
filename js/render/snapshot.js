@@ -57,7 +57,7 @@ async function rasterizeSVG(svgEl) {
     el.removeAttribute('style');
   });
 
-  // Simulation pulses are motion-only — meaningless in a still frame.
+  // SVG motion elements are meaningless in a still frame — strip them.
   clone.querySelectorAll('defs, circle > animateMotion').forEach((el) => {
     const target = el.tagName === 'animateMotion' ? el.parentElement : el;
     target.remove();

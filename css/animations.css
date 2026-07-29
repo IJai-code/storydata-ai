@@ -79,6 +79,16 @@
   animation: node-pop 0.3s cubic-bezier(0.2, 0.6, 0.2, 1) forwards;
 }
 
+/* Revisiting a lens already seen for this dataset: no entrance replay — the
+   view is simply there. Same recipe as reduced-motion, scoped to the canvas,
+   and only touching entrance animations (hover/state transitions are exempt). */
+.no-anim *, .no-anim *::before, .no-anim *::after {
+  animation-duration: 0.01ms !important;
+  animation-delay: 0ms !important;
+}
+.no-anim .tl-item, .no-anim .data-card, .no-anim .pop-node { opacity: 1 !important; transform: none !important; }
+.no-anim .draw-path { stroke-dashoffset: 0 !important; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

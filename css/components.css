@@ -318,35 +318,6 @@ body[data-tier="pro"] .lens-tab.locked::after { display: none; }
   line-height: var(--lh-body);
 }
 .case-empty { color: var(--text-3); font-size: var(--fs-md); margin: var(--sp-4) 0; }
-.case-lenses {
-  margin-top: var(--sp-5);
-  padding-top: var(--sp-4);
-  border-top: 1px solid var(--line-soft);
-}
-.case-lenses-label {
-  display: block;
-  margin-bottom: var(--sp-3);
-  font-family: var(--font-mono);
-  font-size: var(--fs-2xs);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-3);
-}
-.case-lens-row { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
-.case-lens {
-  background: transparent;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-sm);
-  color: var(--text-2);
-  font-family: var(--font-ui);
-  font-size: var(--fs-sm);
-  font-weight: 500;
-  padding: 6px 12px;
-  cursor: pointer;
-  transition: border-color 0.14s ease, color 0.14s ease;
-}
-.case-lens:hover { border-color: var(--line); color: var(--text-1); }
-
 /* ---------- The Pull: a finding is an object you can follow down ---------- */
 /* Resting state is calm; the affordance appears on hover so findings read as
    text until you reach for one. */
@@ -582,18 +553,6 @@ button.case-headline .pull-cue { display: inline-block; margin: 0 0 0 10px; vert
   line-height: var(--lh-body);
 }
 
-/* Lens footer — the outward microscope, offered after the descent hits ground. */
-.trace-lenses { margin-top: var(--sp-5); padding-top: var(--sp-4); border-top: 1px solid var(--line-soft); }
-.trace-lenses-label {
-  display: block;
-  margin-bottom: var(--sp-3);
-  font-family: var(--font-mono);
-  font-size: var(--fs-2xs);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-3);
-}
-
 /* ---------- Tracing bar (shown on a lens while following a finding) ---------- */
 .pull-bar {
   display: flex;
@@ -645,13 +604,6 @@ button.case-headline .pull-cue { display: inline-block; margin: 0 0 0 10px; vert
 /* ---------- Story header on canvas ---------- */
 .story-head {
   margin-bottom: var(--sp-4);
-}
-.story-head h1 {
-  margin: 0 0 4px;
-  font-size: var(--fs-lg);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: var(--lh-tight);
 }
 .story-head .story-meta {
   font-family: var(--font-mono);
@@ -941,7 +893,7 @@ button.case-headline .pull-cue { display: inline-block; margin: 0 0 0 10px; vert
   border-radius: var(--radius-md);
   padding: var(--sp-4);
   opacity: 0;
-  animation: card-enter 0.32s cubic-bezier(0.2, 0.6, 0.2, 1) forwards;
+  animation: card-enter 0.26s cubic-bezier(0.2, 0.6, 0.2, 1) forwards;
   transition: border-color 0.18s;
 }
 .data-card:hover { border-color: var(--line); }
@@ -1012,41 +964,9 @@ button.case-headline .pull-cue { display: inline-block; margin: 0 0 0 10px; vert
 }
 .export-util .btn-quiet { padding-left: 0; }
 
-/* ---------- Advanced sections (Briefing, Simulation) ---------- */
-/* Present, but clearly downstream of the core Upload → Layout → Export path. */
+/* ---------- Advanced sections (Briefing) ---------- */
+/* Present, but clearly downstream of the core Data → Findings → Export path. */
 .panel-section-advanced h2 { color: var(--text-3); opacity: 0.85; }
-
-/* ---------- Live Simulation toggle (advanced, deliberately quiet) ---------- */
-.sim-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 9px;
-  text-align: left;
-  width: 100%;
-  padding: 6px 8px;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  cursor: pointer;
-  font-family: var(--font-ui);
-  font-size: var(--fs-sm);
-  color: var(--text-3);
-  transition: background 0.14s ease, color 0.14s ease;
-}
-.sim-toggle:hover { color: var(--text-1); background: rgba(255, 255, 255, 0.03); }
-.sim-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--text-3);
-  flex: none;
-  transition: background 0.15s;
-}
-.sim-toggle.active { color: var(--text-1); }
-.sim-toggle.active .sim-dot { background: var(--accent); }
-body[data-tier="free"] #simSection .sim-toggle { opacity: 0.7; }
-
 
 /* ---------- Saved stories ---------- */
 .saved-list {
@@ -1086,25 +1006,6 @@ body[data-tier="free"] #simSection .sim-toggle { opacity: 0.7; }
   flex: none;
 }
 .saved-delete:hover { color: var(--danger); }
-
-/* ---------- Live Simulation: timeline light wave ---------- */
-.tl-pulse {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 3px;
-  height: 26px;
-  border-radius: 2px;
-  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.85), transparent);
-  transform: translateX(-50%);
-  opacity: 0;
-  animation: tl-pulse-flow 7s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-  pointer-events: none;
-  z-index: 2;
-}
-@media (max-width: 640px) {
-  .tl-pulse { left: 10px; }
-}
 
 /* ---------- Brand mark ---------- */
 .brand-mark {
@@ -1173,12 +1074,11 @@ body[data-tier="free"] #simSection .sim-toggle { opacity: 0.7; }
 }
 .auth-switch:hover { color: var(--text-1); }
 
-/* On a phone the topbar must not push the page sideways. The identity chip
-   collapses to its avatar, and the two modal triggers step out — both are
-   reachable elsewhere (About lives on the site, Embed in slides in the docs). */
+/* On a phone the topbar must not push the page sideways: the identity chip
+   collapses to its avatar and the slide-embed guide steps out (it's in the
+   docs too). */
 @media (max-width: 640px) {
   .auth-name { display: none; }
-  .topbar #welcomeHelp,
   .topbar #embedHelp { display: none; }
 }
 
@@ -1321,78 +1221,6 @@ body[data-authed="false"] .app { visibility: hidden; }
 @media (max-width: 860px) {
   .insightmap { grid-template-columns: 1fr; }
   .im-summary { position: static; }
-}
-
-
-/* ---------- Welcome / About modal ---------- */
-.welcome-modal { width: min(600px, 100%); }
-.welcome-body {
-  padding: var(--sp-6) var(--sp-5);
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-3);
-}
-.welcome-mark {
-  display: block;
-  margin-bottom: var(--sp-2);
-}
-.welcome-mark svg { display: block; }
-.welcome-body #welcomeTitle {
-  margin: 8px 0 6px;
-  font-size: var(--fs-xl);
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  line-height: var(--lh-tight);
-}
-.welcome-sub {
-  margin: 0;
-  color: var(--text-1);
-  font-size: var(--fs-md);
-}
-.welcome-copy {
-  margin: 0;
-  color: var(--text-2);
-  font-size: var(--fs-sm);
-  line-height: var(--lh-body);
-}
-
-/* Sample dataset card */
-.welcome-featured {
-  margin-top: var(--sp-2);
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: var(--sp-3) var(--sp-4);
-  padding: var(--sp-4);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-}
-.welcome-featured-text h3 {
-  margin: 0 0 4px;
-  font-size: var(--fs-lg);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-.welcome-featured-text p {
-  margin: 0;
-  color: var(--text-2);
-  font-size: var(--fs-sm);
-  line-height: 1.55;
-}
-.welcome-cta { white-space: nowrap; }
-
-.welcome-credit {
-  margin: var(--sp-2) 0 0;
-  padding-top: var(--sp-3);
-  border-top: 1px solid var(--line-soft);
-  font-size: var(--fs-xs);
-  color: var(--text-3);
-}
-
-@media (max-width: 640px) {
-  .welcome-body { padding: var(--sp-5) var(--sp-4); }
-  .welcome-featured { grid-template-columns: 1fr; }
-  .welcome-cta { width: 100%; }
 }
 
 
@@ -1589,37 +1417,6 @@ body[data-authed="false"] .app { visibility: hidden; }
   transition: color 0.14s;
 }
 .example-link:hover { color: var(--text-1); }
-
-/* ---------- Early Access Preview banner (slim, informational) ---------- */
-.preview-banner {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  padding: 5px var(--sp-4);
-  background: var(--bg-1);
-  border-bottom: 1px solid var(--line-soft);
-  font-size: var(--fs-2xs);
-  color: var(--text-3);
-  line-height: var(--lh-tight);
-}
-.preview-banner[hidden] { display: none; }
-.preview-banner-text { flex: 1; }
-.preview-banner-text strong { color: var(--text-2); font-weight: 500; }
-.preview-banner-close {
-  flex: none;
-  background: none;
-  border: none;
-  color: var(--text-3);
-  cursor: pointer;
-  font-size: 0.72rem;
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  transition: color 0.14s ease;
-}
-.preview-banner-close:hover { color: var(--text-1); }
-@media (max-width: 640px) {
-  .preview-banner { padding: 5px var(--sp-4); }
-}
 
 /* ---------- Preview access pill (replaces the upgrade CTA) ---------- */
 /* A quiet status marker, not a call to action — payments arrive post-preview.

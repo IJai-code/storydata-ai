@@ -1,104 +1,68 @@
-// The login / signup page. Reuses the shared simulated-auth primitives and,
-// on success, hands off to the Cases dashboard. Not real authentication (see
-// auth-core.js) — but it behaves like a real flow: truthful "already exists" /
-// "no account" / "wrong password" messages, hashed local password check.
+// Workspace identity. One honest step: name + email + Continue. There is no
+// password and no pretend verification — the pair only labels this browser's
+// workspace (see auth-core.js), and the page says so. If the email has been
+// used here before, its stored name fills in so a returning person can just
+// hit Continue.
 
 import {
   currentUser,
   setSession,
   loadAccounts,
   saveAccounts,
-  hashPassword,
   validEmail,
   displayNameFrom,
 } from './auth-core.js';
 
-const AFTER = 'cases.html';
+// Where to land after: the workspace, unless this browser already has saved
+// cases — the dashboard is for returning users, never a first-run stop.
+function destination() {
+  try {
+    const cases = JSON.parse(localStorage.getItem('ellery_saved_stories') || '[]');
+    return Array.isArray(cases) && cases.length ? 'cases.html' : 'app/';
+  } catch {
+    return 'app/';
+  }
+}
 
-// Already signed in? Skip straight to the workspace shell.
-if (currentUser()) location.replace(AFTER);
+// Already set up? Skip the form entirely.
+if (currentUser()) location.replace(destination());
 
 const els = {
-  title: document.getElementById('authTitle'),
-  sub: document.getElementById('authSub'),
-  nameField: document.getElementById('nameField'),
   name: document.getElementById('fName'),
   email: document.getElementById('fEmail'),
-  pass: document.getElementById('fPass'),
   error: document.getElementById('authError'),
-  submit: document.getElementById('authSubmit'),
-  switch: document.getElementById('authSwitch'),
   form: document.getElementById('authForm'),
 };
 
-let mode = 'signup';
-
-function applyMode() {
-  const signup = mode === 'signup';
-  els.title.textContent = signup ? 'Create your account' : 'Welcome back';
-  els.sub.textContent = signup
-    ? 'Save your cases and pick up where you left off.'
-    : 'Sign in to pick up your cases.';
-  els.nameField.hidden = !signup;
-  els.submit.textContent = signup ? 'Create account' : 'Sign in';
-  els.pass.placeholder = signup ? 'At least 8 characters' : '••••••••';
-  els.switch.textContent = signup
-    ? 'Already have an account? Sign in'
-    : 'New to Ellery? Create an account';
-  els.error.textContent = '';
-  (signup ? els.name : els.email).focus();
-}
-
-els.switch.addEventListener('click', () => {
-  mode = mode === 'signup' ? 'login' : 'signup';
-  applyMode();
+// A returning email gets its remembered name back.
+els.email.addEventListener('change', () => {
+  const known = loadAccounts()[els.email.value.trim().toLowerCase()];
+  if (known?.name && !els.name.value.trim()) els.name.value = known.name;
 });
 
-els.form.addEventListener('submit', async (e) => {
+els.form.addEventListener('submit', (e) => {
   e.preventDefault();
-  const signup = mode === 'signup';
   const name = els.name.value.trim();
   const email = els.email.value.trim();
-  const password = els.pass.value;
   els.error.textContent = '';
+  els.name.classList.remove('invalid');
   els.email.classList.remove('invalid');
 
-  if (signup && name.length < 2) return fail('Tell us your name (at least 2 characters).', els.name);
+  if (name.length < 2) return fail('Add your name (at least 2 characters).', els.name);
   if (!validEmail(email)) return fail('Enter a valid email address.', els.email);
-  if (password.length < 8) return fail('Password must be at least 8 characters.', els.pass);
 
   const accounts = loadAccounts();
-  const key = email.toLowerCase();
-  const existing = accounts[key];
-
-  if (signup && existing) return fail('An account with this email already exists. Sign in instead.', els.email);
-  if (!signup && !existing) return fail('No account found with this email. Create one to get started.', els.email);
-
-  els.submit.disabled = true;
-  els.submit.textContent = 'One moment…';
-  const hash = await hashPassword(email, password);
-
-  if (!signup && existing.hash && hash && hash !== existing.hash) {
-    els.submit.disabled = false;
-    els.submit.textContent = 'Sign in';
-    return fail('Incorrect password. Please try again.', els.pass);
-  }
-
-  const displayName = displayNameFrom(email, signup ? name : existing.name);
-  if (signup) {
-    accounts[key] = { name: displayName, hash };
-    saveAccounts(accounts);
-  }
+  const displayName = displayNameFrom(email, name);
+  accounts[email.toLowerCase()] = { name: displayName };
+  saveAccounts(accounts);
   setSession(displayName, email);
-  location.replace(AFTER);
+  location.replace(destination());
 });
 
 function fail(message, el) {
   els.error.textContent = message;
-  if (el) {
-    el.classList.add('invalid');
-    el.focus();
-  }
+  el.classList.add('invalid');
+  el.focus();
 }
 
-applyMode();
+els.name.focus();

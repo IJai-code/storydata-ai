@@ -57,7 +57,6 @@ export function previewSession() {
     layouts: ['kinetic', 'timeline', 'cards', 'nodes', 'map'],
     watermark: false,
     export: true,
-    simulation: true,
   };
 }
 
@@ -75,7 +74,6 @@ export async function refreshSession(payload = null) {
       layouts: Array.isArray(data.layouts) ? data.layouts : ['kinetic', 'timeline', 'cards', 'nodes'],
       watermark: data.watermark !== false,
       export: data.export === true,
-      simulation: data.simulation === true,
     },
   });
   return data;
@@ -107,8 +105,4 @@ export function watermarkRequired() {
 
 export function exportAllowed() {
   return getState().limits.export;
-}
-
-export function simulationAllowed() {
-  return getState().limits.simulation;
 }

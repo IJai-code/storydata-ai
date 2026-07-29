@@ -19,7 +19,8 @@ export function render(container, dataset) {
     const card = document.createElement('div');
     card.className = 'data-card';
     card.dataset.idx = String(i); // lets The Pull spotlight this exact record
-    card.style.animationDelay = `${Math.min(i * 45, 1200)}ms`;
+    // A brief cascade that celebrates arrival — total ≤ ~300ms, never latency.
+    card.style.animationDelay = `${Math.min(i * 12, 200)}ms`;
 
     const statHTML = picks.value
       ? `<div class="dc-stat">${escapeHTML(formatValue(row[picks.value.key], 'number'))}</div>

@@ -17,9 +17,11 @@ const TABS = [
     label: 'Google Slides',
     sub: 'Chromebook / Web',
     steps: [
-      "Click 'Insert' › 'Video' and upload your Ellery MP4 asset into your Google Drive.",
-      'Place it on your slide canvas.',
-      "In the right 'Format Options' sidebar under 'Video Playback', select 'Play (automatically)' and check 'Loop video'.",
+      'First, download the Ellery MP4 to your computer (it lands in your Downloads folder).',
+      "Open Google Drive (drive.google.com), click 'New' › 'File upload', and choose the downloaded MP4. Wait for the upload to finish.",
+      "In Google Slides, open your slide and click 'Insert' › 'Video', then switch to the 'Google Drive' tab.",
+      'Select the MP4 you just uploaded and click Insert (do not paste a link — it must be the uploaded Drive file).',
+      "Select the video, open the 'Format options' sidebar, and under 'Video playback' choose 'Play (automatically)' and check 'Loop video'.",
     ],
   },
   {

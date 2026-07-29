@@ -1,10 +1,8 @@
-// Shared simulated-auth primitives for the product shell (login page, Cases
-// dashboard, and the app's redirect guard). This is NOT real authentication —
-// it validates credential SHAPE and keeps a local session so the multi-page
-// flow behaves like a real product. Nothing leaves the device; the password is
-// only ever hashed for a local "wrong password" check, never transmitted or
-// stored in the clear. Server tier enforcement is independent of any of this.
-// Replace with a real identity provider before launch.
+// Workspace identity for the product shell (login page, Cases dashboard, and
+// the app's redirect guard). This is not authentication and doesn't pretend to
+// be: a name + email pair labels the workspace in this browser, nothing is
+// transmitted, and server tier enforcement is completely independent. Replace
+// with a real identity provider when accounts become real.
 
 export const USER_KEY = 'ellery_user';
 const ACCOUNTS_KEY = 'ellery_accounts';
@@ -28,10 +26,17 @@ export function setSession(name, email) {
 }
 
 export function signOut() {
-  try { localStorage.removeItem(USER_KEY); } catch { /* ignore */ }
+  // The working session goes with the identity — the next person on this
+  // device should not inherit an in-progress investigation.
+  try {
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem('ellery_session');
+  } catch { /* ignore */ }
 }
 
-/* ---------- Local account registry (truthful gate messages) ---------- */
+/* ---------- Known identities on this device ----------
+   Remembers the name used with each email so a returning person only has to
+   re-enter their email. Nothing more is stored. */
 
 export function loadAccounts() {
   try {
@@ -45,22 +50,15 @@ export function saveAccounts(accounts) {
   try { localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts)); } catch { /* full */ }
 }
 
-export async function hashPassword(email, password) {
-  if (!(window.crypto && crypto.subtle)) return null; // insecure context fallback
-  const data = new TextEncoder().encode(`ellery:${email.toLowerCase()}:${password}`);
-  const buf = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(buf), (b) => b.toString(16).padStart(2, '0')).join('');
-}
-
-// Existing signed-in users predate the registry; record their email so a later
-// login isn't wrongly rejected as "no account".
+// Identities that predate the registry get recorded on sight, so the name
+// still autofills next time.
 export function seedAccountFromCurrentUser() {
   const user = currentUser();
   if (!user) return;
   const accounts = loadAccounts();
   const key = user.email.toLowerCase();
   if (!accounts[key]) {
-    accounts[key] = { name: user.name, hash: null };
+    accounts[key] = { name: user.name };
     saveAccounts(accounts);
   }
 }

@@ -33,19 +33,11 @@
     </a>
     <div class="topbar-right">
       <a href="../cases.html" class="auth-link">Cases</a>
-      <button id="welcomeHelp" class="auth-link" type="button">About</button>
       <button id="embedHelp" class="auth-link">Embed in slides</button>
       <div id="authArea" class="auth-area"></div>
       <button id="upgradeBtn" class="preview-pill" type="button">Preview</button>
     </div>
   </header>
-
-  <div id="previewBanner" class="preview-banner" role="status">
-    <span class="preview-banner-text">Early access preview — all features are currently
-      unlocked while Ellery is in development.</span>
-    <button id="previewBannerClose" class="preview-banner-close" type="button"
-      aria-label="Dismiss announcement">✕</button>
-  </div>
 
   <div class="app">
     <aside class="panel" id="panel">
@@ -57,7 +49,7 @@
           <div class="dropzone-hint">CSV · TSV · JSON · plain text</div>
         </div>
         <div class="row-actions">
-          <button id="visualizeBtn" class="btn btn-primary">Visualize</button>
+          <button id="visualizeBtn" class="btn btn-primary">Analyze</button>
           <button id="fileBtn" class="btn btn-ghost">File…</button>
           <input type="file" id="fileInput" accept=".csv,.tsv,.json,.txt" hidden>
         </div>
@@ -73,12 +65,12 @@
 
       <section class="panel-section">
         <h2>Export</h2>
-        <button id="mp4Btn" class="btn btn-primary btn-wide">Export MP4</button>
+        <button id="mp4Btn" class="btn btn-primary btn-wide">Video for slides</button>
         <div class="export-grid">
-          <button id="pngBtn" class="btn btn-ghost">PNG</button>
-          <button id="linkBtn" class="btn btn-ghost">Interactive</button>
-          <button id="exportBtn" class="btn btn-ghost">HTML</button>
-          <button id="shareBtn" class="btn btn-ghost">Share</button>
+          <button id="pngBtn" class="btn btn-ghost">Image</button>
+          <button id="linkBtn" class="btn btn-ghost">Interactive page</button>
+          <button id="exportBtn" class="btn btn-ghost">Web page</button>
+          <button id="shareBtn" class="btn btn-ghost">Share link</button>
         </div>
         <div class="export-util">
           <button id="saveBtn" class="btn btn-quiet">Save to this device</button>
@@ -98,12 +90,6 @@
         </div>
       </section>
 
-      <section class="panel-section panel-section-advanced" id="simSection">
-        <h2>Simulation</h2>
-        <button id="simToggle" class="sim-toggle btn-wide" type="button">
-          <span class="sim-dot"></span><span class="sim-label">Run simulation</span>
-        </button>
-      </section>
     </aside>
 
     <main class="stage">

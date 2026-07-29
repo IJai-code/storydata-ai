@@ -111,7 +111,7 @@ export function render(container, dataset) {
 
   const hint = document.createElement('div');
   hint.className = 'viz-hint';
-  hint.textContent = `${branches.length} branches · ${totalLeaves} nodes · hover a node for details`;
+  hint.textContent = `${branches.length} branches · ${totalLeaves} nodes`;
   wrap.appendChild(hint);
   container.appendChild(wrap);
 

@@ -27,12 +27,6 @@ export function render(container, dataset) {
   const canvas = document.createElement('canvas');
   canvas.className = 'kinetic-canvas';
   wrap.appendChild(canvas);
-
-  const hint = document.createElement('div');
-  hint.className = 'viz-hint';
-  hint.textContent =
-    'sort pulses reorder the cards live · drag a card onto another to compare · click a card to set a baseline · hover to read full details';
-  wrap.appendChild(hint);
   container.appendChild(wrap);
 
   const reducedMotion =

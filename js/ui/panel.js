@@ -1,21 +1,18 @@
-// Left control panel: data ingestion, layout picker, Live Simulation toggle,
-// local save/load, share preview, and export.
-// All gated operations go through the server; this module only reflects
-// the session limits in the UI.
+// Left control panel: data ingestion, briefing, local save/load, share
+// preview, and export. All gated operations go through the server; this
+// module only reflects the session limits in the UI.
 
 import { setState, getState, subscribe } from '../state.js';
 import {
   LAYOUTS,
   layoutAllowed,
   exportAllowed,
-  simulationAllowed,
   isPro,
 } from '../tier/gates.js';
 import { openPaywall, openPreviewInfo } from '../tier/paywall.js';
 import {
   exportCleanCode,
   exportSharePreview,
-  simulationSupported,
   getKineticSystem,
 } from '../render/canvas.js';
 import { exportPNG } from '../render/png.js';
@@ -141,7 +138,6 @@ let ingesting = false;
 export function initPanel() {
   wireIngestion();
   wireStory();
-  wireSimulation();
   wireSaveShareExport();
   wireTierControls();
 
@@ -156,9 +152,6 @@ export function initPanel() {
       if (state.story) setState({ story: null });
     }
     if (changed.includes('story')) renderStoryList();
-    if (changed.includes('layout') || changed.includes('simulation')) {
-      syncSimToggle();
-    }
   });
   syncLocks();
   renderSavedList();
@@ -249,12 +242,9 @@ async function runIngest(raw, { quiet = false } = {}) {
     setState({ dataset: result.dataset });
 
     const { dataset } = result;
+    // Success is visible — the findings render. Only ingest warnings (things
+    // the screen can't otherwise show) get announced.
     if (!quiet) {
-      toast(
-        `Dataset loaded — ${dataset.rows.length}${
-          dataset.truncated ? ` of ${dataset.meta.totalRows}` : ''
-        } rows, ${dataset.columns.length} columns.`
-      );
       for (const w of (result.warnings || []).slice(0, 2)) toast(w, 'warn');
     }
 
@@ -290,7 +280,7 @@ function renderSchemaChips(dataset) {
     return;
   }
   const chips = [
-    `<span class="chip chip-count"><strong>${dataset.rows.length}</strong> rows</span>`,
+    `<span class="chip chip-count"><strong>${dataset.rows.length}</strong> records</span>`,
     ...(dataset.truncated
       ? [`<span class="chip chip-warn">capped from ${dataset.meta.totalRows}</span>`]
       : []),
@@ -396,8 +386,8 @@ async function generateStory() {
   }
   const scenes = sys.autoStory();
   const cls = sys.classify();
+  // The scene list appearing in the panel is the confirmation.
   setState({ story: { scenes, type: { label: cls.label, reason: cls.reason } } });
-  toast(`Briefing assembled — ${scenes.length} scenes. ${cls.label}.`);
 }
 
 function setStoryPlayingUI(playing) {
@@ -443,34 +433,6 @@ function renderStoryList() {
     .join('');
 }
 
-/* ---------- Live Simulation Mode (Pro) ---------- */
-
-function wireSimulation() {
-  document.getElementById('simToggle').addEventListener('click', () => {
-    if (!simulationAllowed()) {
-      openPaywall('simulation');
-      return;
-    }
-    const next = !getState().simulation;
-    setState({ simulation: next });
-    if (next && !simulationSupported(getState().layout)) {
-      toast('Simulation runs on the Insight Map, Mindmap, and Timeline layouts.', 'warn');
-    }
-  });
-  syncSimToggle();
-}
-
-function syncSimToggle() {
-  const btn = document.getElementById('simToggle');
-  const { simulation, layout } = getState();
-  btn.classList.toggle('active', simulation);
-  btn.querySelector('.sim-label').textContent = simulation
-    ? simulationSupported(layout)
-      ? 'Simulation running'
-      : 'On — switch to Insight Map, Mindmap, or Timeline'
-    : 'Run simulation';
-}
-
 /* ---------- Save locally / share / export ---------- */
 
 function wireSaveShareExport() {
@@ -484,12 +446,9 @@ function wireSaveShareExport() {
     const btn = document.getElementById('shareBtn');
     btn.disabled = true;
     try {
+      // The browser's own download surface confirms success.
       const result = await exportSharePreview();
-      if (result.ok) {
-        toast('Share file saved.');
-      } else {
-        toast(result.error || 'Share failed.', 'error');
-      }
+      if (!result.ok) toast(result.error || 'Share failed.', 'error');
     } finally {
       btn.disabled = false;
     }
@@ -512,7 +471,6 @@ function wireSaveShareExport() {
     try {
       const result = await exportMP4(document.getElementById('canvas'), { story });
       if (result.ok) {
-        toast(`${result.format.toUpperCase()} saved.`);
         // Safari/Firefox can't record H.264; WebM won't drop into Keynote or
         // PowerPoint directly, so flag it rather than letting the import fail.
         if (result.format === 'webm') {
@@ -552,7 +510,6 @@ function wireSaveShareExport() {
       a.download = `ellery-${layout}-briefing.html`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-      toast('Interactive file saved.');
     } finally {
       linkBtn.disabled = false;
     }
@@ -567,15 +524,7 @@ function wireSaveShareExport() {
     pngBtn.disabled = true;
     try {
       const result = await exportPNG(document.getElementById('canvas'));
-      if (result.ok) {
-        toast(
-          isPro()
-            ? 'PNG exported — drop it straight into your deck.'
-            : 'PNG exported — stamped with Ellery attribution.'
-        );
-      } else {
-        toast(result.error || 'PNG export failed.', 'error');
-      }
+      if (!result.ok) toast(result.error || 'Image export failed.', 'error');
     } finally {
       pngBtn.disabled = false;
     }
@@ -594,11 +543,9 @@ function wireSaveShareExport() {
     exportBtn.disabled = true;
     try {
       const result = await exportCleanCode();
-      if (result.ok) {
-        toast('HTML saved.');
-      } else if (result.status === 403) {
+      if (result.status === 403) {
         openPaywall('export');
-      } else {
+      } else if (!result.ok) {
         toast(result.error || 'Export failed.', 'error');
       }
     } finally {
@@ -651,7 +598,7 @@ function saveStory() {
   const story = getState().story;
   const entry = {
     id: Date.now(),
-    name: `${LAYOUTS[layout].name} · ${dataset.rows.length} rows${
+    name: `${LAYOUTS[layout].name} · ${dataset.rows.length} records${
       story?.scenes?.length ? ` · ${story.scenes.length}-scene story` : ''
     }`,
     savedAt: new Date().toISOString(),
@@ -659,10 +606,8 @@ function saveStory() {
     dataset,
     story: story?.scenes?.length ? story : null,
   };
-  if (writeSaved([entry, ...list])) {
-    renderSavedList();
-    toast(story?.scenes?.length ? 'Briefing saved on this device.' : 'Saved on this device.');
-  }
+  // The entry appearing in the saved list below the button is the confirmation.
+  if (writeSaved([entry, ...list])) renderSavedList();
 }
 
 function loadStory(id) {
@@ -676,7 +621,6 @@ function loadStory(id) {
   if (entry.story?.scenes?.length) {
     setTimeout(() => setState({ story: entry.story }), 0);
   }
-  toast(`Loaded “${entry.name}”.`);
 }
 
 function deleteStory(id) {
@@ -716,9 +660,9 @@ function wireTierControls() {
 
 function syncLocks() {
   const pro = isPro();
-  // A downgrade must not leave a Pro layout live on the canvas.
-  if (!layoutAllowed(getState().layout)) setState({ layout: 'kinetic' });
-  if (getState().simulation && !simulationAllowed()) setState({ simulation: false });
+  // A downgrade must not leave a Pro lens live on the canvas — fall back to
+  // the Case File, which is never gated.
+  if (!layoutAllowed(getState().layout)) setState({ layout: 'findings' });
   // The topbar tier badge was removed during the preview (everyone is Pro);
   // guard so this keeps working if it ever returns.
   const badge = document.getElementById('tierBadge');

@@ -5,7 +5,6 @@
 // Nothing here is a security boundary — server tier enforcement is independent.
 
 import { currentUser, signOut, seedAccountFromCurrentUser } from '../auth-core.js';
-import { toast } from './toast.js';
 
 const LOGIN_URL = '../login.html';
 let areaEl = null;
@@ -33,7 +32,6 @@ function renderTopbar(user) {
   areaEl.querySelector('#authSignOut').addEventListener('click', () => {
     signOut();
     document.body.dataset.authed = 'false';
-    toast('Signed out.');
     window.location.replace(LOGIN_URL);
   });
 }
