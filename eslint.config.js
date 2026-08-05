@@ -4,7 +4,7 @@ import globals from 'globals';
 export default [
   js.configs.recommended,
   {
-    files: ['public/js/render/kinetic-engine.js'],
+    files: ['js/render/kinetic-engine.js'],
     languageOptions: {
       ecmaVersion: 2023,
       sourceType: 'script',
@@ -12,8 +12,8 @@ export default [
     },
   },
   {
-    files: ['public/js/**/*.js', 'server/gated/**/*.js'],
-    ignores: ['public/js/render/kinetic-engine.js'],
+    files: ['js/**/*.js', 'server/gated/**/*.js'],
+    ignores: ['js/render/kinetic-engine.js'],
     languageOptions: {
       ecmaVersion: 2023,
       sourceType: 'module',
@@ -23,6 +23,15 @@ export default [
   {
     files: ['server/**/*.js', 'eslint.config.js'],
     ignores: ['server/gated/**'],
+    languageOptions: {
+      ecmaVersion: 2023,
+      sourceType: 'module',
+      globals: globals.node,
+    },
+  },
+  {
+    // Local-only Node tooling: the preview server and the golden-test runner.
+    files: ['tools/**/*.mjs'],
     languageOptions: {
       ecmaVersion: 2023,
       sourceType: 'module',

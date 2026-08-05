@@ -32,7 +32,7 @@ export function runRelationships(discoveryReport) {
       for (const rel of rule.detect(ctx) || []) if (rel) relationships.push(rel);
     } catch (err) {
       // same deal as discovery — a thrown rule shouldnt take the others with it
-      // eslint-disable-next-line no-console
+       
       console.warn(`[relationships] rule "${rule.name}" failed:`, err);
     }
   }

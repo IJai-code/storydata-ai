@@ -2,6 +2,10 @@
 // groups, and which group pulls the most weight on the metric.
 import { registerDetector } from '../registry.js';
 import { createDiscovery, IMPORTANCE, TONE, formatNumber } from '../discovery.js';
+import { justify, group, wholeColumn } from '../../derive/build.js';
+
+const SRC = 'discovery/detectors/distribution.js';
+const CERTAIN = { value: 1, note: 'a direct count or ordering over the snapshot — nothing estimated' };
 
 registerDetector({
   name: 'distribution',
@@ -22,6 +26,13 @@ registerDetector({
           confidence: 1,
           evidence: { column: cat.key, value: top[0][0], count: top[0][1], groups: top.length },
           metadata: { detector: 'distribution', key: `largest:${cat.key}`, columns: [cat.key], tone: TONE.NEUTRAL },
+          justification: justify({
+            build: (g) => g.reduce('groupLargest', [g.column(cat.key)]),
+            witness: group(cat.key, top[0][0], [cat.key]),
+            asserts: { value: top[0][0], count: top[0][1], groups: top.length },
+            policy: { rule: 'Group by category; report the largest by record count.', params: 'ordering by count', source: SRC },
+            confidence: CERTAIN,
+          }),
         })
       );
       out.push(
@@ -33,6 +44,13 @@ registerDetector({
           confidence: 1,
           evidence: { column: cat.key, groups: top.length },
           metadata: { detector: 'distribution', key: `spread:${cat.key}`, columns: [cat.key], tone: TONE.NEUTRAL },
+          justification: justify({
+            build: (g) => g.stat('distinct', [g.column(cat.key)]),
+            witness: wholeColumn(cat.key, [cat.key]),
+            asserts: top.length,
+            policy: { rule: 'Count distinct category groups.', params: 'no threshold', source: SRC },
+            confidence: CERTAIN,
+          }),
         })
       );
     }
@@ -59,6 +77,17 @@ registerDetector({
             confidence: 1,
             evidence: { categoryColumn: cat.key, metricColumn: m.key, value: ranked[0][0], total: ranked[0][1], share },
             metadata: { detector: 'distribution', key: `top-by-metric:${cat.key}:${m.key}`, columns: [cat.key, m.key], tone: TONE.OK },
+            justification: justify({
+              build: (g) => g.reduce('groupShare', [g.column(cat.key), g.column(m.key)]),
+              witness: group(cat.key, ranked[0][0], [cat.key, m.key]),
+              asserts: { value: ranked[0][0], total: ranked[0][1], share },
+              policy: {
+                rule: 'Sum the metric per category; report the leading group and its share of the total.',
+                params: 'share = groupTotal ÷ grandTotal',
+                source: SRC,
+              },
+              confidence: CERTAIN,
+            }),
           })
         );
       }

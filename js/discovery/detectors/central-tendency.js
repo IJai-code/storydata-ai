@@ -1,6 +1,14 @@
 // The "typical" value — mean and median — for the main numeric columns.
 import { registerDetector } from '../registry.js';
 import { createDiscovery, IMPORTANCE, TONE, formatNumber } from '../discovery.js';
+import { justify, wholeColumn } from '../../derive/build.js';
+
+const POLICY = {
+  rule: 'Report the mean and median of the numeric column.',
+  params: 'descriptive — no threshold',
+  source: 'discovery/detectors/central-tendency.js',
+};
+const CERTAIN = { value: 1, note: 'a direct count or ordering over the snapshot — nothing estimated' };
 
 registerDetector({
   name: 'central-tendency',
@@ -18,6 +26,16 @@ registerDetector({
           confidence: 1,
           evidence: { column: col.key, mean: col.stats.mean, median: col.stats.median, stddev: col.stats.stddev },
           metadata: { detector: 'central-tendency', key: `avg:${col.key}`, columns: [col.key], tone: TONE.NEUTRAL, tags: [tag] },
+          justification: justify({
+            build: (g) => {
+              const c = g.column(col.key);
+              return g.reduce('describe', [g.stat('mean', [c]), g.stat('median', [c]), g.stat('stddev', [c])]);
+            },
+            witness: wholeColumn(col.key, [col.key]),
+            asserts: { mean: col.stats.mean, median: col.stats.median, stddev: col.stats.stddev },
+            policy: POLICY,
+            confidence: CERTAIN,
+          }),
         })
       );
     };

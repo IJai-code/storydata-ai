@@ -1,0 +1,299 @@
+{
+  "discoveries": [
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Score",
+        "label": "Delta",
+        "rowIndex": 3,
+        "value": 120
+      },
+      "explain": "Delta holds 120 — the highest value in this column.",
+      "fingerprints": {
+        "procedure": "9f04291e",
+        "result": "f53c3a7e"
+      },
+      "focus": {
+        "columns": [
+          "Score"
+        ],
+        "detector": "extremes",
+        "direction": "max",
+        "evidence": {
+          "column": "Score",
+          "label": "Delta",
+          "rowIndex": 3,
+          "value": 120
+        },
+        "id": "extreme:max:Score",
+        "rowIndices": [
+          3
+        ],
+        "scope": "row",
+        "summary": "Delta leads on score at 120.",
+        "title": "Highest score",
+        "tone": "ok"
+      },
+      "id": "extreme:max:Score",
+      "importance": 0.75,
+      "metadata": {
+        "columns": [
+          "Score"
+        ],
+        "detector": "extremes",
+        "direction": "max",
+        "id": "extreme:max:Score",
+        "key": "max:Score",
+        "tags": [],
+        "tone": "ok"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "max(Score) over 6 values = 120",
+        "policy": {
+          "params": "ordering only — no threshold",
+          "rule": "Order the metric across all records; surface the highest and lowest.",
+          "source": "discovery/detectors/extremes.js"
+        }
+      },
+      "summary": "Delta leads on score at 120.",
+      "title": "Highest score",
+      "type": "extreme",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Score",
+        "label": "Alpha",
+        "rowIndex": 0,
+        "value": 42
+      },
+      "explain": "Alpha holds 42 — the lowest value in this column.",
+      "fingerprints": {
+        "procedure": "8b6a0a1c",
+        "result": "f8ee8b66"
+      },
+      "focus": {
+        "columns": [
+          "Score"
+        ],
+        "detector": "extremes",
+        "direction": "min",
+        "evidence": {
+          "column": "Score",
+          "label": "Alpha",
+          "rowIndex": 0,
+          "value": 42
+        },
+        "id": "extreme:min:Score",
+        "rowIndices": [
+          0
+        ],
+        "scope": "row",
+        "summary": "Alpha trails on score at 42.",
+        "title": "Lowest score",
+        "tone": "neutral"
+      },
+      "id": "extreme:min:Score",
+      "importance": 0.5,
+      "metadata": {
+        "columns": [
+          "Score"
+        ],
+        "detector": "extremes",
+        "direction": "min",
+        "id": "extreme:min:Score",
+        "key": "min:Score",
+        "tags": [],
+        "tone": "neutral"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "min(Score) over 6 values = 42",
+        "policy": {
+          "params": "ordering only — no threshold",
+          "rule": "Order the metric across all records; surface the highest and lowest.",
+          "source": "discovery/detectors/extremes.js"
+        }
+      },
+      "summary": "Alpha trails on score at 42.",
+      "title": "Lowest score",
+      "type": "extreme",
+      "verified": true
+    },
+    {
+      "confidence": 0.6163100407235267,
+      "evidence": {
+        "column": "Score",
+        "mean": 56.833333333333336,
+        "rowIndex": 3,
+        "stddev": 28.292617804335855,
+        "value": 120,
+        "z": 2.2326200814470534
+      },
+      "explain": "120 sits 2.2 standard deviations from the mean of 56.83.",
+      "fingerprints": {
+        "procedure": "0c5f1e3b",
+        "result": "7ae3f345"
+      },
+      "focus": {
+        "columns": [
+          "Score"
+        ],
+        "detector": "outliers",
+        "direction": null,
+        "evidence": {
+          "column": "Score",
+          "mean": 56.833333333333336,
+          "rowIndex": 3,
+          "stddev": 28.292617804335855,
+          "value": 120,
+          "z": 2.2326200814470534
+        },
+        "id": "outlier:outlier:Score",
+        "rowIndices": [
+          3
+        ],
+        "scope": "row",
+        "summary": "Delta sits 2.2σ from the mean score (120).",
+        "title": "Notable outlier",
+        "tone": "warn"
+      },
+      "id": "outlier:outlier:Score",
+      "importance": 0.5,
+      "metadata": {
+        "columns": [
+          "Score"
+        ],
+        "detector": "outliers",
+        "id": "outlier:outlier:Score",
+        "key": "outlier:Score",
+        "tags": [],
+        "tone": "warn"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "scales with distance past 2σ: min(1, 0.5 + (z − 2) / 2)",
+          "value": 0.6163100407235267
+        },
+        "derivation": "z = |120 − 56.83| / 28.29 = 2.2σ  (> 2.0σ)",
+        "policy": {
+          "params": "threshold = 2.0σ",
+          "rule": "Flag the record whose distance from the mean exceeds the σ threshold.",
+          "source": "discovery/detectors/outliers.js"
+        }
+      },
+      "summary": "Delta sits 2.2σ from the mean score (120).",
+      "title": "Notable outlier",
+      "type": "outlier",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Score",
+        "mean": 56.833333333333336,
+        "median": 44.5,
+        "stddev": 28.292617804335855
+      },
+      "explain": "Mean 56.83, median 44.5, spread ±28.29.",
+      "fingerprints": {
+        "procedure": "fbab2898",
+        "result": "474d7ef2"
+      },
+      "focus": {
+        "columns": [
+          "Score"
+        ],
+        "detector": "central-tendency",
+        "direction": null,
+        "evidence": {
+          "column": "Score",
+          "mean": 56.833333333333336,
+          "median": 44.5,
+          "stddev": 28.292617804335855
+        },
+        "id": "central-tendency:avg:Score",
+        "rowIndices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "scope": "dataset",
+        "summary": "Mean score is 56.83 (median 44.5).",
+        "title": "Average score",
+        "tone": "neutral"
+      },
+      "id": "central-tendency:avg:Score",
+      "importance": 0.3,
+      "metadata": {
+        "columns": [
+          "Score"
+        ],
+        "detector": "central-tendency",
+        "id": "central-tendency:avg:Score",
+        "key": "avg:Score",
+        "tags": [
+          "metric"
+        ],
+        "tone": "neutral"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "mean = 56.83, median = 44.5, σ = 28.29",
+        "policy": {
+          "params": "descriptive — no threshold",
+          "rule": "Report the mean and median of the numeric column.",
+          "source": "discovery/detectors/central-tendency.js"
+        }
+      },
+      "summary": "Mean score is 56.83 (median 44.5).",
+      "title": "Average score",
+      "type": "central-tendency",
+      "verified": true
+    }
+  ],
+  "domain": {
+    "id": "generic",
+    "label": "General"
+  },
+  "format": "csv",
+  "meta": {
+    "columnCount": 2,
+    "detectors": [
+      "availability",
+      "central-tendency",
+      "distribution",
+      "extremes",
+      "outliers"
+    ],
+    "rowCount": 6,
+    "version": "1.0.0"
+  },
+  "ok": true,
+  "snapshot": {
+    "columnCount": 2,
+    "engineVersion": "1.0.0",
+    "fingerprint": "c8a052ee",
+    "format": "csv",
+    "policyVersion": "1.0.0",
+    "rowCount": 6,
+    "schemaHash": "45dc8b8f",
+    "totalRows": 6,
+    "truncated": false
+  },
+  "warnings": []
+}

@@ -1,0 +1,496 @@
+{
+  "discoveries": [
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Units",
+        "count": 3,
+        "threshold": 10
+      },
+      "explain": "3 records fall at or below 10.",
+      "fingerprints": {
+        "procedure": "b1b8f246",
+        "result": "a0a3ce61"
+      },
+      "focus": {
+        "columns": [
+          "Units"
+        ],
+        "detector": "availability",
+        "direction": null,
+        "evidence": {
+          "column": "Units",
+          "count": 3,
+          "threshold": 10
+        },
+        "id": "availability:qty:low",
+        "rowIndices": [
+          1,
+          4,
+          6
+        ],
+        "scope": "subset",
+        "summary": "3 records are below 10 units.",
+        "title": "Low-stock warning",
+        "tone": "warn"
+      },
+      "id": "availability:qty:low",
+      "importance": 0.75,
+      "metadata": {
+        "columns": [
+          "Units"
+        ],
+        "detector": "availability",
+        "id": "availability:qty:low",
+        "key": "qty:low",
+        "tags": [],
+        "tone": "warn"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "count(0 < Units ≤ 10) = 3",
+        "policy": {
+          "params": "line = max(5, 10% of peak) = 10",
+          "rule": "Count records at or below the low-stock line.",
+          "source": "discovery/detectors/availability.js"
+        }
+      },
+      "summary": "3 records are below 10 units.",
+      "title": "Low-stock warning",
+      "type": "availability",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Units",
+        "label": "Widget F",
+        "rowIndex": 5,
+        "value": 100
+      },
+      "explain": "Widget F holds 100 — the highest value in this column.",
+      "fingerprints": {
+        "procedure": "fd7ed0e4",
+        "result": "393b0d8b"
+      },
+      "focus": {
+        "columns": [
+          "Units"
+        ],
+        "detector": "extremes",
+        "direction": "max",
+        "evidence": {
+          "column": "Units",
+          "label": "Widget F",
+          "rowIndex": 5,
+          "value": 100
+        },
+        "id": "extreme:max:Units",
+        "rowIndices": [
+          5
+        ],
+        "scope": "row",
+        "summary": "Widget F leads on units at 100.",
+        "title": "Highest units",
+        "tone": "ok"
+      },
+      "id": "extreme:max:Units",
+      "importance": 0.75,
+      "metadata": {
+        "columns": [
+          "Units"
+        ],
+        "detector": "extremes",
+        "direction": "max",
+        "id": "extreme:max:Units",
+        "key": "max:Units",
+        "tags": [],
+        "tone": "ok"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "max(Units) over 7 values = 100",
+        "policy": {
+          "params": "ordering only — no threshold",
+          "rule": "Order the metric across all records; surface the highest and lowest.",
+          "source": "discovery/detectors/extremes.js"
+        }
+      },
+      "summary": "Widget F leads on units at 100.",
+      "title": "Highest units",
+      "type": "extreme",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Units",
+        "count": 2,
+        "total": 7
+      },
+      "explain": "2 of 7 records match this condition.",
+      "fingerprints": {
+        "procedure": "56b6108f",
+        "result": "0bc3b426"
+      },
+      "focus": {
+        "columns": [
+          "Units"
+        ],
+        "detector": "availability",
+        "direction": null,
+        "evidence": {
+          "column": "Units",
+          "count": 2,
+          "total": 7
+        },
+        "id": "availability:qty:zero",
+        "rowIndices": [
+          0,
+          3
+        ],
+        "scope": "subset",
+        "summary": "2 records have zero units.",
+        "title": "Units depleted",
+        "tone": "critical"
+      },
+      "id": "availability:qty:zero",
+      "importance": 0.6785714285714286,
+      "metadata": {
+        "columns": [
+          "Units"
+        ],
+        "detector": "availability",
+        "id": "availability:qty:zero",
+        "key": "qty:zero",
+        "tags": [],
+        "tone": "critical"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "count(Units = 0) = 2 of 7",
+        "policy": {
+          "params": "threshold = 0",
+          "rule": "Count records at zero on the quantity column.",
+          "source": "discovery/detectors/availability.js"
+        }
+      },
+      "summary": "2 records have zero units.",
+      "title": "Units depleted",
+      "type": "availability",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Units",
+        "label": "Widget D",
+        "rowIndex": 3,
+        "value": 0
+      },
+      "explain": "Widget D holds 0 — the lowest value in this column.",
+      "fingerprints": {
+        "procedure": "9fabbc02",
+        "result": "03d4aecd"
+      },
+      "focus": {
+        "columns": [
+          "Units"
+        ],
+        "detector": "extremes",
+        "direction": "min",
+        "evidence": {
+          "column": "Units",
+          "label": "Widget D",
+          "rowIndex": 3,
+          "value": 0
+        },
+        "id": "extreme:min:Units",
+        "rowIndices": [
+          3
+        ],
+        "scope": "row",
+        "summary": "Widget D trails on units at 0.",
+        "title": "Lowest units",
+        "tone": "neutral"
+      },
+      "id": "extreme:min:Units",
+      "importance": 0.5,
+      "metadata": {
+        "columns": [
+          "Units"
+        ],
+        "detector": "extremes",
+        "direction": "min",
+        "id": "extreme:min:Units",
+        "key": "min:Units",
+        "tags": [],
+        "tone": "neutral"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "min(Units) over 7 values = 0",
+        "policy": {
+          "params": "ordering only — no threshold",
+          "rule": "Order the metric across all records; surface the highest and lowest.",
+          "source": "discovery/detectors/extremes.js"
+        }
+      },
+      "summary": "Widget D trails on units at 0.",
+      "title": "Lowest units",
+      "type": "extreme",
+      "verified": true
+    },
+    {
+      "confidence": 0.5840168070997196,
+      "evidence": {
+        "column": "Units",
+        "mean": 23.428571428571427,
+        "rowIndex": 5,
+        "stddev": 35.31837701681719,
+        "value": 100,
+        "z": 2.168033614199439
+      },
+      "explain": "100 sits 2.2 standard deviations from the mean of 23.43.",
+      "fingerprints": {
+        "procedure": "4717257a",
+        "result": "aa0a0f0a"
+      },
+      "focus": {
+        "columns": [
+          "Units"
+        ],
+        "detector": "outliers",
+        "direction": null,
+        "evidence": {
+          "column": "Units",
+          "mean": 23.428571428571427,
+          "rowIndex": 5,
+          "stddev": 35.31837701681719,
+          "value": 100,
+          "z": 2.168033614199439
+        },
+        "id": "outlier:outlier:Units",
+        "rowIndices": [
+          5
+        ],
+        "scope": "row",
+        "summary": "Widget F sits 2.2σ from the mean units (100).",
+        "title": "Notable outlier",
+        "tone": "warn"
+      },
+      "id": "outlier:outlier:Units",
+      "importance": 0.5,
+      "metadata": {
+        "columns": [
+          "Units"
+        ],
+        "detector": "outliers",
+        "id": "outlier:outlier:Units",
+        "key": "outlier:Units",
+        "tags": [],
+        "tone": "warn"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "scales with distance past 2σ: min(1, 0.5 + (z − 2) / 2)",
+          "value": 0.5840168070997196
+        },
+        "derivation": "z = |100 − 23.43| / 35.32 = 2.2σ  (> 2.0σ)",
+        "policy": {
+          "params": "threshold = 2.0σ",
+          "rule": "Flag the record whose distance from the mean exceeds the σ threshold.",
+          "source": "discovery/detectors/outliers.js"
+        }
+      },
+      "summary": "Widget F sits 2.2σ from the mean units (100).",
+      "title": "Notable outlier",
+      "type": "outlier",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Price",
+        "mean": 15.142857142857142,
+        "median": 14,
+        "stddev": 5.166611805721464
+      },
+      "explain": "Mean 15.14, median 14, spread ±5.17.",
+      "fingerprints": {
+        "procedure": "3d3a97fe",
+        "result": "2a3a6518"
+      },
+      "focus": {
+        "columns": [
+          "Price"
+        ],
+        "detector": "central-tendency",
+        "direction": null,
+        "evidence": {
+          "column": "Price",
+          "mean": 15.142857142857142,
+          "median": 14,
+          "stddev": 5.166611805721464
+        },
+        "id": "central-tendency:avg:Price",
+        "rowIndices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "scope": "dataset",
+        "summary": "Mean price is 15.14 (median 14).",
+        "title": "Average price",
+        "tone": "neutral"
+      },
+      "id": "central-tendency:avg:Price",
+      "importance": 0.3,
+      "metadata": {
+        "columns": [
+          "Price"
+        ],
+        "detector": "central-tendency",
+        "id": "central-tendency:avg:Price",
+        "key": "avg:Price",
+        "tags": [
+          "price"
+        ],
+        "tone": "neutral"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "mean = 15.14, median = 14, σ = 5.17",
+        "policy": {
+          "params": "descriptive — no threshold",
+          "rule": "Report the mean and median of the numeric column.",
+          "source": "discovery/detectors/central-tendency.js"
+        }
+      },
+      "summary": "Mean price is 15.14 (median 14).",
+      "title": "Average price",
+      "type": "central-tendency",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Units",
+        "mean": 23.428571428571427,
+        "median": 4,
+        "stddev": 35.31837701681719
+      },
+      "explain": "Mean 23.43, median 4, spread ±35.32.",
+      "fingerprints": {
+        "procedure": "21a80ec7",
+        "result": "7a1e7be9"
+      },
+      "focus": {
+        "columns": [
+          "Units"
+        ],
+        "detector": "central-tendency",
+        "direction": null,
+        "evidence": {
+          "column": "Units",
+          "mean": 23.428571428571427,
+          "median": 4,
+          "stddev": 35.31837701681719
+        },
+        "id": "central-tendency:avg:Units",
+        "rowIndices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "scope": "dataset",
+        "summary": "Mean units is 23.43 (median 4).",
+        "title": "Average units",
+        "tone": "neutral"
+      },
+      "id": "central-tendency:avg:Units",
+      "importance": 0.3,
+      "metadata": {
+        "columns": [
+          "Units"
+        ],
+        "detector": "central-tendency",
+        "id": "central-tendency:avg:Units",
+        "key": "avg:Units",
+        "tags": [
+          "metric"
+        ],
+        "tone": "neutral"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "mean = 23.43, median = 4, σ = 35.32",
+        "policy": {
+          "params": "descriptive — no threshold",
+          "rule": "Report the mean and median of the numeric column.",
+          "source": "discovery/detectors/central-tendency.js"
+        }
+      },
+      "summary": "Mean units is 23.43 (median 4).",
+      "title": "Average units",
+      "type": "central-tendency",
+      "verified": true
+    }
+  ],
+  "domain": {
+    "id": "retail",
+    "label": "Retail / Inventory"
+  },
+  "format": "csv",
+  "meta": {
+    "columnCount": 3,
+    "detectors": [
+      "availability",
+      "central-tendency",
+      "distribution",
+      "extremes",
+      "outliers"
+    ],
+    "rowCount": 7,
+    "version": "1.0.0"
+  },
+  "ok": true,
+  "snapshot": {
+    "columnCount": 3,
+    "engineVersion": "1.0.0",
+    "fingerprint": "f7c0c509",
+    "format": "csv",
+    "policyVersion": "1.0.0",
+    "rowCount": 7,
+    "schemaHash": "34f54063",
+    "totalRows": 7,
+    "truncated": false
+  },
+  "warnings": []
+}

@@ -51,7 +51,7 @@ export function runDecisions(discoveryReport, relationshipReport) {
       for (const d of found) if (d) decisions.push(d);
     } catch (err) {
       // isolate each rule so one bad apple doesnt spoil the whole report
-      // eslint-disable-next-line no-console
+       
       console.warn(`[decisions] rule "${rule.name}" failed:`, err);
     }
   }

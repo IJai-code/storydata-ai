@@ -553,6 +553,34 @@ button.case-headline .pull-cue { display: inline-block; margin: 0 0 0 10px; vert
   line-height: var(--lh-body);
 }
 
+/* Re-check — recomputes the finding from ground, in front of the reader. */
+.ground-verify {
+  margin-top: var(--sp-3);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+.verify-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text-2);
+  font-family: var(--font-ui);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+}
+.verify-btn:hover:not(:disabled) { color: var(--text-1); border-color: var(--text-3); }
+.verify-btn:disabled { opacity: 0.4; cursor: default; }
+.verify-out {
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  color: var(--text-3);
+  line-height: var(--lh-body);
+}
+.verify-out.is-ok { color: var(--text-1); }
+.verify-out.is-bad { color: var(--danger); }
+
 /* ---------- Tracing bar (shown on a lens while following a finding) ---------- */
 .pull-bar {
   display: flex;

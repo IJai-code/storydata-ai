@@ -1,0 +1,763 @@
+{
+  "discoveries": [
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Revenue",
+        "label": "Ember Sofa",
+        "rowIndex": 3,
+        "value": 900
+      },
+      "explain": "Ember Sofa holds 900 — the highest value in this column.",
+      "fingerprints": {
+        "procedure": "02525e97",
+        "result": "7d19707f"
+      },
+      "focus": {
+        "columns": [
+          "Revenue"
+        ],
+        "detector": "extremes",
+        "direction": "max",
+        "evidence": {
+          "column": "Revenue",
+          "label": "Ember Sofa",
+          "rowIndex": 3,
+          "value": 900
+        },
+        "id": "extreme:max:Revenue",
+        "rowIndices": [
+          3
+        ],
+        "scope": "row",
+        "summary": "Ember Sofa leads on revenue at 900.",
+        "title": "Highest revenue",
+        "tone": "ok"
+      },
+      "id": "extreme:max:Revenue",
+      "importance": 0.75,
+      "metadata": {
+        "columns": [
+          "Revenue"
+        ],
+        "detector": "extremes",
+        "direction": "max",
+        "id": "extreme:max:Revenue",
+        "key": "max:Revenue",
+        "tags": [],
+        "tone": "ok"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "max(Revenue) over 8 values = 900",
+        "policy": {
+          "params": "ordering only — no threshold",
+          "rule": "Order the metric across all records; surface the highest and lowest.",
+          "source": "discovery/detectors/extremes.js"
+        }
+      },
+      "summary": "Ember Sofa leads on revenue at 900.",
+      "title": "Highest revenue",
+      "type": "extreme",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Status",
+        "count": 2,
+        "total": 8
+      },
+      "explain": "2 of 8 records match this condition.",
+      "fingerprints": {
+        "procedure": "07b05d6f",
+        "result": "99d5cf84"
+      },
+      "focus": {
+        "columns": [
+          "Status"
+        ],
+        "detector": "availability",
+        "direction": null,
+        "evidence": {
+          "column": "Status",
+          "count": 2,
+          "total": 8
+        },
+        "id": "availability:status:critical",
+        "rowIndices": [
+          2,
+          6
+        ],
+        "scope": "subset",
+        "summary": "2 of 8 records are unavailable.",
+        "title": "Out of stock",
+        "tone": "critical"
+      },
+      "id": "availability:status:critical",
+      "importance": 0.6649999999999999,
+      "metadata": {
+        "columns": [
+          "Status"
+        ],
+        "detector": "availability",
+        "id": "availability:status:critical",
+        "key": "status:critical",
+        "tags": [],
+        "tone": "critical"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "count(status classified “unavailable”) = 2 of 8",
+        "policy": {
+          "params": "vocabulary: Retail / Inventory",
+          "rule": "Classify each record’s status through the domain vocabulary, then count.",
+          "source": "discovery/profile.js · domains.js"
+        }
+      },
+      "summary": "2 of 8 records are unavailable.",
+      "title": "Out of stock",
+      "type": "availability",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Status",
+        "count": 2,
+        "total": 8
+      },
+      "explain": "2 of 8 records match this condition.",
+      "fingerprints": {
+        "procedure": "4b3b78e2",
+        "result": "cb64032f"
+      },
+      "focus": {
+        "columns": [
+          "Status"
+        ],
+        "detector": "availability",
+        "direction": null,
+        "evidence": {
+          "column": "Status",
+          "count": 2,
+          "total": 8
+        },
+        "id": "availability:status:warn",
+        "rowIndices": [
+          1,
+          5
+        ],
+        "scope": "subset",
+        "summary": "2 records are running low or limited.",
+        "title": "Low / limited",
+        "tone": "warn"
+      },
+      "id": "availability:status:warn",
+      "importance": 0.5249999999999999,
+      "metadata": {
+        "columns": [
+          "Status"
+        ],
+        "detector": "availability",
+        "id": "availability:status:warn",
+        "key": "status:warn",
+        "tags": [],
+        "tone": "warn"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "count(status classified “low”) = 2 of 8",
+        "policy": {
+          "params": "vocabulary: Retail / Inventory",
+          "rule": "Classify each record’s status through the domain vocabulary, then count.",
+          "source": "discovery/profile.js · domains.js"
+        }
+      },
+      "summary": "2 records are running low or limited.",
+      "title": "Low / limited",
+      "type": "availability",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "healthy": 4,
+        "pct": 50,
+        "total": 8
+      },
+      "explain": "4 of 8 records are in good standing (50%).",
+      "fingerprints": {
+        "procedure": "14cf9c4e",
+        "result": "27373d27"
+      },
+      "focus": {
+        "columns": [],
+        "detector": "availability",
+        "direction": null,
+        "evidence": {
+          "healthy": 4,
+          "pct": 50,
+          "total": 8
+        },
+        "id": "availability:health",
+        "rowIndices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "scope": "dataset",
+        "summary": "50% of records are in good standing.",
+        "title": "Availability health",
+        "tone": "warn"
+      },
+      "id": "availability:health",
+      "importance": 0.5,
+      "metadata": {
+        "columns": [
+          "Status"
+        ],
+        "detector": "availability",
+        "id": "availability:health",
+        "key": "health",
+        "tags": [],
+        "tone": "warn"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "4 not flagged / 8 = 50%",
+        "policy": {
+          "params": "derived from status classification",
+          "rule": "Share of records that are neither critical nor low.",
+          "source": "discovery/detectors/availability.js"
+        }
+      },
+      "summary": "50% of records are in good standing.",
+      "title": "Availability health",
+      "type": "availability",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Category",
+        "count": 3,
+        "groups": 4,
+        "value": "Decor"
+      },
+      "explain": "Decor contains 3 of the records.",
+      "fingerprints": {
+        "procedure": "045f571a",
+        "result": "fe4e3b35"
+      },
+      "focus": {
+        "columns": [
+          "Category"
+        ],
+        "detector": "distribution",
+        "direction": null,
+        "evidence": {
+          "column": "Category",
+          "count": 3,
+          "groups": 4,
+          "value": "Decor"
+        },
+        "id": "distribution:largest:Category",
+        "rowIndices": [
+          2,
+          5,
+          6
+        ],
+        "scope": "group",
+        "summary": "Decor is the largest category with 3 records.",
+        "title": "Largest category",
+        "tone": "neutral"
+      },
+      "id": "distribution:largest:Category",
+      "importance": 0.5,
+      "metadata": {
+        "columns": [
+          "Category"
+        ],
+        "detector": "distribution",
+        "id": "distribution:largest:Category",
+        "key": "largest:Category",
+        "tags": [],
+        "tone": "neutral"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "count(Decor) = 3, largest of 4 groups",
+        "policy": {
+          "params": "ordering by count",
+          "rule": "Group by category; report the largest by record count.",
+          "source": "discovery/detectors/distribution.js"
+        }
+      },
+      "summary": "Decor is the largest category with 3 records.",
+      "title": "Largest category",
+      "type": "distribution",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "categoryColumn": "Category",
+        "metricColumn": "Revenue",
+        "share": 69,
+        "total": 1150,
+        "value": "Furniture"
+      },
+      "explain": "Furniture totals 1,150 — 69% of the column.",
+      "fingerprints": {
+        "procedure": "d2f37393",
+        "result": "6c54a0e7"
+      },
+      "focus": {
+        "columns": [
+          "Category",
+          "Revenue"
+        ],
+        "detector": "distribution",
+        "direction": null,
+        "evidence": {
+          "categoryColumn": "Category",
+          "metricColumn": "Revenue",
+          "share": 69,
+          "total": 1150,
+          "value": "Furniture"
+        },
+        "id": "distribution:top-by-metric:Category:Revenue",
+        "rowIndices": [
+          1,
+          3,
+          4
+        ],
+        "scope": "group",
+        "summary": "Furniture drives 1,150 of revenue (69% of total).",
+        "title": "Top category by revenue",
+        "tone": "ok"
+      },
+      "id": "distribution:top-by-metric:Category:Revenue",
+      "importance": 0.5,
+      "metadata": {
+        "columns": [
+          "Category",
+          "Revenue"
+        ],
+        "detector": "distribution",
+        "id": "distribution:top-by-metric:Category:Revenue",
+        "key": "top-by-metric:Category:Revenue",
+        "tags": [],
+        "tone": "ok"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "Furniture = 1,150, 69% of the total",
+        "policy": {
+          "params": "share = groupTotal ÷ grandTotal",
+          "rule": "Sum the metric per category; report the leading group and its share of the total.",
+          "source": "discovery/detectors/distribution.js"
+        }
+      },
+      "summary": "Furniture drives 1,150 of revenue (69% of total).",
+      "title": "Top category by revenue",
+      "type": "distribution",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Revenue",
+        "label": "Cobalt Rug",
+        "rowIndex": 2,
+        "value": 90
+      },
+      "explain": "Cobalt Rug holds 90 — the lowest value in this column.",
+      "fingerprints": {
+        "procedure": "b77efe45",
+        "result": "a6319765"
+      },
+      "focus": {
+        "columns": [
+          "Revenue"
+        ],
+        "detector": "extremes",
+        "direction": "min",
+        "evidence": {
+          "column": "Revenue",
+          "label": "Cobalt Rug",
+          "rowIndex": 2,
+          "value": 90
+        },
+        "id": "extreme:min:Revenue",
+        "rowIndices": [
+          2
+        ],
+        "scope": "row",
+        "summary": "Cobalt Rug trails on revenue at 90.",
+        "title": "Lowest revenue",
+        "tone": "neutral"
+      },
+      "id": "extreme:min:Revenue",
+      "importance": 0.5,
+      "metadata": {
+        "columns": [
+          "Revenue"
+        ],
+        "detector": "extremes",
+        "direction": "min",
+        "id": "extreme:min:Revenue",
+        "key": "min:Revenue",
+        "tags": [],
+        "tone": "neutral"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "min(Revenue) over 8 values = 90",
+        "policy": {
+          "params": "ordering only — no threshold",
+          "rule": "Order the metric across all records; surface the highest and lowest.",
+          "source": "discovery/detectors/extremes.js"
+        }
+      },
+      "summary": "Cobalt Rug trails on revenue at 90.",
+      "title": "Lowest revenue",
+      "type": "extreme",
+      "verified": true
+    },
+    {
+      "confidence": 0.8216056946102446,
+      "evidence": {
+        "column": "Revenue",
+        "mean": 208.75,
+        "rowIndex": 3,
+        "stddev": 261.5190002657551,
+        "value": 900,
+        "z": 2.643211389220489
+      },
+      "explain": "900 sits 2.6 standard deviations from the mean of 209.",
+      "fingerprints": {
+        "procedure": "3fb7b126",
+        "result": "32162f4f"
+      },
+      "focus": {
+        "columns": [
+          "Revenue"
+        ],
+        "detector": "outliers",
+        "direction": null,
+        "evidence": {
+          "column": "Revenue",
+          "mean": 208.75,
+          "rowIndex": 3,
+          "stddev": 261.5190002657551,
+          "value": 900,
+          "z": 2.643211389220489
+        },
+        "id": "outlier:outlier:Revenue",
+        "rowIndices": [
+          3
+        ],
+        "scope": "row",
+        "summary": "Ember Sofa sits 2.6σ from the mean revenue (900).",
+        "title": "Notable outlier",
+        "tone": "warn"
+      },
+      "id": "outlier:outlier:Revenue",
+      "importance": 0.5,
+      "metadata": {
+        "columns": [
+          "Revenue"
+        ],
+        "detector": "outliers",
+        "id": "outlier:outlier:Revenue",
+        "key": "outlier:Revenue",
+        "tags": [],
+        "tone": "warn"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "scales with distance past 2σ: min(1, 0.5 + (z − 2) / 2)",
+          "value": 0.8216056946102446
+        },
+        "derivation": "z = |900 − 209| / 262 = 2.6σ  (> 2.0σ)",
+        "policy": {
+          "params": "threshold = 2.0σ",
+          "rule": "Flag the record whose distance from the mean exceeds the σ threshold.",
+          "source": "discovery/detectors/outliers.js"
+        }
+      },
+      "summary": "Ember Sofa sits 2.6σ from the mean revenue (900).",
+      "title": "Notable outlier",
+      "type": "outlier",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Price",
+        "mean": 224.81125,
+        "median": 109.25,
+        "stddev": 273.0589371105394
+      },
+      "explain": "Mean 225, median 109, spread ±273.",
+      "fingerprints": {
+        "procedure": "3d3a97fe",
+        "result": "e0640b70"
+      },
+      "focus": {
+        "columns": [
+          "Price"
+        ],
+        "detector": "central-tendency",
+        "direction": null,
+        "evidence": {
+          "column": "Price",
+          "mean": 224.81125,
+          "median": 109.25,
+          "stddev": 273.0589371105394
+        },
+        "id": "central-tendency:avg:Price",
+        "rowIndices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "scope": "dataset",
+        "summary": "Mean price is 225 (median 109).",
+        "title": "Average price",
+        "tone": "neutral"
+      },
+      "id": "central-tendency:avg:Price",
+      "importance": 0.3,
+      "metadata": {
+        "columns": [
+          "Price"
+        ],
+        "detector": "central-tendency",
+        "id": "central-tendency:avg:Price",
+        "key": "avg:Price",
+        "tags": [
+          "price"
+        ],
+        "tone": "neutral"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "mean = 225, median = 109, σ = 273",
+        "policy": {
+          "params": "descriptive — no threshold",
+          "rule": "Report the mean and median of the numeric column.",
+          "source": "discovery/detectors/central-tendency.js"
+        }
+      },
+      "summary": "Mean price is 225 (median 109).",
+      "title": "Average price",
+      "type": "central-tendency",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Revenue",
+        "mean": 208.75,
+        "median": 112.5,
+        "stddev": 261.5190002657551
+      },
+      "explain": "Mean 209, median 113, spread ±262.",
+      "fingerprints": {
+        "procedure": "f0e189a7",
+        "result": "f3410bb3"
+      },
+      "focus": {
+        "columns": [
+          "Revenue"
+        ],
+        "detector": "central-tendency",
+        "direction": null,
+        "evidence": {
+          "column": "Revenue",
+          "mean": 208.75,
+          "median": 112.5,
+          "stddev": 261.5190002657551
+        },
+        "id": "central-tendency:avg:Revenue",
+        "rowIndices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "scope": "dataset",
+        "summary": "Mean revenue is 209 (median 113).",
+        "title": "Average revenue",
+        "tone": "neutral"
+      },
+      "id": "central-tendency:avg:Revenue",
+      "importance": 0.3,
+      "metadata": {
+        "columns": [
+          "Revenue"
+        ],
+        "detector": "central-tendency",
+        "id": "central-tendency:avg:Revenue",
+        "key": "avg:Revenue",
+        "tags": [
+          "metric"
+        ],
+        "tone": "neutral"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "mean = 209, median = 113, σ = 262",
+        "policy": {
+          "params": "descriptive — no threshold",
+          "rule": "Report the mean and median of the numeric column.",
+          "source": "discovery/detectors/central-tendency.js"
+        }
+      },
+      "summary": "Mean revenue is 209 (median 113).",
+      "title": "Average revenue",
+      "type": "central-tendency",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Category",
+        "groups": 4
+      },
+      "explain": "The records fall into 4 groups.",
+      "fingerprints": {
+        "procedure": "5da3174b",
+        "result": "fa5e680f"
+      },
+      "focus": {
+        "columns": [
+          "Category"
+        ],
+        "detector": "distribution",
+        "direction": null,
+        "evidence": {
+          "column": "Category",
+          "groups": 4
+        },
+        "id": "distribution:spread:Category",
+        "rowIndices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "scope": "dataset",
+        "summary": "Records span 4 category groups.",
+        "title": "Category spread",
+        "tone": "neutral"
+      },
+      "id": "distribution:spread:Category",
+      "importance": 0.15,
+      "metadata": {
+        "columns": [
+          "Category"
+        ],
+        "detector": "distribution",
+        "id": "distribution:spread:Category",
+        "key": "spread:Category",
+        "tags": [],
+        "tone": "neutral"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "distinct(Category) = 4 groups",
+        "policy": {
+          "params": "no threshold",
+          "rule": "Count distinct category groups.",
+          "source": "discovery/detectors/distribution.js"
+        }
+      },
+      "summary": "Records span 4 category groups.",
+      "title": "Category spread",
+      "type": "distribution",
+      "verified": true
+    }
+  ],
+  "domain": {
+    "id": "retail",
+    "label": "Retail / Inventory"
+  },
+  "format": "csv",
+  "meta": {
+    "columnCount": 6,
+    "detectors": [
+      "availability",
+      "central-tendency",
+      "distribution",
+      "extremes",
+      "outliers"
+    ],
+    "rowCount": 8,
+    "version": "1.0.0"
+  },
+  "ok": true,
+  "snapshot": {
+    "columnCount": 6,
+    "engineVersion": "1.0.0",
+    "fingerprint": "f7d02086",
+    "format": "csv",
+    "policyVersion": "1.0.0",
+    "rowCount": 8,
+    "schemaHash": "0dc36dd4",
+    "totalRows": 8,
+    "truncated": false
+  },
+  "warnings": []
+}

@@ -1,0 +1,436 @@
+{
+  "discoveries": [
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Amount",
+        "label": "North",
+        "rowIndex": 0,
+        "value": 300
+      },
+      "explain": "North holds 300 — the highest value in this column.",
+      "fingerprints": {
+        "procedure": "4d88fda8",
+        "result": "c05d51e4"
+      },
+      "focus": {
+        "columns": [
+          "Amount"
+        ],
+        "detector": "extremes",
+        "direction": "max",
+        "evidence": {
+          "column": "Amount",
+          "label": "North",
+          "rowIndex": 0,
+          "value": 300
+        },
+        "id": "extreme:max:Amount",
+        "rowIndices": [
+          0
+        ],
+        "scope": "row",
+        "summary": "North leads on amount at 300.",
+        "title": "Highest amount",
+        "tone": "ok"
+      },
+      "id": "extreme:max:Amount",
+      "importance": 0.75,
+      "metadata": {
+        "columns": [
+          "Amount"
+        ],
+        "detector": "extremes",
+        "direction": "max",
+        "id": "extreme:max:Amount",
+        "key": "max:Amount",
+        "tags": [],
+        "tone": "ok"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "max(Amount) over 9 values = 300",
+        "policy": {
+          "params": "ordering only — no threshold",
+          "rule": "Order the metric across all records; surface the highest and lowest.",
+          "source": "discovery/detectors/extremes.js"
+        }
+      },
+      "summary": "North leads on amount at 300.",
+      "title": "Highest amount",
+      "type": "extreme",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Region",
+        "count": 3,
+        "groups": 3,
+        "value": "East"
+      },
+      "explain": "East contains 3 of the records.",
+      "fingerprints": {
+        "procedure": "2fb5f9c0",
+        "result": "6b25a294"
+      },
+      "focus": {
+        "columns": [
+          "Region"
+        ],
+        "detector": "distribution",
+        "direction": null,
+        "evidence": {
+          "column": "Region",
+          "count": 3,
+          "groups": 3,
+          "value": "East"
+        },
+        "id": "distribution:largest:Region",
+        "rowIndices": [
+          2,
+          5,
+          8
+        ],
+        "scope": "group",
+        "summary": "East is the largest region with 3 records.",
+        "title": "Largest region",
+        "tone": "neutral"
+      },
+      "id": "distribution:largest:Region",
+      "importance": 0.5,
+      "metadata": {
+        "columns": [
+          "Region"
+        ],
+        "detector": "distribution",
+        "id": "distribution:largest:Region",
+        "key": "largest:Region",
+        "tags": [],
+        "tone": "neutral"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "count(East) = 3, largest of 3 groups",
+        "policy": {
+          "params": "ordering by count",
+          "rule": "Group by category; report the largest by record count.",
+          "source": "discovery/detectors/distribution.js"
+        }
+      },
+      "summary": "East is the largest region with 3 records.",
+      "title": "Largest region",
+      "type": "distribution",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "categoryColumn": "Region",
+        "metricColumn": "Amount",
+        "share": 43,
+        "total": 840,
+        "value": "North"
+      },
+      "explain": "North totals 840 — 43% of the column.",
+      "fingerprints": {
+        "procedure": "f5bbace2",
+        "result": "e7150fdb"
+      },
+      "focus": {
+        "columns": [
+          "Region",
+          "Amount"
+        ],
+        "detector": "distribution",
+        "direction": null,
+        "evidence": {
+          "categoryColumn": "Region",
+          "metricColumn": "Amount",
+          "share": 43,
+          "total": 840,
+          "value": "North"
+        },
+        "id": "distribution:top-by-metric:Region:Amount",
+        "rowIndices": [
+          0,
+          3,
+          6
+        ],
+        "scope": "group",
+        "summary": "North drives 840 of amount (43% of total).",
+        "title": "Top region by amount",
+        "tone": "ok"
+      },
+      "id": "distribution:top-by-metric:Region:Amount",
+      "importance": 0.5,
+      "metadata": {
+        "columns": [
+          "Region",
+          "Amount"
+        ],
+        "detector": "distribution",
+        "id": "distribution:top-by-metric:Region:Amount",
+        "key": "top-by-metric:Region:Amount",
+        "tags": [],
+        "tone": "ok"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "North = 840, 43% of the total",
+        "policy": {
+          "params": "share = groupTotal ÷ grandTotal",
+          "rule": "Sum the metric per category; report the leading group and its share of the total.",
+          "source": "discovery/detectors/distribution.js"
+        }
+      },
+      "summary": "North drives 840 of amount (43% of total).",
+      "title": "Top region by amount",
+      "type": "distribution",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Amount",
+        "label": "South",
+        "rowIndex": 1,
+        "value": 150
+      },
+      "explain": "South holds 150 — the lowest value in this column.",
+      "fingerprints": {
+        "procedure": "e201ea26",
+        "result": "5e043bcf"
+      },
+      "focus": {
+        "columns": [
+          "Amount"
+        ],
+        "detector": "extremes",
+        "direction": "min",
+        "evidence": {
+          "column": "Amount",
+          "label": "South",
+          "rowIndex": 1,
+          "value": 150
+        },
+        "id": "extreme:min:Amount",
+        "rowIndices": [
+          1
+        ],
+        "scope": "row",
+        "summary": "South trails on amount at 150.",
+        "title": "Lowest amount",
+        "tone": "neutral"
+      },
+      "id": "extreme:min:Amount",
+      "importance": 0.5,
+      "metadata": {
+        "columns": [
+          "Amount"
+        ],
+        "detector": "extremes",
+        "direction": "min",
+        "id": "extreme:min:Amount",
+        "key": "min:Amount",
+        "tags": [],
+        "tone": "neutral"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "min(Amount) over 9 values = 150",
+        "policy": {
+          "params": "ordering only — no threshold",
+          "rule": "Order the metric across all records; surface the highest and lowest.",
+          "source": "discovery/detectors/extremes.js"
+        }
+      },
+      "summary": "South trails on amount at 150.",
+      "title": "Lowest amount",
+      "type": "extreme",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Amount",
+        "mean": 217.22222222222223,
+        "median": 210,
+        "stddev": 50.39351320199363
+      },
+      "explain": "Mean 217, median 210, spread ±50.39.",
+      "fingerprints": {
+        "procedure": "16fbf792",
+        "result": "2abaaaa0"
+      },
+      "focus": {
+        "columns": [
+          "Amount"
+        ],
+        "detector": "central-tendency",
+        "direction": null,
+        "evidence": {
+          "column": "Amount",
+          "mean": 217.22222222222223,
+          "median": 210,
+          "stddev": 50.39351320199363
+        },
+        "id": "central-tendency:avg:Amount",
+        "rowIndices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "scope": "dataset",
+        "summary": "Mean amount is 217 (median 210).",
+        "title": "Average amount",
+        "tone": "neutral"
+      },
+      "id": "central-tendency:avg:Amount",
+      "importance": 0.3,
+      "metadata": {
+        "columns": [
+          "Amount"
+        ],
+        "detector": "central-tendency",
+        "id": "central-tendency:avg:Amount",
+        "key": "avg:Amount",
+        "tags": [
+          "metric"
+        ],
+        "tone": "neutral"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "mean = 217, median = 210, σ = 50.39",
+        "policy": {
+          "params": "descriptive — no threshold",
+          "rule": "Report the mean and median of the numeric column.",
+          "source": "discovery/detectors/central-tendency.js"
+        }
+      },
+      "summary": "Mean amount is 217 (median 210).",
+      "title": "Average amount",
+      "type": "central-tendency",
+      "verified": true
+    },
+    {
+      "confidence": 1,
+      "evidence": {
+        "column": "Region",
+        "groups": 3
+      },
+      "explain": "The records fall into 3 groups.",
+      "fingerprints": {
+        "procedure": "f5ff0871",
+        "result": "c56ff91a"
+      },
+      "focus": {
+        "columns": [
+          "Region"
+        ],
+        "detector": "distribution",
+        "direction": null,
+        "evidence": {
+          "column": "Region",
+          "groups": 3
+        },
+        "id": "distribution:spread:Region",
+        "rowIndices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "scope": "dataset",
+        "summary": "Records span 3 region groups.",
+        "title": "Region spread",
+        "tone": "neutral"
+      },
+      "id": "distribution:spread:Region",
+      "importance": 0.15,
+      "metadata": {
+        "columns": [
+          "Region"
+        ],
+        "detector": "distribution",
+        "id": "distribution:spread:Region",
+        "key": "spread:Region",
+        "tags": [],
+        "tone": "neutral"
+      },
+      "provenance": {
+        "confidence": {
+          "note": "a direct count or ordering over the snapshot — nothing estimated",
+          "value": 1
+        },
+        "derivation": "distinct(Region) = 3 groups",
+        "policy": {
+          "params": "no threshold",
+          "rule": "Count distinct category groups.",
+          "source": "discovery/detectors/distribution.js"
+        }
+      },
+      "summary": "Records span 3 region groups.",
+      "title": "Region spread",
+      "type": "distribution",
+      "verified": true
+    }
+  ],
+  "domain": {
+    "id": "generic",
+    "label": "General"
+  },
+  "format": "csv",
+  "meta": {
+    "columnCount": 2,
+    "detectors": [
+      "availability",
+      "central-tendency",
+      "distribution",
+      "extremes",
+      "outliers"
+    ],
+    "rowCount": 9,
+    "version": "1.0.0"
+  },
+  "ok": true,
+  "snapshot": {
+    "columnCount": 2,
+    "engineVersion": "1.0.0",
+    "fingerprint": "973498ee",
+    "format": "csv",
+    "policyVersion": "1.0.0",
+    "rowCount": 9,
+    "schemaHash": "0a889154",
+    "totalRows": 9,
+    "truncated": false
+  },
+  "warnings": []
+}

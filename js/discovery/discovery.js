@@ -33,6 +33,7 @@ export function createDiscovery({
   importance = IMPORTANCE.MEDIUM,
   evidence = {},
   metadata = {},
+  justification = null,
 }) {
   if (!type || !title) throw new Error('createDiscovery requires both a type and a title');
   const id = metadata.id || `${type}:${metadata.key ?? title}`;
@@ -45,6 +46,9 @@ export function createDiscovery({
     importance: clamp01(importance),
     evidence: Object.freeze({ ...evidence }),
     metadata: Object.freeze({ tone: TONE.NEUTRAL, tags: [], ...metadata, id }),
+    // The Claim's chain to ground (supports + op graph + π). Null until a
+    // detector migrates; pull.js falls back to its legacy path for those.
+    justification,
   });
 }
 

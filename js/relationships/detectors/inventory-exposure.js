@@ -7,7 +7,7 @@ import { createRelationship, TONE } from '../relationship.js';
 
 registerRelationship({
   name: 'inventory-exposure',
-  detect({ discoveries, byKeyPrefix, find }) {
+  detect({ byKeyPrefix, find }) {
     const critical = find(
       (d) => d.type === 'availability' && (d.metadata.key === 'status:critical' || d.metadata.key === 'qty:zero')
     );

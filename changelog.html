@@ -50,6 +50,22 @@
   <section class="section" style="border-top:none;padding-top:0">
     <div class="container">
       <div class="log-entry">
+        <div class="log-meta"><span class="log-version">Preview v1.1</span>Aug 2026</div>
+        <div class="log-body">
+          <h3>Findings can be re-checked <span class="log-tag">reasoning</span></h3>
+          <ul>
+            <li>Every finding now carries the derivation graph it was computed from, down to
+              individual cells and the policy constants applied.</li>
+            <li>Ground shows two fingerprints: the <em>procedure</em> — the computation itself,
+              independent of the data — and the <em>result</em>, which binds it to this snapshot.
+              Data can change while the reasoning stays identical, and you can see that.</li>
+            <li>“Re-check this finding” re-derives the claim from the fingerprinted records and
+              reports whether it reproduces. It is a real recomputation, not a stored verdict.</li>
+            <li>Records supporting a finding are addressed by content, not row position.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="log-entry">
         <div class="log-meta"><span class="log-version">Preview v1</span>Jul 2026</div>
         <div class="log-body">
           <h3>The Pull reaches fingerprinted ground <span class="log-tag">interaction</span></h3>

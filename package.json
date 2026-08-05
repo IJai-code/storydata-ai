@@ -11,8 +11,10 @@
   },
   "scripts": {
     "start": "node server/server.js",
-    "lint": "eslint server public/js eslint.config.js",
-    "dev:mock": "python3 tools/mock_api.py 4173"
+    "lint": "eslint server js tools eslint.config.js",
+    "dev:mock": "python3 tools/mock_api.py 4173",
+    "test": "node tools/test/run.mjs",
+    "test:update": "node tools/test/run.mjs --update"
   },
   "dependencies": {
     "cors": "^2.8.6",

@@ -3,7 +3,7 @@
 // distribution discovery) and how far the single biggest record sits above the
 // average (extreme vs central-tendency).
 import { registerRelationship } from '../registry.js';
-import { createRelationship, IMPORTANCE, TONE, formatNumber } from '../relationship.js';
+import { createRelationship, TONE, formatNumber } from '../relationship.js';
 
 // These two thresholds are judgement calls, not science. 35% felt like the point
 // where "one group carries this" stops being noise, and 2.5x mean is roughly
@@ -13,7 +13,7 @@ const TOP_HEAVY_RATIO = 2.5; // biggest record ÷ mean
 
 registerRelationship({
   name: 'concentration',
-  detect({ discoveries, byKeyPrefix, find }) {
+  detect({ byKeyPrefix, find }) {
     const out = [];
 
     // (a) One category dominates the metric total.

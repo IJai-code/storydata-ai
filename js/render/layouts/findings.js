@@ -10,11 +10,12 @@
 import { getState } from '../../state.js';
 import {
   buildReport,
-  resolveFocus,
   explain,
   provenanceOf,
   snapshotOf,
   rowFingerprint,
+  fingerprintsOf,
+  verifyFinding,
 } from '../pull.js';
 import { formatValue, escapeHTML } from '../util.js';
 
@@ -84,14 +85,14 @@ function renderTrace(focus, dataset, report) {
   const roles = report.profile.roles;
   const labelCol = roles.label;
   const colByKey = Object.fromEntries(dataset.columns.map((c) => [c.key, c]));
-  const cls = TONE_CLASS[focus.tone] || 'neutral';
   const snapshot = snapshotOf(dataset);
-  const prov = provenanceOf(d, report);
+  const prov = provenanceOf(d, report, dataset);
+  const fp = fingerprintsOf(d, snapshot);
 
   const root = document.createElement('div');
   root.className = 'casefile trace';
 
-  const because = explain(focus);
+  const because = explain(focus, d, dataset, report);
   // Raw evidence values can be long floats (e.g. a z-score); cap displayed
   // precision to 3 decimals so the chips read cleanly next to the rounded ones.
   const showNum = (v) => formatValue(Number.isInteger(v) ? v : Math.round(v * 1000) / 1000, 'number');
@@ -198,13 +199,33 @@ function renderTrace(focus, dataset, report) {
           <div><dt>snapshot</dt><dd>${snapshot.fingerprint}</dd></div>
           <div><dt>schema</dt><dd>${snapshot.schemaHash}</dd></div>
           <div><dt>shape</dt><dd>${snapshot.rowCount} × ${snapshot.columnCount} · ${escapeHTML(snapshot.format)}${snapshot.truncated ? ` · capped from ${snapshot.totalRows}` : ''}</dd></div>
+          <div><dt>procedure</dt><dd>${fp.procedure}</dd></div>
+          <div><dt>result</dt><dd>${fp.result}</dd></div>
           <div><dt>engine</dt><dd>v${escapeHTML(snapshot.engineVersion)}</dd></div>
           <div><dt>policy</dt><dd>v${escapeHTML(snapshot.policyVersion)}</dd></div>
         </dl>
-        <p class="ground-law">Conclusion = f( evidence, policy ). Re-run this snapshot under the
-          same policy and the finding reproduces exactly.</p>
+        <p class="ground-law">Conclusion = f( evidence, policy ). The procedure fingerprint names
+          the computation; the result binds it to this snapshot. Re-run either and they reproduce.</p>
+        <div class="ground-verify">
+          <button class="verify-btn" type="button" data-verify>Re-check this finding</button>
+          <span class="verify-out" role="status" aria-live="polite"></span>
+        </div>
       </div>
     </div>`;
+
+  // Re-check: every operation in the finding's graph is recomputed from the
+  // fingerprinted records and compared against what the finding claims. Nothing
+  // here reads a stored verdict — if the arithmetic disagreed, this would say so.
+  root.querySelector('[data-verify]')?.addEventListener('click', (e) => {
+    const out = root.querySelector('.verify-out');
+    const ok = verifyFinding(d, dataset, report);
+    out.textContent = ok
+      ? `Reproduced — recomputed from ${snapshot.fingerprint} under policy v${snapshot.policyVersion}.`
+      : 'Did not reproduce. The finding does not match its own evidence.';
+    out.classList.toggle('is-ok', ok);
+    out.classList.toggle('is-bad', !ok);
+    e.currentTarget.disabled = true;
+  });
 
   // Records open in place to reveal their raw cells — the last step of the Pull.
   root.querySelector('.trace-rows')?.addEventListener('click', (e) => {

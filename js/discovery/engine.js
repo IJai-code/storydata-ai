@@ -31,7 +31,7 @@ export function runDiscovery(dataset) {
     } catch (err) {
       // isolate each detector — one blowing up shouldnt cost us every other
       // signal too. we'd rather drop one finding than the whole report.
-      // eslint-disable-next-line no-console
+       
       console.warn(`[discovery] detector "${detector.name}" failed:`, err);
     }
   }

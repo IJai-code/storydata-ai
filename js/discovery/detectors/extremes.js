@@ -1,6 +1,14 @@
 // Who's on top and who's at the bottom of the primary metric.
 import { registerDetector } from '../registry.js';
 import { createDiscovery, IMPORTANCE, TONE, formatNumber } from '../discovery.js';
+import { justify, record } from '../../derive/build.js';
+
+const POLICY = {
+  rule: 'Order the metric across all records; surface the highest and lowest.',
+  params: 'ordering only — no threshold',
+  source: 'discovery/detectors/extremes.js',
+};
+const CERTAIN = { value: 1, note: 'a direct count or ordering over the snapshot — nothing estimated' };
 
 registerDetector({
   name: 'extremes',
@@ -29,6 +37,13 @@ registerDetector({
         confidence: 1,
         evidence: { column: m.key, value: top.row[m.key], rowIndex: top.index, label: nameOf(top.row) },
         metadata: { detector: 'extremes', key: `max:${m.key}`, columns: [m.key], tone: TONE.OK, direction: 'max' },
+        justification: justify({
+          build: (g) => g.stat('max', [g.column(m.key)]),
+          witness: record(dataset, top.index, [m.key]),
+          asserts: top.row[m.key],
+          policy: POLICY,
+          confidence: CERTAIN,
+        }),
       }),
       createDiscovery({
         type: 'extreme',
@@ -38,6 +53,13 @@ registerDetector({
         confidence: 1,
         evidence: { column: m.key, value: bottom.row[m.key], rowIndex: bottom.index, label: nameOf(bottom.row) },
         metadata: { detector: 'extremes', key: `min:${m.key}`, columns: [m.key], tone: TONE.NEUTRAL, direction: 'min' },
+        justification: justify({
+          build: (g) => g.stat('min', [g.column(m.key)]),
+          witness: record(dataset, bottom.index, [m.key]),
+          asserts: bottom.row[m.key],
+          policy: POLICY,
+          confidence: CERTAIN,
+        }),
       }),
     ];
   },
