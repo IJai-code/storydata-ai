@@ -421,6 +421,42 @@
     "version": "1.0.0"
   },
   "ok": true,
+  "relationships": [
+    {
+      "composed": {
+        "asserts": {
+          "group": "North",
+          "meets": true,
+          "share": 43
+        },
+        "policy": {
+          "params": "share ≥ 35%",
+          "rule": "Flag a category holding at least the share threshold of the metric total.",
+          "source": "relationships/detectors/concentration.js"
+        },
+        "supports": [
+          {
+            "claimId": "distribution:top-by-metric:Region:Amount",
+            "of": "claim"
+          }
+        ],
+        "verified": true
+      },
+      "evidence": {
+        "group": "North",
+        "kind": "category-share",
+        "metricColumn": "Amount",
+        "share": 43
+      },
+      "id": "concentration:concentration:category",
+      "summary": "North accounts for 43% of the total — value is concentrated in one group.",
+      "supporting": [
+        "distribution:top-by-metric:Region:Amount"
+      ],
+      "title": "Concentration risk",
+      "type": "concentration"
+    }
+  ],
   "snapshot": {
     "columnCount": 2,
     "engineVersion": "1.0.0",

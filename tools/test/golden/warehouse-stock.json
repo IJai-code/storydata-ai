@@ -481,6 +481,81 @@
     "version": "1.0.0"
   },
   "ok": true,
+  "relationships": [
+    {
+      "composed": null,
+      "evidence": {
+        "count": 3,
+        "sharedColumns": [
+          "Units"
+        ],
+        "types": [
+          "availability",
+          "outlier"
+        ]
+      },
+      "id": "clustered-anomaly:clustered-anomaly",
+      "summary": "3 anomaly signals detected concentrated on Units — likely a single underlying issue rather than isolated noise.",
+      "supporting": [
+        "availability:qty:low",
+        "availability:qty:zero",
+        "outlier:outlier:Units"
+      ],
+      "title": "Clustered anomalies",
+      "type": "clustered-anomaly"
+    },
+    {
+      "composed": null,
+      "evidence": {
+        "leader": "Widget F",
+        "metricColumn": "Units",
+        "total": 7,
+        "unavailable": 2
+      },
+      "id": "inventory-risk:inventory-risk",
+      "summary": "2 of 7 records are unavailable while Widget F carries the most value — revenue is exposed to stockouts.",
+      "supporting": [
+        "availability:qty:zero",
+        "extreme:max:Units"
+      ],
+      "title": "Inventory risk",
+      "type": "inventory-risk"
+    },
+    {
+      "composed": null,
+      "evidence": {
+        "kind": "max-vs-mean",
+        "leader": "Widget F",
+        "max": 100,
+        "mean": 23.428571428571427,
+        "ratio": 4.27
+      },
+      "id": "concentration:concentration:record",
+      "summary": "Widget F is 4.3× the average (100 vs 23.43) — a few records dominate.",
+      "supporting": [
+        "extreme:max:Units",
+        "central-tendency:avg:Units"
+      ],
+      "title": "Top-heavy distribution",
+      "type": "concentration"
+    },
+    {
+      "composed": null,
+      "evidence": {
+        "column": "Units",
+        "outlierConfidence": 0.5840168070997196,
+        "value": 100,
+        "z": 2.168033614199439
+      },
+      "id": "needs-investigation:needs-investigation:outlier:outlier:Units",
+      "summary": "A record looks like an outlier but the signal is weak (58% confidence) — investigate before acting on it.",
+      "supporting": [
+        "outlier:outlier:Units"
+      ],
+      "title": "Needs investigation",
+      "type": "needs-investigation"
+    }
+  ],
   "snapshot": {
     "columnCount": 3,
     "engineVersion": "1.0.0",

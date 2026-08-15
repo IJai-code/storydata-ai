@@ -11,6 +11,7 @@
   },
   "scripts": {
     "start": "node server/server.js",
+    "dev": "node tools/preview-server.mjs",
     "lint": "eslint server js tools eslint.config.js",
     "dev:mock": "python3 tools/mock_api.py 4173",
     "test": "node tools/test/run.mjs",

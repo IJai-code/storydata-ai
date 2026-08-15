@@ -16,13 +16,14 @@ import { fileURLToPath } from 'node:url';
 
 import { ingest } from '../../server/ingest/normalize.js';
 import { runDiscovery } from '../../js/discovery/index.js';
+import { runRelationships } from '../../js/relationships/index.js';
 import {
   snapshotOf,
   resolveFocus,
   explain,
   provenanceOf,
   fingerprintsOf,
-  verifyFinding,
+  verifyClaim,
 } from '../../js/render/pull.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -78,9 +79,29 @@ function capture(raw) {
       // the result binds it to this snapshot, and `verified` is a real
       // recomputation from ground — a false here is a broken truth path.
       fingerprints: fingerprintsOf(d, snapshot),
-      verified: verifyFinding(d, dataset, report),
+      verified: verifyClaim(d, dataset, report).ok,
     };
   });
+
+  // The Relationship tier. Only migrated rules carry a justification; capturing
+  // `supports` and `verified` pins that a composed claim still re-derives from
+  // the Discoveries it cites, all the way down to cells.
+  const relationships = runRelationships(report).relationships.map((r) => ({
+    id: r.id,
+    type: r.type,
+    title: r.title,
+    summary: r.summary,
+    supporting: r.supporting,
+    evidence: r.evidence,
+    composed: r.justification
+      ? {
+          supports: r.justification.supports,
+          asserts: r.justification.asserts,
+          policy: r.justification.policy,
+          verified: verifyClaim(r, dataset, report).ok,
+        }
+      : null,
+  }));
 
   return {
     ok: true,
@@ -90,6 +111,7 @@ function capture(raw) {
     meta: report.meta,
     snapshot,
     discoveries,
+    relationships,
   };
 }
 
@@ -110,6 +132,81 @@ const fixtures = fs
   .readdirSync(FIXTURES)
   .filter((f) => /\.(csv|json|txt)$/i.test(f))
   .sort();
+
+/* ---------- Invariants ----------
+   Checked on every run, independent of the golden files. These are the rules a
+   finding must satisfy to be honest at all; a golden diff would only tell us
+   the output changed, not that a claim became uncheckable. */
+
+const INVARIANTS = [
+  {
+    name: 'every finding carries a justification',
+    holds: (d) => !!d.justification,
+    why: 'without one, the Pull has nothing to descend through',
+  },
+  {
+    name: 'every justification asserts a value',
+    // Omitting `asserts` makes verification compare against undefined, which
+    // fails closed — honest, but it renders as a broken finding rather than
+    // the authoring mistake it actually is. Catch it here instead.
+    holds: (d) => d.justification && 'asserts' in d.justification && d.justification.asserts !== undefined,
+    why: 'verification would silently compare against undefined and always fail',
+  },
+  {
+    name: 'every finding verifies against its own evidence',
+    holds: (c, ctx) => verifyClaim(c, ctx.dataset, ctx.report).ok,
+    why: 'the claim does not reproduce from the ground it cites',
+  },
+];
+
+function checkInvariants(raw) {
+  const ing = ingest(raw);
+  if (!ing.ok) return [];
+  const dataset = ing.dataset;
+  const report = runDiscovery(dataset);
+  const rels = runRelationships(report);
+  const broken = [];
+
+  // Every Discovery must be complete. Relationships are mid-migration, so only
+  // the ones already carrying a justification are held to the contract — but
+  // those are held to exactly the same one, which is the point of Claim ← Support*.
+  const claims = [
+    ...report.discoveries.map((c) => ({ claim: c, required: true })),
+    ...rels.relationships.map((c) => ({ claim: c, required: false })),
+  ];
+
+  for (const { claim, required } of claims) {
+    if (!required && !claim.justification) continue;
+    for (const inv of INVARIANTS) {
+      let ok;
+      try {
+        ok = inv.holds(claim, { dataset, report, rels });
+      } catch (err) {
+        ok = false;
+        inv.lastError = err.message;
+      }
+      if (!ok) broken.push(`${claim.id} — ${inv.name} (${inv.why})`);
+    }
+  }
+  return broken;
+}
+
+// Invariants run to completion BEFORE anything is compared or written. A
+// --update that wrote some files and then aborted would leave the golden set
+// half-blessed by code we already know is broken.
+let brokenInvariants = 0;
+for (const file of fixtures) {
+  const broken = checkInvariants(fs.readFileSync(path.join(FIXTURES, file), 'utf8'));
+  if (broken.length) {
+    brokenInvariants += broken.length;
+    console.log(`INVARIANT  ${file.replace(/\.[^.]+$/, '')}`);
+    for (const b of broken) console.log(`    ${b}`);
+  }
+}
+if (brokenInvariants) {
+  console.log(`\n${brokenInvariants} invariant violation(s). These are authoring errors, not golden drift — nothing was written, and --update will not clear them.`);
+  process.exit(1);
+}
 
 let failed = 0;
 let updated = 0;
@@ -152,5 +249,5 @@ if (failed) {
   console.log(`\n${failed} of ${fixtures.length} fixture(s) drifted. Review the diff; if intended, re-run with --update.`);
   process.exit(1);
 }
-console.log(`\nAll ${fixtures.length} fixture(s) match golden. Truth path is stable.`);
+console.log(`\nAll ${fixtures.length} fixture(s) match golden · invariants hold. Truth path is stable.`);
 process.exit(0);

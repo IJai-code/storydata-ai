@@ -4,6 +4,7 @@
 // average (extreme vs central-tendency).
 import { registerRelationship } from '../registry.js';
 import { createRelationship, TONE, formatNumber } from '../relationship.js';
+import { justifyOver } from '../../derive/build.js';
 
 // These two thresholds are judgement calls, not science. 35% felt like the point
 // where "one group carries this" stops being noise, and 2.5x mean is roughly
@@ -30,6 +31,27 @@ registerRelationship({
           supporting: [top.id],
           evidence: { kind: 'category-share', group: top.evidence.value, share, metricColumn: top.evidence.metricColumn },
           metadata: { detector: 'concentration', key: 'concentration:category', tone: share >= 60 ? TONE.CRITICAL : TONE.WARN },
+          justification: justifyOver({
+            supports: [top.id],
+            // Every quantity the summary states, plus the predicate outcome.
+            // `group` and `share` are projected from the supporting Discovery's
+            // own asserted value, which verification re-derives from cells.
+            build: (g) => {
+              const shareOf = g.claim(top.id, 'share');
+              return g.record({
+                group: g.claim(top.id, 'value'),
+                share: shareOf,
+                meets: g.reduce('atLeast', [shareOf, g.param('share-min', CATEGORY_SHARE_MIN)]),
+              });
+            },
+            policy: {
+              rule: 'Flag a category holding at least the share threshold of the metric total.',
+              params: `share ≥ ${CATEGORY_SHARE_MIN}%`,
+              source: 'relationships/detectors/concentration.js',
+            },
+            confidence: { value: 1, note: 'a direct comparison against the supporting finding' },
+            asserts: { group: top.evidence.value, share, meets: true },
+          }),
         })
       );
     }

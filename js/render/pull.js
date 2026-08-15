@@ -93,7 +93,15 @@ export function fingerprintsOf(d, snapshot) {
 }
 
 // Re-run every operation from fingerprinted ground and confirm it reproduces the
-// finding. This is a real recomputation, not a stored flag.
-export function verifyFinding(d, dataset, report) {
-  return verify(d.justification, dataset, report.profile);
+// claim. A real recomputation, not a stored flag. Returns the full result so a
+// caller can say *which* link broke; `.ok` is the headline.
+export function verifyClaim(d, dataset, report) {
+  return verify(d, {
+    dataset,
+    profile: report.profile,
+    // Lets a composed claim resolve and re-derive the claims it rests on.
+    claimById: (id) => report.discoveries.find((x) => x.id === id) || null,
+  });
 }
+
+export const verifyFinding = (d, dataset, report) => verifyClaim(d, dataset, report).ok;

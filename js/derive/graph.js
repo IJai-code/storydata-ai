@@ -107,7 +107,21 @@ export const OPS = Object.freeze({
 
   zscore: ([value, mean, stddev]) => Math.abs((value - mean) / stddev),
   exceeds: ([value, threshold]) => value > threshold,
+
+  /* Composition tier (Relationships). Deliberately five small ops, not an
+     expression engine: four comparisons plus a struct constructor. A claim's
+     asserted shape is a `record` over projections of its supports. */
+  ratio: ([a, b]) => a / b,
+  atLeast: ([x, t]) => x >= t,
+  below: ([x, t]) => x < t,
+  count: ([xs]) => (Array.isArray(xs) ? xs.length : 0),
 });
+
+// `record` names its inputs, so it is evaluated separately from the positional
+// ops above. It is what lets one generic combiner produce every Relationship's
+// asserted shape instead of one bespoke op per rule.
+const evalRecord = (node, values) =>
+  Object.fromEntries(Object.entries(node.fields).map(([k, id]) => [k, values[id]]));
 
 /* ---------- Building ---------- */
 
@@ -135,6 +149,18 @@ export function newGraph() {
     param: (name, value) => intern({ kind: 'param', name, value }, `param:${name}::${canon(value)}`),
     stat: (stat, inputs) => intern({ kind: 'stat', stat, inputs }, `stat:${stat}:${inputs.join(',')}:`),
     reduce: (op, inputs) => intern({ kind: 'reduce', op, inputs }, `reduce:${op}:${inputs.join(',')}:`),
+
+    // A leaf that stands for another Claim's value. Evaluating it re-derives
+    // that claim from ITS ground — never reads its stored `asserts`, which
+    // would make composition trust the very number under test.
+    claim: (claimId, path = '') => intern({ kind: 'claim', claimId, path }, `claim:${claimId}:${path}:`),
+
+    // Named struct — the asserted shape of a composed claim.
+    record: (fields) =>
+      intern(
+        { kind: 'record', fields },
+        `record::${Object.keys(fields).sort().map((k) => `${k}=${fields[k]}`).join(',')}`
+      ),
   };
 }
 
@@ -179,6 +205,17 @@ export function evaluate(nodes, ctx, root, values = {}) {
     case 'param':
       values[root] = n.value;
       break;
+    case 'claim': {
+      // Re-derive the supporting claim from its own ground, then project.
+      const supporting = ctx.claimById?.(n.claimId);
+      const derived = supporting ? evaluateClaim(supporting, ctx) : undefined;
+      values[root] = n.path ? derived?.[n.path] : derived;
+      break;
+    }
+    case 'record':
+      for (const id of Object.values(n.fields)) evaluate(nodes, ctx, id, values);
+      values[root] = evalRecord(n, values);
+      break;
     default: {
       for (const input of n.inputs) evaluate(nodes, ctx, input, values);
       values[root] = OPS[n.op ?? n.stat](n.inputs.map((i) => values[i]), n, ctx);
@@ -187,8 +224,15 @@ export function evaluate(nodes, ctx, root, values = {}) {
   return values;
 }
 
-export const evaluateAll = (justification, dataset, profile) =>
-  evaluate(justification.opGraph.nodes, { dataset, profile }, justification.opGraph.root);
+// The value a Claim's own procedure produces, whatever tier it belongs to.
+function evaluateClaim(claim, ctx) {
+  const g = claim.justification?.opGraph;
+  if (!g) return undefined;
+  return evaluate(g.nodes, ctx, g.root)[g.root];
+}
+
+export const evaluateAll = (justification, dataset, profile, claimById) =>
+  evaluate(justification.opGraph.nodes, { dataset, profile, claimById }, justification.opGraph.root);
 
 /* ---------- Verification ---------- */
 
@@ -200,10 +244,44 @@ export const evaluateAll = (justification, dataset, profile) =>
 // against what the *detector asserted* when it made the claim: evaluate the
 // graph from fingerprinted ground, independently of the detector's own
 // arithmetic, and compare the result to the value the finding stands behind.
-export function verify(justification, dataset, profile) {
-  const { root } = justification.opGraph;
-  const values = evaluateAll(justification, dataset, profile);
-  return deepEqual(values[root], justification.asserts);
+// Three checks, per the frozen contract (docs/derivation-graph.md §7.5):
+//   1. resolvable — every cited support exists in this snapshot
+//   2. recursive  — every claim support verifies
+//   3. local      — the re-derived value equals what the claim asserts
+// Ground supports are the floor: a cell either is in the snapshot or is not.
+//
+// Step 3 is equality against the FULL asserted struct, not just the predicate
+// outcome. A rule that fires on `share >= 35` while stating "69%" must fail if
+// the real share is 64 — the predicate would still hold, but the claim lies.
+export function verify(claim, ctx) {
+  const j = claim.justification;
+  const supports = [];
+  let ok = true;
+
+  for (const s of j?.supports ?? []) {
+    if (s.of !== 'claim') continue;
+    const supporting = ctx.claimById?.(s.claimId);
+    if (!supporting) {
+      supports.push({ claimId: s.claimId, ok: false, mode: 'missing-support' });
+      ok = false;
+      continue;
+    }
+    const r = verify(supporting, ctx);
+    if (!r.ok) ok = false;
+    supports.push({ claimId: s.claimId, ok: r.ok, mode: r.ok ? null : 'support-failed', detail: r });
+  }
+
+  const g = j?.opGraph;
+  const actual = g ? evaluate(g.nodes, ctx, g.root)[g.root] : undefined;
+  const localOk = deepEqual(actual, j?.asserts);
+  if (!localOk) ok = false;
+
+  return {
+    ok,
+    claimId: claim.id,
+    local: { ok: localOk, expected: j?.asserts, actual, mode: localOk ? null : 'local-mismatch' },
+    supports,
+  };
 }
 
 function deepEqual(a, b) {

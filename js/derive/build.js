@@ -52,3 +52,23 @@ export function justify({ build, witness, policy, confidence, asserts }) {
     asserts,
   });
 }
+
+// Assemble a composed (Relationship-tier) justification: supports are other
+// Claims, and the op graph composes *their* values rather than cells. Selection
+// is recorded in `supports`, exactly as the Discovery witness records rows —
+// verification never re-runs the rule that chose them.
+//
+// `asserts` must carry every quantity the claim states, not merely the predicate
+// outcome: a rule firing on "share >= 35" while saying "69%" has to fail when the
+// real share is 64, and a bare boolean could not catch that.
+export function justifyOver({ supports, build, policy, confidence, asserts }) {
+  const g = newGraph();
+  const root = build(g);
+  return Object.freeze({
+    supports: Object.freeze(supports.map((claimId) => Object.freeze({ of: 'claim', claimId }))),
+    opGraph: Object.freeze({ root, nodes: Object.freeze(g.nodes) }),
+    policy: Object.freeze(policy),
+    confidence: Object.freeze(confidence),
+    asserts,
+  });
+}

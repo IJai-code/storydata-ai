@@ -35,6 +35,7 @@ export function createRelationship({
   supporting = [],
   evidence = {},
   metadata = {},
+  justification = null,
 }) {
   if (!type || !title) throw new Error('createRelationship requires both a type and a title');
   const id = metadata.id || `${type}:${metadata.key ?? title}`;
@@ -48,6 +49,9 @@ export function createRelationship({
     supporting: Object.freeze([...supporting]),
     evidence: Object.freeze({ ...evidence }),
     metadata: Object.freeze({ tone: TONE.NEUTRAL, tags: [], ...metadata, id }),
+    // A composed justification: `claim` supports and an op graph over their
+    // values. Same envelope as a Discovery's, so one verify/pull handles both.
+    justification,
   });
 }
 

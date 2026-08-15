@@ -748,6 +748,99 @@
     "version": "1.0.0"
   },
   "ok": true,
+  "relationships": [
+    {
+      "composed": {
+        "asserts": {
+          "group": "Furniture",
+          "meets": true,
+          "share": 69
+        },
+        "policy": {
+          "params": "share ≥ 35%",
+          "rule": "Flag a category holding at least the share threshold of the metric total.",
+          "source": "relationships/detectors/concentration.js"
+        },
+        "supports": [
+          {
+            "claimId": "distribution:top-by-metric:Category:Revenue",
+            "of": "claim"
+          }
+        ],
+        "verified": true
+      },
+      "evidence": {
+        "group": "Furniture",
+        "kind": "category-share",
+        "metricColumn": "Revenue",
+        "share": 69
+      },
+      "id": "concentration:concentration:category",
+      "summary": "Furniture accounts for 69% of the total — value is concentrated in one group.",
+      "supporting": [
+        "distribution:top-by-metric:Category:Revenue"
+      ],
+      "title": "Concentration risk",
+      "type": "concentration"
+    },
+    {
+      "composed": null,
+      "evidence": {
+        "count": 3,
+        "sharedColumns": [
+          "Status"
+        ],
+        "types": [
+          "availability",
+          "outlier"
+        ]
+      },
+      "id": "clustered-anomaly:clustered-anomaly",
+      "summary": "3 anomaly signals detected concentrated on Status — likely a single underlying issue rather than isolated noise.",
+      "supporting": [
+        "availability:status:critical",
+        "availability:status:warn",
+        "outlier:outlier:Revenue"
+      ],
+      "title": "Clustered anomalies",
+      "type": "clustered-anomaly"
+    },
+    {
+      "composed": null,
+      "evidence": {
+        "leader": "Furniture",
+        "metricColumn": "Revenue",
+        "total": 8,
+        "unavailable": 2
+      },
+      "id": "inventory-risk:inventory-risk",
+      "summary": "2 of 8 records are unavailable while Furniture carries the most value — revenue is exposed to stockouts.",
+      "supporting": [
+        "availability:status:critical",
+        "distribution:top-by-metric:Category:Revenue"
+      ],
+      "title": "Inventory risk",
+      "type": "inventory-risk"
+    },
+    {
+      "composed": null,
+      "evidence": {
+        "kind": "max-vs-mean",
+        "leader": "Ember Sofa",
+        "max": 900,
+        "mean": 208.75,
+        "ratio": 4.31
+      },
+      "id": "concentration:concentration:record",
+      "summary": "Ember Sofa is 4.3× the average (900 vs 209) — a few records dominate.",
+      "supporting": [
+        "extreme:max:Revenue",
+        "central-tendency:avg:Revenue"
+      ],
+      "title": "Top-heavy distribution",
+      "type": "concentration"
+    }
+  ],
   "snapshot": {
     "columnCount": 6,
     "engineVersion": "1.0.0",

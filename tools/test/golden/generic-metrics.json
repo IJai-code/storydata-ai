@@ -284,6 +284,24 @@
     "version": "1.0.0"
   },
   "ok": true,
+  "relationships": [
+    {
+      "composed": null,
+      "evidence": {
+        "column": "Score",
+        "outlierConfidence": 0.6163100407235267,
+        "value": 120,
+        "z": 2.2326200814470534
+      },
+      "id": "needs-investigation:needs-investigation:outlier:outlier:Score",
+      "summary": "A record looks like an outlier but the signal is weak (62% confidence) — investigate before acting on it.",
+      "supporting": [
+        "outlier:outlier:Score"
+      ],
+      "title": "Needs investigation",
+      "type": "needs-investigation"
+    }
+  ],
   "snapshot": {
     "columnCount": 2,
     "engineVersion": "1.0.0",

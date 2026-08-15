@@ -498,3 +498,209 @@ the top two.
 
 **Architecture frozen at this revision.** Next action is code: `js/derive/`, then
 `extremes` on the frame above, golden green at every step.
+
+---
+
+# The Relationship verification contract
+
+Status: **frozen**. Derived from the five rules in `js/relationships/detectors/`,
+not from theory. Change it only if the code contradicts it.
+
+## 7.1 What a Relationship is
+
+A Relationship is a Claim whose supports are other Claims. Same envelope as a
+Discovery — `asserts`, `supports`, `compose`, `policy`, `confidence` — with two
+differences: its supports are `{of:'claim'}` rather than `{of:'ground'}`, and its
+op graph composes *asserted values of supports* instead of cells.
+
+```
+Claim = { id, asserts, supports[], compose, policy, confidence }
+support = { of:'ground', witness }        // Discovery tier
+        | { of:'claim',  id }             // Relationship / Decision tier
+```
+
+## 7.2 (Q1) What a Relationship asserts
+
+**The quantities it states, not merely that it fired.**
+
+This is the tautology lesson again. `concentration:category` fires when
+`share >= 35`, but its summary says “Furniture accounts for **69%**”. If it
+asserted only `meets: true`, a run where the real share was 5% — sorry, 95% —
+would still verify, because the predicate still holds. The stated number would
+be free to lie.
+
+So `asserts` carries every quantity the claim puts on screen, plus the predicate
+outcome:
+
+```
+asserts = { group: 'Furniture', share: 69, meets: true }
+```
+
+Rule: **if a number appears in the summary, it appears in `asserts`.**
+
+## 7.3 (Q2) What must be stored
+
+Enough that verification never calls detector code. Three things:
+
+1. **`supports`** — the claim ids it relies on. Selection is *recorded*, exactly
+   as the Discovery witness records rows. Verification does not re-run the
+   selector (see §7.6 for why that boundary is the right one).
+2. **`compose`** — an op graph whose leaves are `claim(id, path?)` and
+   `param(name, value)`. No closures, no rule references.
+3. **`asserts`** — the value the graph must reproduce.
+
+`policy` and `confidence` are read back for display and are *not* inputs to
+verification.
+
+## 7.4 The composition algebra (small, explicit, closed)
+
+One new leaf kind and five ops cover all five existing rules. This is a struct
+constructor plus four comparisons — deliberately **not** a general expression
+engine.
+
+```
+leaf  claim(id, path?)     // a support's asserted value, or a field of it
+leaf  param(name, value)   // π
+
+op    ratio   [a, b]        → a / b
+op    atLeast [x, t]        → x >= t
+op    below   [x, t]        → x < t
+op    count   [xs]          → xs.length
+op    record  {field: node} → { field: value, … }    // the asserted shape
+```
+
+`record` is what avoids a per-rule op: every Relationship's asserted shape is a
+named struct over projections and comparisons.
+
+Coverage check against the real rules:
+
+| rule | composition |
+|---|---|
+| `concentration:category` | `record{ group: claim(top,'value'), share: claim(top,'share'), meets: atLeast(claim(top,'share'), 35) }` |
+| `concentration:record` | `record{ max: claim(maxD), mean: claim(avgD,'mean'), ratio: ratio(…), meets: atLeast(ratio, 2.5) }` |
+| `clustered-anomaly` | `record{ count: count(supports), meets: atLeast(count, 2) }` |
+| `inventory-risk` | `record{ unavailable: claim(crit), total: …, meets: atLeast(claim(crit), 1) }` |
+| `needs-investigation` | `record{ z: claim(outlier,'z'), meets: below(z, 2.29) }` — see §7.8 |
+
+## 7.5 (Q3, Q4) What `verify` returns, and why “supports verify AND predicate” is not enough
+
+```
+verify(claim, ctx) → { ok, claimId, local: {ok, expected, actual}, supports: [result…] }
+```
+
+Three checks, in order:
+
+1. **Resolvable** — every cited support exists in this snapshot. Ground witnesses
+   resolve by record fingerprint; claim supports resolve by id.
+2. **Recursive** — every claim support verifies. Ground supports bottom out: a
+   cell either is in the snapshot or is not.
+3. **Local** — `deepEqual(evaluate(compose.root), asserts)`.
+
+**Q4: no, “supports verify AND the predicate is true” is not sufficient.** It is
+necessary but too weak, for the reason in §7.2 — the predicate can hold while the
+stated numbers are wrong. Step 3 is deliberately equality against the full
+asserted struct, of which `meets` is only one field.
+
+The second subtlety: claim leaves must evaluate to the support's **re-derived**
+value, obtained by evaluating that support's own graph against the snapshot —
+*not* by reading its stored `asserts`. Reading the stored value would make
+composition trust the very number under test, which is the tautology trap in a
+new costume.
+
+Failure modes, all distinguishable in the result:
+
+| mode | meaning |
+|---|---|
+| `missing-support` | a cited claim or record is not in this snapshot |
+| `support-failed` | an upstream claim no longer verifies |
+| `local-mismatch` | the composed value ≠ what this claim states |
+
+## 7.6 The boundary of verification (stated, not hidden)
+
+Verification proves **“this claim follows from the supports it cites.”** It does
+*not* prove “these are the right supports to have cited.” Re-running selection
+would mean re-running rule code, which is precisely the coupling this
+architecture removes. The Discovery tier already draws the same line: we verify
+the arithmetic over the cited column, not the choice of column.
+
+This limit is honest and should be visible in the UI wording.
+
+## 7.7 (Q5) Confidence
+
+**Confidence is presentation. It is neither asserted nor verified.**
+
+- It is *policy-derived*: `min` for `inventory-exposure`, the mean of member
+  confidences for `clustered-anomaly`, weakest-link in `decisions/assess.js`.
+- Putting it in `asserts` would break verification of every historical claim
+  whenever the confidence formula is tuned — even though nothing factual changed.
+- It is deterministic, so it can be recomputed and displayed; that is a separate
+  concern from whether the claim holds.
+
+The distinction that matters: **a support's confidence may be an input to a
+composition; a Relationship's own confidence never is.** `fragile-outlier` looks
+like a counterexample — its subject *is* weak confidence — but see §7.8.
+
+## 7.8 The one rule with a prerequisite
+
+`fragile-outlier` currently thresholds on the outlier's *confidence* (< 0.7).
+Confidence must not be load-bearing for truth, and the underlying quantity is
+right there: confidence is a pure function of z, `min(1, 0.5 + (z−2)/2)`, so
+`confidence < 0.7 ⟺ z < 2.4`. The rule should compose over **z**, which is a fact
+about the data, rather than over a presentational score.
+
+That requires `outliers` to assert `{ z, exceeds }` instead of bare `true` — a
+small, intended change that moves its procedure fingerprint. Do it when migrating
+that rule, not before.
+
+Two Discovery detectors will likewise need slightly richer `asserts` when a
+Relationship quotes them: `extremes` asserts a bare scalar today, so a claim
+naming the *record* (“Ember Sofa”) cannot yet verify that label. Same treatment,
+same intended-diff discipline. `concentration:category` — the reference case —
+needs none of this: `distribution` already asserts `{value, total, share}`.
+
+## 7.9 (Q6) Worked example, end to end
+
+Claim: **“Furniture accounts for 69% of the total — value is concentrated in one group.”**
+
+**Stored** (nothing else):
+
+```
+id       'concentration:concentration:category'
+asserts  { group: 'Furniture', share: 69, meets: true }
+supports [ { of:'claim', id:'distribution:top-by-metric:Category:Revenue' } ]
+compose  root = record{
+           group: claim(topId, 'value'),
+           share: claim(topId, 'share'),
+           meets: atLeast(claim(topId,'share'), param('share-min', 35))
+         }
+policy   { rule:'Flag a category holding at least the share threshold of the metric total.',
+           params:'share ≥ 35%', source:'relationships/detectors/concentration.js' }
+```
+
+**Recomputed** on verify:
+
+```
+concentration:category
+├─ support: distribution:top-by-metric:Category:Revenue
+│    └─ verify(Discovery):
+│         evaluate groupShare[ column(Category), column(Revenue) ]
+│           column leaves → cells → snapshot 8c1ee26e     ← fingerprinted ground
+│         → { value:'Furniture', total:1150, share:69 }
+│         deepEqual(…, its asserts) → ok
+└─ local: evaluate record{…}
+     claim(topId,'value') → 'Furniture'   (re-derived above, not read from store)
+     claim(topId,'share') → 69
+     atLeast(69, 35)      → true
+   → { group:'Furniture', share:69, meets:true }
+   deepEqual(…, asserts) → ok
+
+verify → { ok: true }
+```
+
+**Success** = the support re-derived from ground, and the composition over those
+re-derived values reproduced every stated quantity.
+
+**Failure, concretely:** edit one Furniture revenue cell so the true share
+becomes 64. The Discovery's `groupShare` now evaluates to `share:64` ≠ its
+asserted `69` → `support-failed`, and the Relationship reports `local-mismatch`
+on `share`. The chain breaks at the exact link that moved.
