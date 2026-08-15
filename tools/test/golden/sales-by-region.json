@@ -436,7 +436,7 @@
         },
         "supports": [
           {
-            "claimId": "distribution:top-by-metric:Region:Amount",
+            "id": "distribution:top-by-metric:Region:Amount",
             "of": "claim"
           }
         ],

@@ -14,7 +14,9 @@
     "dev": "node tools/preview-server.mjs",
     "lint": "eslint server js tools eslint.config.js",
     "dev:mock": "python3 tools/mock_api.py 4173",
-    "test": "node tools/test/run.mjs",
+    "test": "node tools/test/run.mjs && node tools/test/contract.mjs",
+    "test:golden": "node tools/test/run.mjs",
+    "test:contract": "node tools/test/contract.mjs",
     "test:update": "node tools/test/run.mjs --update"
   },
   "dependencies": {

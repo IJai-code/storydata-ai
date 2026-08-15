@@ -4,7 +4,8 @@
 // identity so a Pull never re-runs analysis — it is pure navigation.
 
 import { runDiscovery } from '../discovery/index.js';
-import { evaluateAll, verify, procedureFingerprint, resultFingerprint } from '../derive/graph.js';
+import { runRelationships } from '../relationships/index.js';
+import { evaluateAll, verify, pull as pullClaim, procedureFingerprint, resultFingerprint } from '../derive/graph.js';
 import { projectWitness, scopeOf, groundOf, derivationString, becauseString } from '../derive/project.js';
 
 // Re-exported so the trace formats evidence numbers with the engine's own
@@ -92,16 +93,36 @@ export function fingerprintsOf(d, snapshot) {
   };
 }
 
+/* ---------- The claim index ----------
+   One lookup spanning every tier, so a composed claim resolves its supports
+   without anyone hard-coding which engine produced them. Decisions will resolve
+   Relationships through exactly this, unchanged. */
+
+let claimCache = { report: null, index: null };
+
+export function claimIndex(report) {
+  if (claimCache.report === report) return claimCache.index;
+  const index = new Map();
+  for (const d of report.discoveries) index.set(d.id, d);
+  for (const r of runRelationships(report).relationships) index.set(r.id, r);
+  claimCache = { report, index };
+  return index;
+}
+
+const claimCtx = (dataset, report) => ({
+  dataset,
+  profile: report.profile,
+  claimById: (id) => claimIndex(report).get(id) || null,
+});
+
 // Re-run every operation from fingerprinted ground and confirm it reproduces the
 // claim. A real recomputation, not a stored flag. Returns the full result so a
 // caller can say *which* link broke; `.ok` is the headline.
-export function verifyClaim(d, dataset, report) {
-  return verify(d, {
-    dataset,
-    profile: report.profile,
-    // Lets a composed claim resolve and re-derive the claims it rests on.
-    claimById: (id) => report.discoveries.find((x) => x.id === id) || null,
-  });
-}
+export const verifyClaim = (claim, dataset, report) => verify(claim, claimCtx(dataset, report));
 
-export const verifyFinding = (d, dataset, report) => verifyClaim(d, dataset, report).ok;
+export const verifyFinding = (claim, dataset, report) => verifyClaim(claim, dataset, report).ok;
+
+// The Pull, across tiers. Yields the claim, then descends each support: a claim
+// support recurses, a ground support terminates at the fingerprinted witness.
+// Generic — nothing here knows what a "concentration" is.
+export const pullClaimChain = (claim, report) => [...pullClaim(claim, (id) => claimIndex(report).get(id) || null)];

@@ -65,7 +65,7 @@ export function justifyOver({ supports, build, policy, confidence, asserts }) {
   const g = newGraph();
   const root = build(g);
   return Object.freeze({
-    supports: Object.freeze(supports.map((claimId) => Object.freeze({ of: 'claim', claimId }))),
+    supports: Object.freeze(supports.map((id) => Object.freeze({ of: 'claim', id }))),
     opGraph: Object.freeze({ root, nodes: Object.freeze(g.nodes) }),
     policy: Object.freeze(policy),
     confidence: Object.freeze(confidence),

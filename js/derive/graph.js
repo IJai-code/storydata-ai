@@ -260,15 +260,15 @@ export function verify(claim, ctx) {
 
   for (const s of j?.supports ?? []) {
     if (s.of !== 'claim') continue;
-    const supporting = ctx.claimById?.(s.claimId);
+    const supporting = ctx.claimById?.(s.id);
     if (!supporting) {
-      supports.push({ claimId: s.claimId, ok: false, mode: 'missing-support' });
+      supports.push({ claimId: s.id, ok: false, reason: 'missing-support' });
       ok = false;
       continue;
     }
     const r = verify(supporting, ctx);
     if (!r.ok) ok = false;
-    supports.push({ claimId: s.claimId, ok: r.ok, mode: r.ok ? null : 'support-failed', detail: r });
+    supports.push({ claimId: s.id, ok: r.ok, reason: r.ok ? null : 'support-failed', detail: r });
   }
 
   const g = j?.opGraph;
@@ -279,7 +279,7 @@ export function verify(claim, ctx) {
   return {
     ok,
     claimId: claim.id,
-    local: { ok: localOk, expected: j?.asserts, actual, mode: localOk ? null : 'local-mismatch' },
+    local: { ok: localOk, expected: j?.asserts, actual, reason: localOk ? null : 'local-mismatch' },
     supports,
   };
 }
@@ -300,14 +300,18 @@ function deepEqual(a, b) {
    Relationships and Decisions become pullable without a second provenance
    system. */
 
-export function* pull(claim, claimById = () => null) {
-  yield { claim };
+export function* pull(claim, claimById = () => null, depth = 0) {
+  yield { claim, depth };
   for (const s of claim.justification?.supports ?? []) {
     if (s.of === 'claim') {
-      const next = claimById(s.claimId);
-      if (next) yield* pull(next, claimById);
+      const next = claimById(s.id);
+      // An unresolvable support is surfaced, not skipped — the same condition
+      // verify() reports as `missing-support`. Silently dropping it would let a
+      // Pull look complete while a link is gone.
+      if (next) yield* pull(next, claimById, depth + 1);
+      else yield { missing: s.id, depth: depth + 1 };
     } else {
-      yield { ground: s.witness };
+      yield { ground: s.witness, depth: depth + 1 };
     }
   }
 }
