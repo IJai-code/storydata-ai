@@ -10,8 +10,8 @@
       },
       "explain": "Delta holds 120 — the highest value in this column.",
       "fingerprints": {
-        "procedure": "9f04291e",
-        "result": "f53c3a7e"
+        "procedure": "582f1ebc",
+        "result": "27331bce"
       },
       "focus": {
         "columns": [
@@ -74,8 +74,8 @@
       },
       "explain": "Alpha holds 42 — the lowest value in this column.",
       "fingerprints": {
-        "procedure": "8b6a0a1c",
-        "result": "f8ee8b66"
+        "procedure": "f7d460d9",
+        "result": "44c6e850"
       },
       "focus": {
         "columns": [
@@ -140,8 +140,8 @@
       },
       "explain": "120 sits 2.2 standard deviations from the mean of 56.83.",
       "fingerprints": {
-        "procedure": "0c5f1e3b",
-        "result": "7ae3f345"
+        "procedure": "0062dace",
+        "result": "cdeaaac7"
       },
       "focus": {
         "columns": [
@@ -286,15 +286,32 @@
   "ok": true,
   "relationships": [
     {
-      "composed": null,
+      "composed": {
+        "asserts": {
+          "label": "Delta",
+          "meets": true,
+          "z": 2.2326200814470534
+        },
+        "policy": {
+          "params": "z < 2.4σ",
+          "rule": "Flag an outlier that clears the detection line only narrowly, so it is reviewed rather than acted on.",
+          "source": "relationships/detectors/fragile-outlier.js"
+        },
+        "supports": [
+          {
+            "id": "outlier:outlier:Score",
+            "of": "claim"
+          }
+        ],
+        "verified": true
+      },
       "evidence": {
         "column": "Score",
-        "outlierConfidence": 0.6163100407235267,
         "value": 120,
         "z": 2.2326200814470534
       },
       "id": "needs-investigation:needs-investigation:outlier:outlier:Score",
-      "summary": "A record looks like an outlier but the signal is weak (62% confidence) — investigate before acting on it.",
+      "summary": "Delta sits 2.2σ from the mean — under the 2.4σ line where the signal firms up, so investigate before acting on it.",
       "supporting": [
         "outlier:outlier:Score"
       ],

@@ -11,7 +11,7 @@ import { api, API_BASE } from '../api.js';
 import { applyWatermark } from './watermark.js';
 import * as util from './util.js';
 import * as discovery from '../discovery/index.js';
-import { buildReport, resolveFocus, applyFocus } from './pull.js';
+import { buildReport, resolveFocus, applyFocus, claimById } from './pull.js';
 import { escapeHTML } from './util.js';
 import * as findings from './layouts/findings.js';
 import * as timeline from './layouts/timeline.js';
@@ -66,7 +66,7 @@ export function initCanvas(el, { gateDenied } = {}) {
       const state = getState();
       if (!state.dataset) return;
       const report = buildReport(state.dataset);
-      const d = report.discoveries.find((x) => x.id === pull.dataset.pull);
+      const d = claimById(report, pull.dataset.pull);
       if (d) setState({ focus: resolveFocus(d, state.dataset, report), layout: 'findings' });
       return;
     }

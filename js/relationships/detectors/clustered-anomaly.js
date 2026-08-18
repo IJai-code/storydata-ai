@@ -3,6 +3,9 @@
 // more of them point at the same column, we call that out. Under two: skip.
 import { registerRelationship } from '../registry.js';
 import { createRelationship, TONE } from '../relationship.js';
+import { justifyOver } from '../../derive/build.js';
+
+const MIN_SIGNALS = 2;
 
 registerRelationship({
   name: 'clustered-anomaly',
@@ -40,6 +43,29 @@ registerRelationship({
         supporting: anomalies.map((a) => a.id),
         evidence: { count: anomalies.length, sharedColumns: shared, types: [...new Set(anomalies.map((a) => a.type))].sort() },
         metadata: { detector: 'clustered-anomaly', key: 'clustered-anomaly', tone: TONE.WARN },
+        justification: justifyOver({
+          // Selection is recorded, not re-run: these are the anomalies the rule
+          // cited, and the count is over exactly them.
+          supports: anomalies.map((a) => a.id),
+          build: (g) => {
+            const members = g.reduce('list', anomalies.map((a) => g.claim(a.id)));
+            // Shared fields come from each support's own recorded witness, so
+            // "concentrated on X" is checkable rather than decorative.
+            const fields = g.reduce('list', anomalies.map((a) => g.claim(a.id, '@fields')));
+            return g.record({
+              count: g.reduce('count', [members]),
+              sharedColumns: g.reduce('sharedFields', [fields]),
+              meets: g.reduce('atLeast', [g.reduce('count', [members]), g.param('min-signals', MIN_SIGNALS)]),
+            });
+          },
+          policy: {
+            rule: 'Group anomaly signals that land on the same fields; report the cluster once at least the minimum are present.',
+            params: `signals ≥ ${MIN_SIGNALS}`,
+            source: 'relationships/detectors/clustered-anomaly.js',
+          },
+          confidence: { value: confidence, note: 'the mean confidence of the clustered signals' },
+          asserts: { count: anomalies.length, sharedColumns: shared, meets: true },
+        }),
       }),
     ];
   },

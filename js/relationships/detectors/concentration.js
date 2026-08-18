@@ -9,6 +9,7 @@ import { justifyOver } from '../../derive/build.js';
 // These two thresholds are judgement calls, not science. 35% felt like the point
 // where "one group carries this" stops being noise, and 2.5x mean is roughly
 // where a single record starts to skew the picture. Tune if real data disagrees.
+const SRC = 'relationships/detectors/concentration.js';
 const CATEGORY_SHARE_MIN = 35; // top group's share of the metric total
 const TOP_HEAVY_RATIO = 2.5; // biggest record ÷ mean
 
@@ -47,7 +48,7 @@ registerRelationship({
             policy: {
               rule: 'Flag a category holding at least the share threshold of the metric total.',
               params: `share ≥ ${CATEGORY_SHARE_MIN}%`,
-              source: 'relationships/detectors/concentration.js',
+              source: SRC,
             },
             confidence: { value: 1, note: 'a direct comparison against the supporting finding' },
             asserts: { group: top.evidence.value, share, meets: true },
@@ -84,6 +85,29 @@ registerRelationship({
               ratio: Math.round(ratio * 100) / 100,
             },
             metadata: { detector: 'concentration', key: 'concentration:record', tone: TONE.WARN },
+            justification: justifyOver({
+              supports: [maxD.id, avgD.id],
+              build: (g) => {
+                const max = g.claim(maxD.id, 'value');
+                const mean = g.claim(avgD.id, 'mean');
+                const r = g.reduce('ratio', [max, mean]);
+                return g.record({
+                  leader: g.claim(maxD.id, 'label'),
+                  max,
+                  mean,
+                  ratio: r,
+                  meets: g.reduce('atLeast', [r, g.param('ratio-min', TOP_HEAVY_RATIO)]),
+                });
+              },
+              policy: {
+                rule: 'Flag when the leading record stands at least the ratio threshold above the mean.',
+                params: `max ÷ mean ≥ ${TOP_HEAVY_RATIO}`,
+                source: SRC,
+              },
+              confidence: { value: 1, note: 'a direct comparison across two supporting findings' },
+              // The raw ratio is the assertion; the summary rounds it for reading.
+              asserts: { leader: maxD.evidence.label, max: maxD.evidence.value, mean: avgD.evidence.mean, ratio, meets: true },
+            }),
           })
         );
       }

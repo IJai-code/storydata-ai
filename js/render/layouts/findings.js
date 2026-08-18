@@ -10,6 +10,8 @@
 import { getState } from '../../state.js';
 import {
   buildReport,
+  rankedClaims,
+  claimById,
   explain,
   provenanceOf,
   snapshotOf,
@@ -25,8 +27,8 @@ export function render(container, dataset) {
   const report = buildReport(dataset);
   const focus = getState().focus;
 
-  // A finding is being pulled — descend into it instead of listing all.
-  if (focus && report.discoveries.some((d) => d.id === focus.id)) {
+  // A claim is being pulled — descend into it instead of listing all.
+  if (focus && claimById(report, focus.id)) {
     container.appendChild(renderTrace(focus, dataset, report));
     return () => {};
   }
@@ -35,16 +37,17 @@ export function render(container, dataset) {
   return () => {};
 }
 
-/* ---------- The Case File: the ranked findings ---------- */
+/* ---------- The Case File: the ranked claims ---------- */
 
 function renderList(report) {
-  const { discoveries, domain, meta } = report;
+  const { domain, meta } = report;
+  const claims = rankedClaims(report);
   const root = document.createElement('div');
   root.className = 'casefile';
 
-  const lead = discoveries[0];
+  const lead = claims[0];
   const checks = meta.detectors.length;
-  const rest = discoveries.slice(1);
+  const rest = claims.slice(1);
 
   root.innerHTML = `
     <header class="case-header">
@@ -67,11 +70,15 @@ function renderList(report) {
 
 function findingRow(d) {
   const cls = TONE_CLASS[d.metadata.tone] || 'neutral';
+  // A composed claim rests on other findings rather than directly on records.
+  // Same row, same vocabulary — one quiet mark so the reader knows which is which.
+  const n = d.justification?.supports?.filter((s) => s.of === 'claim').length || 0;
+  const restsOn = n ? `<span class="finding-rests">from ${n} finding${n === 1 ? '' : 's'}</span>` : '';
   return `
     <li class="finding finding-${cls} case-pull" data-pull="${escapeAttr(d.id)}">
       <span class="finding-dot"></span>
       <span class="finding-body">
-        <span class="finding-title">${escapeHTML(d.title)}</span>
+        <span class="finding-title">${escapeHTML(d.title)}${restsOn}</span>
         <span class="finding-text">${escapeHTML(d.summary)}</span>
       </span>
       <span class="pull-cue" aria-hidden="true">Trace ↓</span>
@@ -81,7 +88,7 @@ function findingRow(d) {
 /* ---------- The Trace: one finding, followed all the way down ---------- */
 
 function renderTrace(focus, dataset, report) {
-  const d = report.discoveries.find((x) => x.id === focus.id);
+  const d = claimById(report, focus.id);
   const roles = report.profile.roles;
   const labelCol = roles.label;
   const colByKey = Object.fromEntries(dataset.columns.map((c) => [c.key, c]));
@@ -151,6 +158,33 @@ function renderTrace(focus, dataset, report) {
       ? `All ${focus.rowIndices.length} records`
       : `${focus.rowIndices.length} records`;
 
+  // A composed claim rests on other findings. They are shown as findings — same
+  // language, same Trace affordance — so the reader can see this claim is about
+  // other claims, and keep pulling from here rather than hitting a dead end.
+  const supports = (d.justification?.supports || []).filter((s) => s.of === 'claim');
+  const restsOnHTML = supports.length
+    ? `<div class="trace-layer trace-rests">
+         <span class="trace-step">Rests on <span class="trace-hint">— ${supports.length}
+           supporting ${supports.length === 1 ? 'finding' : 'findings'}, each traceable in turn</span></span>
+         <ol class="rests-list">
+           ${supports
+             .map((s) => {
+               const sc = claimById(report, s.id);
+               if (!sc) return `<li class="rests-item is-missing">missing support · ${escapeHTML(s.id)}</li>`;
+               const tone = TONE_CLASS[sc.metadata.tone] || 'neutral';
+               return `<li class="rests-item finding-${tone} case-pull" data-pull="${escapeAttr(sc.id)}">
+                   <span class="rests-body">
+                     <span class="rests-title">${escapeHTML(sc.title)}</span>
+                     <span class="rests-text">${escapeHTML(sc.summary)}</span>
+                   </span>
+                   <span class="pull-cue" aria-hidden="true">Trace ↓</span>
+                 </li>`;
+             })
+             .join('')}
+         </ol>
+       </div>`
+    : '';
+
   root.innerHTML = `
     <button class="trace-back" data-pull-clear>‹ All findings</button>
 
@@ -160,6 +194,8 @@ function renderTrace(focus, dataset, report) {
         <span class="trace-title">${escapeHTML(focus.title)}</span>
         <p class="trace-summary">${escapeHTML(focus.summary)}</p>
       </div>
+
+      ${restsOnHTML}
 
       <div class="trace-layer">
         <span class="trace-step">Evidence</span>

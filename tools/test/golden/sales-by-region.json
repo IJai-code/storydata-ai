@@ -10,8 +10,8 @@
       },
       "explain": "North holds 300 — the highest value in this column.",
       "fingerprints": {
-        "procedure": "4d88fda8",
-        "result": "c05d51e4"
+        "procedure": "e79812a6",
+        "result": "d482b642"
       },
       "focus": {
         "columns": [
@@ -208,8 +208,8 @@
       },
       "explain": "South holds 150 — the lowest value in this column.",
       "fingerprints": {
-        "procedure": "e201ea26",
-        "result": "5e043bcf"
+        "procedure": "817f5675",
+        "result": "4a15a64a"
       },
       "focus": {
         "columns": [

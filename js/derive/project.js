@@ -151,35 +151,54 @@ const TEMPLATES = Object.freeze({
   exceeds,
 });
 
-function context(justification, dataset, report, values) {
+function context(justification, dataset, report, values, valueAt) {
   const { nodes, root } = justification.opGraph;
+  const ground = groundOf(justification);
   return {
     nodes,
     dataset,
     report,
-    value: values[root],
+    // The narrated node's value, so a record root does not hand templates a struct.
+    value: values[valueAt ?? root],
     values,
-    rowIndices: projectWitness(groundOf(justification), dataset),
+    rowIndices: ground ? projectWitness(ground, dataset) : [],
   };
 }
 
 export const groundOf = (justification) => justification.supports.find((s) => s.of === 'ground')?.witness;
 
-const templateFor = (nodes, root) => {
+// A `record` root is a struct, not a calculation, so it hands the prose to the
+// field it named as narrator. That way a claim can assert more without its
+// derivation line degrading into "{…}".
+const narratedNode = (nodes, root) => {
   const n = nodes[root];
-  return TEMPLATES[n.op ?? n.stat];
+  if (n.kind === 'record' && n.narrator && n.fields[n.narrator]) return narratedNode(nodes, n.fields[n.narrator]);
+  return root;
+};
+
+
+// A record with no narrator is a composed claim's asserted struct. It reads out
+// as the fields it stands behind — the composition IS the derivation.
+const recordTemplate = {
+  formula: (ctx) =>
+    Object.entries(ctx.value || {})
+      .map(([k, v]) => `${k} = ${typeof v === 'boolean' ? (v ? 'yes' : 'no') : num(v)}`)
+      .join('  ·  '),
+  because: () => '',
+};
+
+const narrate = (kind, justification, dataset, report, values) => {
+  const { nodes, root } = justification.opGraph;
+  const at = narratedNode(nodes, root);
+  const n = nodes[at];
+  const t = n.kind === 'record' ? recordTemplate : TEMPLATES[n.op ?? n.stat];
+  return t ? t[kind](context(justification, dataset, report, values, at), n) : '';
 };
 
 // The derivation line — "max(Revenue) over 8 values = 900".
-export function derivationString(justification, dataset, report, values) {
-  const { nodes, root } = justification.opGraph;
-  const t = templateFor(nodes, root);
-  return t ? t.formula(context(justification, dataset, report, values), nodes[root]) : '';
-}
+export const derivationString = (justification, dataset, report, values) =>
+  narrate('formula', justification, dataset, report, values);
 
 // The plain-English sentence naming what Ellery actually looked at.
-export function becauseString(justification, dataset, report, values) {
-  const { nodes, root } = justification.opGraph;
-  const t = templateFor(nodes, root);
-  return t ? t.because(context(justification, dataset, report, values), nodes[root]) : '';
-}
+export const becauseString = (justification, dataset, report, values) =>
+  narrate('because', justification, dataset, report, values);

@@ -532,6 +532,34 @@ button.case-headline .pull-cue { display: inline-block; margin: 0 0 0 10px; vert
   letter-spacing: 0.03em;
 }
 
+/* Rests on — the claims a composed claim stands upon. Deliberately the same
+   language as a finding row: a supporting claim is a finding, not a new object. */
+.finding-rests {
+  margin-left: 8px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  color: var(--text-3);
+  letter-spacing: 0.03em;
+}
+.rests-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.rests-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: 10px 12px;
+  border: 1px solid var(--line-soft);
+  border-left: 2px solid var(--line);
+  cursor: pointer;
+}
+.rests-item:hover { border-color: var(--line); }
+.rests-item.finding-bad { border-left-color: var(--danger); }
+.rests-item.finding-warn { border-left-color: var(--warn); }
+.rests-item.is-missing { cursor: default; color: var(--danger); font-family: var(--font-mono); font-size: var(--fs-2xs); }
+.rests-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rests-title { font-size: var(--fs-sm); color: var(--text-1); }
+.rests-text { font-size: var(--fs-xs); color: var(--text-2); line-height: var(--lh-body); }
+
 /* Ground — the fingerprinted snapshot, the terminal of the descent. */
 .trace-ground .trace-step::before { background: var(--brand); }
 .ground-line { margin: 0 0 var(--sp-3); font-size: var(--fs-md); color: var(--text-1); }

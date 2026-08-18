@@ -10,8 +10,8 @@
       },
       "explain": "Ember Sofa holds 900 — the highest value in this column.",
       "fingerprints": {
-        "procedure": "02525e97",
-        "result": "7d19707f"
+        "procedure": "a85913e1",
+        "result": "dc9a4081"
       },
       "focus": {
         "columns": [
@@ -73,8 +73,8 @@
       },
       "explain": "2 of 8 records match this condition.",
       "fingerprints": {
-        "procedure": "07b05d6f",
-        "result": "99d5cf84"
+        "procedure": "90708cf5",
+        "result": "99b4d958"
       },
       "focus": {
         "columns": [
@@ -135,8 +135,8 @@
       },
       "explain": "2 of 8 records match this condition.",
       "fingerprints": {
-        "procedure": "4b3b78e2",
-        "result": "cb64032f"
+        "procedure": "35f1622a",
+        "result": "88c6654e"
       },
       "focus": {
         "columns": [
@@ -398,8 +398,8 @@
       },
       "explain": "Cobalt Rug holds 90 — the lowest value in this column.",
       "fingerprints": {
-        "procedure": "b77efe45",
-        "result": "a6319765"
+        "procedure": "4db9119a",
+        "result": "d9cbf015"
       },
       "focus": {
         "columns": [
@@ -464,8 +464,8 @@
       },
       "explain": "900 sits 2.6 standard deviations from the mean of 209.",
       "fingerprints": {
-        "procedure": "3fb7b126",
-        "result": "32162f4f"
+        "procedure": "3516053b",
+        "result": "deb09c35"
       },
       "focus": {
         "columns": [
@@ -784,7 +784,35 @@
       "type": "concentration"
     },
     {
-      "composed": null,
+      "composed": {
+        "asserts": {
+          "count": 3,
+          "meets": true,
+          "sharedColumns": [
+            "Status"
+          ]
+        },
+        "policy": {
+          "params": "signals ≥ 2",
+          "rule": "Group anomaly signals that land on the same fields; report the cluster once at least the minimum are present.",
+          "source": "relationships/detectors/clustered-anomaly.js"
+        },
+        "supports": [
+          {
+            "id": "availability:status:critical",
+            "of": "claim"
+          },
+          {
+            "id": "availability:status:warn",
+            "of": "claim"
+          },
+          {
+            "id": "outlier:outlier:Revenue",
+            "of": "claim"
+          }
+        ],
+        "verified": true
+      },
       "evidence": {
         "count": 3,
         "sharedColumns": [
@@ -806,7 +834,30 @@
       "type": "clustered-anomaly"
     },
     {
-      "composed": null,
+      "composed": {
+        "asserts": {
+          "leader": "Furniture",
+          "meets": true,
+          "total": 8,
+          "unavailable": 2
+        },
+        "policy": {
+          "params": "at least one unavailable record",
+          "rule": "Pair unavailable stock with whatever leads the metric, so exposure is stated against where the value sits.",
+          "source": "relationships/detectors/inventory-exposure.js"
+        },
+        "supports": [
+          {
+            "id": "availability:status:critical",
+            "of": "claim"
+          },
+          {
+            "id": "distribution:top-by-metric:Category:Revenue",
+            "of": "claim"
+          }
+        ],
+        "verified": true
+      },
       "evidence": {
         "leader": "Furniture",
         "metricColumn": "Revenue",
@@ -823,7 +874,31 @@
       "type": "inventory-risk"
     },
     {
-      "composed": null,
+      "composed": {
+        "asserts": {
+          "leader": "Ember Sofa",
+          "max": 900,
+          "mean": 208.75,
+          "meets": true,
+          "ratio": 4.311377245508982
+        },
+        "policy": {
+          "params": "max ÷ mean ≥ 2.5",
+          "rule": "Flag when the leading record stands at least the ratio threshold above the mean.",
+          "source": "relationships/detectors/concentration.js"
+        },
+        "supports": [
+          {
+            "id": "extreme:max:Revenue",
+            "of": "claim"
+          },
+          {
+            "id": "central-tendency:avg:Revenue",
+            "of": "claim"
+          }
+        ],
+        "verified": true
+      },
       "evidence": {
         "kind": "max-vs-mean",
         "leader": "Ember Sofa",

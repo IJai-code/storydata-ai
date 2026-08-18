@@ -115,6 +115,19 @@ export const OPS = Object.freeze({
   atLeast: ([x, t]) => x >= t,
   below: ([x, t]) => x < t,
   count: ([xs]) => (Array.isArray(xs) ? xs.length : 0),
+  // Collects its operands into an array, so a claim can compose over several
+  // supports without a variadic special case.
+  list: (xs) => xs,
+  // Fields cited by two or more supports — what makes a cluster a cluster.
+  // Deterministic: most-cited first, ties by name.
+  sharedFields: ([lists]) => {
+    const n = new Map();
+    for (const fields of lists) for (const f of fields || []) n.set(f, (n.get(f) || 0) + 1);
+    return [...n.entries()]
+      .filter(([, c]) => c >= 2)
+      .sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))
+      .map(([f]) => f);
+  },
 });
 
 // `record` names its inputs, so it is evaluated separately from the positional
@@ -153,13 +166,21 @@ export function newGraph() {
     // A leaf that stands for another Claim's value. Evaluating it re-derives
     // that claim from ITS ground — never reads its stored `asserts`, which
     // would make composition trust the very number under test.
+    // `path` selects from a small, explicit domain:
+    //   ''        the support's re-derived asserted value
+    //   'x'       field x of that value
+    //   '@fields' the fields its witness cites — recorded structure, not a
+    //             measurement, so reading it is not trusting the number
+    //             under test
     claim: (claimId, path = '') => intern({ kind: 'claim', claimId, path }, `claim:${claimId}:${path}:`),
 
-    // Named struct — the asserted shape of a composed claim.
-    record: (fields) =>
+    // Named struct — the asserted shape of a claim. `narrator` names the field
+    // whose node carries the prose, so a richer assertion does not cost the
+    // derivation line its wording.
+    record: (fields, narrator = '') =>
       intern(
-        { kind: 'record', fields },
-        `record::${Object.keys(fields).sort().map((k) => `${k}=${fields[k]}`).join(',')}`
+        { kind: 'record', fields, narrator },
+        `record:${narrator}:${Object.keys(fields).sort().map((k) => `${k}=${fields[k]}`).join(',')}`
       ),
   };
 }
@@ -206,8 +227,13 @@ export function evaluate(nodes, ctx, root, values = {}) {
       values[root] = n.value;
       break;
     case 'claim': {
-      // Re-derive the supporting claim from its own ground, then project.
       const supporting = ctx.claimById?.(n.claimId);
+      if (n.path === '@fields') {
+        // Recorded structure of the cited support, not a measurement.
+        values[root] = supporting?.justification?.supports?.[0]?.witness?.fields ?? [];
+        break;
+      }
+      // Re-derive the supporting claim from its own ground, then project.
       const derived = supporting ? evaluateClaim(supporting, ctx) : undefined;
       values[root] = n.path ? derived?.[n.path] : derived;
       break;

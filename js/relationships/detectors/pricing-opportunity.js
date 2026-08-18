@@ -4,6 +4,7 @@
 // here for when it does.
 import { registerRelationship } from '../registry.js';
 import { createRelationship, TONE, formatNumber } from '../relationship.js';
+import { justifyOver } from '../../derive/build.js';
 
 const isMargin = (d) => (d.metadata.tags || []).includes('margin') || /\bmargin\b/i.test(d.title);
 const isLowSales = (d) =>
@@ -26,6 +27,21 @@ registerRelationship({
         supporting: [margin.id, lowSales.id],
         evidence: { marginDiscovery: margin.id, salesValue: lowSales.evidence.value, record: lowSales.evidence.label },
         metadata: { detector: 'pricing-opportunity', key: 'pricing-opportunity', tone: TONE.OK },
+        justification: justifyOver({
+          supports: [margin.id, lowSales.id],
+          build: (g) =>
+            g.record({
+              record: g.claim(lowSales.id, 'label'),
+              salesValue: g.claim(lowSales.id, 'value'),
+            }),
+          policy: {
+            rule: 'Pair a healthy-margin finding with a trailing-sales finding to surface a pricing candidate.',
+            params: 'both inputs must be present',
+            source: 'relationships/detectors/pricing-opportunity.js',
+          },
+          confidence: { value: Math.min(margin.confidence, lowSales.confidence), note: 'weakest of the two supporting findings' },
+          asserts: { record: lowSales.justification?.asserts?.label, salesValue: lowSales.evidence.value },
+        }),
       }),
     ];
   },

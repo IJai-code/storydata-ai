@@ -38,9 +38,15 @@ registerDetector({
         evidence: { column: m.key, value: top.row[m.key], rowIndex: top.index, label: nameOf(top.row) },
         metadata: { detector: 'extremes', key: `max:${m.key}`, columns: [m.key], tone: TONE.OK, direction: 'max' },
         justification: justify({
-          build: (g) => g.stat('max', [g.column(m.key)]),
+          // The summary names the record, so the label is part of the claim —
+          // asserting only the number would let a wrong name pass unchallenged.
+          build: (g) =>
+            g.record(
+              { value: g.stat('max', [g.column(m.key)]), label: g.cell(dataset, top.index, labelCol.key) },
+              'value'
+            ),
           witness: record(dataset, top.index, [m.key]),
-          asserts: top.row[m.key],
+          asserts: { value: top.row[m.key], label: nameOf(top.row) },
           policy: POLICY,
           confidence: CERTAIN,
         }),
@@ -54,9 +60,13 @@ registerDetector({
         evidence: { column: m.key, value: bottom.row[m.key], rowIndex: bottom.index, label: nameOf(bottom.row) },
         metadata: { detector: 'extremes', key: `min:${m.key}`, columns: [m.key], tone: TONE.NEUTRAL, direction: 'min' },
         justification: justify({
-          build: (g) => g.stat('min', [g.column(m.key)]),
+          build: (g) =>
+            g.record(
+              { value: g.stat('min', [g.column(m.key)]), label: g.cell(dataset, bottom.index, labelCol.key) },
+              'value'
+            ),
           witness: record(dataset, bottom.index, [m.key]),
-          asserts: bottom.row[m.key],
+          asserts: { value: bottom.row[m.key], label: nameOf(bottom.row) },
           policy: POLICY,
           confidence: CERTAIN,
         }),

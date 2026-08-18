@@ -27,8 +27,35 @@ export function buildReport(dataset) {
 // Resolve a finding to the exact rows + decisive columns behind it. This is
 // selection, not analysis: the finding's witness already names the records that
 // support it, so the Pull only projects them onto the current snapshot.
-export function resolveFocus(d, dataset) {
+export function resolveFocus(d, dataset, report) {
   const witness = groundOf(d.justification);
+
+  // A composed claim owns no ground of its own — it stands on other claims. Its
+  // rows are the union of theirs, gathered through the same generic traversal,
+  // so a Relationship lights up a lens exactly like a Discovery does.
+  if (!witness) {
+    const rows = new Set();
+    const cols = new Set();
+    for (const step of report ? pullClaimChain(d, report) : []) {
+      if (!step.ground) continue;
+      for (const i of projectWitness(step.ground, dataset)) rows.add(i);
+      for (const c of step.ground.fields || []) cols.add(c);
+    }
+    return {
+      id: d.id,
+      title: d.title,
+      summary: d.summary,
+      evidence: d.evidence || {},
+      detector: d.metadata?.detector,
+      direction: null,
+      tone: d.metadata?.tone || 'neutral',
+      rowIndices: [...rows].sort((a, b) => a - b),
+      columns: [...cols],
+      scope: 'composed',
+      composed: true,
+    };
+  }
+
   return {
     id: d.id,
     title: d.title,
@@ -43,10 +70,26 @@ export function resolveFocus(d, dataset) {
   };
 }
 
+/* ---------- The Case File's claims ----------
+   Discoveries and Relationships ranked together. A Relationship is not a new
+   product surface; it is another kind of claim the Case File can carry. */
+
+export function rankedClaims(report) {
+  const rels = runRelationships(report).relationships;
+  return [...report.discoveries, ...rels].sort(
+    (a, b) =>
+      b.importance - a.importance ||
+      b.confidence - a.confidence ||
+      (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
+  );
+}
+
+export const claimById = (report, id) => claimIndex(report).get(id) || null;
+
 // One plain sentence naming what Ellery actually looked at — rendered from the
 // operation the detector performed, not from a per-detector special case.
 export function explain(focus, d, dataset, report) {
-  return becauseString(d.justification, dataset, report, evaluateAll(d.justification, dataset, report.profile));
+  return becauseString(d.justification, dataset, report, evaluateAll(d.justification, dataset, report.profile, (id) => claimIndex(report).get(id) || null));
 }
 
 // Spotlight the focus rows inside a rendered lens: light the matches, dim the
@@ -74,7 +117,7 @@ export function applyFocus(container, focus) {
 
 export function provenanceOf(d, report, dataset) {
   return {
-    derivation: derivationString(d.justification, dataset, report, evaluateAll(d.justification, dataset, report.profile)),
+    derivation: derivationString(d.justification, dataset, report, evaluateAll(d.justification, dataset, report.profile, (id) => claimIndex(report).get(id) || null)),
     policy: d.justification.policy,
     confidence: d.justification.confidence,
   };

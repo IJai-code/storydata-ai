@@ -207,6 +207,112 @@ check('every Discovery still verifies (ground tier unaffected)', () => {
   assert(dataset.rows.length === 8, 'fixture changed shape');
 });
 
+/* ---------- 8. Cross-tier regression: failure propagates by composition ----------
+   One mechanism, no tier-specific failure handling:
+     ground moves → Discovery stops reproducing → Relationship fails. */
+
+const CROSS = path.join(HERE, 'fixtures', 'cross-tier.csv');
+
+function crossWorld(mutate = (rows) => rows) {
+  const base = ingest(fs.readFileSync(CROSS, 'utf8')).dataset;
+  const dataset = { ...base, rows: mutate(base.rows.map((r) => ({ ...r }))) };
+  const report = runDiscovery(dataset);
+  const relationships = runRelationships(report).relationships;
+  const index = new Map();
+  for (const d of report.discoveries) index.set(d.id, d);
+  for (const r of relationships) index.set(r.id, r);
+  return {
+    dataset,
+    report,
+    relationships,
+    ctx: { dataset, profile: report.profile, claimById: (id) => index.get(id) || null },
+  };
+}
+
+check('cross-tier: every relationship in the fixture verifies end to end', () => {
+  const { relationships, ctx } = crossWorld();
+  assert(relationships.length >= 4, `expected a rich fixture, got ${relationships.length} relationships`);
+  for (const r of relationships) {
+    assert(r.justification, `${r.id} has no justification`);
+    assert(verify(r, ctx).ok, `${r.id} did not verify`);
+  }
+});
+
+check('cross-tier: every chain terminates at ground', () => {
+  const { relationships, report } = crossWorld();
+  for (const r of relationships) {
+    const chain = pullClaimChain(r, report);
+    assert(chain.some((s) => s.ground), `${r.id} never reaches ground`);
+    assert(!chain.some((s) => s.missing), `${r.id} has an unresolved support`);
+    // Every claim in the chain below the root is a real claim, not a blob.
+    for (const s of chain.filter((x) => x.claim)) assert(s.claim.id, 'claim step without an id');
+  }
+});
+
+check('cross-tier: a corrupted ground cell fails Discovery AND the Relationship above it', () => {
+  // The claims are the ones analysis produced; the DATA has since moved under
+  // them. Re-running discovery on the new data would produce new, self-consistent
+  // claims — that is not the scenario. This is: stored claims, changed ground.
+  const clean = crossWorld();
+  const moved = crossWorld((rows) => rows.map((r) => (r.Category === 'Furniture' ? { ...r, Revenue: 10 } : r)));
+  const ctx = { ...clean.ctx, dataset: moved.dataset };
+
+  const rel = clean.relationships.find((r) => r.metadata.key === 'concentration:category');
+  assert(rel, 'no concentration:category in fixture');
+
+  const r = verify(rel, ctx);
+  assert(!r.ok, 'relationship should fail when its ground moved');
+  eq(r.supports[0].reason, 'support-failed', 'support reason');
+  assert(!r.supports[0].detail.local.ok, 'the Discovery itself must be the failing link');
+
+  // The failure is compositional: the Discovery broke first, and the Relationship
+  // broke because of it — one mechanism, not a tier-specific check.
+  assert(!r.local.ok, 'the relationship-level assertion should also stop matching');
+});
+
+check('cross-tier: corrupting a Relationship\'s stored asserts gives local-mismatch, not trust', () => {
+  const { relationships, ctx } = crossWorld();
+  for (const rel of relationships) {
+    const a = rel.justification.asserts;
+    // Perturb one numeric field of the assertion; the ground is untouched.
+    const numericKey = Object.keys(a).find((k) => typeof a[k] === 'number');
+    if (!numericKey) continue;
+    const tampered = { ...rel, justification: { ...rel.justification, asserts: { ...a, [numericKey]: a[numericKey] + 1 } } };
+    const r = verify(tampered, ctx);
+    assert(!r.ok, `${rel.id}: tampered assertion was accepted`);
+    eq(r.local.reason, 'local-mismatch', `${rel.id} reason`);
+    assert(
+      r.supports.every((s) => s.ok),
+      `${rel.id}: supports should still be fine — the lie is local`
+    );
+  }
+});
+
+/* ---------- 9. fragile-outlier thresholds on z, not confidence ---------- */
+
+check('fragile-outlier composes over z, never over a confidence score', () => {
+  const dataset = ingest(fs.readFileSync(path.join(HERE, 'fixtures', 'warehouse-stock.csv'), 'utf8')).dataset;
+  const report = runDiscovery(dataset);
+  const rels = runRelationships(report).relationships;
+  const index = new Map();
+  for (const d of report.discoveries) index.set(d.id, d);
+  for (const r of rels) index.set(r.id, r);
+  const ctx = { dataset, profile: report.profile, claimById: (id) => index.get(id) || null };
+
+  const fo = rels.find((r) => r.type === 'needs-investigation');
+  assert(fo, 'fragile-outlier did not fire on the warehouse fixture');
+  assert(verify(fo, ctx).ok, 'fragile-outlier does not verify');
+
+  // The assertion is factual (z + label), not a presentational score.
+  assert(typeof fo.justification.asserts.z === 'number', 'z must be asserted');
+  assert(!('confidence' in fo.justification.asserts), 'confidence must not be part of the assertion');
+
+  // And the supporting outlier asserts the z it is thresholded on.
+  const support = index.get(fo.justification.supports[0].id);
+  assert(typeof support.justification.asserts.z === 'number', 'outlier must assert z');
+  eq(fo.justification.asserts.z, support.justification.asserts.z, 'z must come from the support');
+});
+
 /* ---------- Result ---------- */
 
 console.log('');

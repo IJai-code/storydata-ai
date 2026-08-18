@@ -38,6 +38,9 @@ registerDetector({
         evidence: { column: m.key, value: best.value, z: best.z, rowIndex: best.index, mean: stats.mean, stddev: stats.stddev },
         metadata: { detector: 'outliers', key: `outlier:${m.key}`, columns: [m.key], tone: TONE.WARN },
         justification: justify({
+          // z is asserted, not just the verdict: it is the factual quantity the
+          // summary states, and the one a downstream claim can threshold on
+          // without reaching for a presentational confidence score.
           build: (g) => {
             const c = g.column(m.key);
             const z = g.reduce('zscore', [
@@ -45,10 +48,17 @@ registerDetector({
               g.stat('mean', [c]),
               g.stat('stddev', [c]),
             ]);
-            return g.reduce('exceeds', [z, g.param('sigma-threshold', SIGMA)]);
+            return g.record(
+              {
+                z,
+                label: g.cell(dataset, best.index, labelCol.key),
+                exceeds: g.reduce('exceeds', [z, g.param('sigma-threshold', SIGMA)]),
+              },
+              'exceeds'
+            );
           },
           witness: record(dataset, best.index, [m.key]),
-          asserts: true,
+          asserts: { z: best.z, label: String(best.row[labelCol.key] ?? '—'), exceeds: true },
           policy: {
             rule: 'Flag the record whose distance from the mean exceeds the σ threshold.',
             params: `threshold = ${SIGMA.toFixed(1)}σ`,

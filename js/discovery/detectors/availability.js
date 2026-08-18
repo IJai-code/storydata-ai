@@ -52,9 +52,18 @@ registerDetector({
             evidence: { column: status.key, count: critical, total: n },
             metadata: { detector: 'availability', key: 'status:critical', columns: [status.key], tone: TONE.CRITICAL },
             justification: justify({
-              build: (g) => g.reduce('countEqual', [classified(g), g.param('tone', 'critical')]),
+              // "2 of 8 records are unavailable" states both numbers, so both
+              // are asserted — the total is not scenery.
+              build: (g) =>
+                g.record(
+                  {
+                    count: g.reduce('countEqual', [classified(g), g.param('tone', 'critical')]),
+                    total: g.reduce('count', [g.column(status.key)]),
+                  },
+                  'count'
+                ),
               witness: records(dataset, criticalIdx, [status.key]),
-              asserts: critical,
+              asserts: { count: critical, total: n },
               policy: statusPolicy,
               confidence: CERTAIN,
             }),
@@ -72,9 +81,16 @@ registerDetector({
             evidence: { column: status.key, count: warn, total: n },
             metadata: { detector: 'availability', key: 'status:warn', columns: [status.key], tone: TONE.WARN },
             justification: justify({
-              build: (g) => g.reduce('countEqual', [classified(g), g.param('tone', 'warn')]),
+              build: (g) =>
+                g.record(
+                  {
+                    count: g.reduce('countEqual', [classified(g), g.param('tone', 'warn')]),
+                    total: g.reduce('count', [g.column(status.key)]),
+                  },
+                  'count'
+                ),
               witness: records(dataset, warnIdx, [status.key]),
-              asserts: warn,
+              asserts: { count: warn, total: n },
               policy: statusPolicy,
               confidence: CERTAIN,
             }),
@@ -142,9 +158,16 @@ registerDetector({
             evidence: { column: qty.key, count: zeros, total: n },
             metadata: { detector: 'availability', key: 'qty:zero', columns: [qty.key], tone: TONE.CRITICAL },
             justification: justify({
-              build: (g) => g.reduce('countEqual', [g.column(qty.key), g.param('value', 0)]),
+              build: (g) =>
+                g.record(
+                  {
+                    count: g.reduce('countEqual', [g.column(qty.key), g.param('value', 0)]),
+                    total: g.reduce('count', [g.column(qty.key)]),
+                  },
+                  'count'
+                ),
               witness: records(dataset, zeroIdx, [qty.key]),
-              asserts: zeros,
+              asserts: { count: zeros, total: n },
               policy: { rule: 'Count records at zero on the quantity column.', params: 'threshold = 0', source: SRC },
               confidence: CERTAIN,
             }),
@@ -162,9 +185,16 @@ registerDetector({
             evidence: { column: qty.key, count: low, threshold },
             metadata: { detector: 'availability', key: 'qty:low', columns: [qty.key], tone: TONE.WARN },
             justification: justify({
-              build: (g) => g.reduce('countBetween', [g.column(qty.key), g.param('low', 0), g.param('high', threshold)]),
+              build: (g) =>
+                g.record(
+                  {
+                    count: g.reduce('countBetween', [g.column(qty.key), g.param('low', 0), g.param('high', threshold)]),
+                    threshold: g.param('high', threshold),
+                  },
+                  'count'
+                ),
               witness: records(dataset, lowIdx, [qty.key]),
-              asserts: low,
+              asserts: { count: low, threshold },
               policy: {
                 rule: 'Count records at or below the low-stock line.',
                 params: `line = max(5, 10% of peak) = ${threshold}`,

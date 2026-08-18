@@ -9,8 +9,8 @@
       },
       "explain": "3 records fall at or below 10.",
       "fingerprints": {
-        "procedure": "b1b8f246",
-        "result": "a0a3ce61"
+        "procedure": "ae142fe1",
+        "result": "5e2ca689"
       },
       "focus": {
         "columns": [
@@ -73,8 +73,8 @@
       },
       "explain": "Widget F holds 100 — the highest value in this column.",
       "fingerprints": {
-        "procedure": "fd7ed0e4",
-        "result": "393b0d8b"
+        "procedure": "065955a5",
+        "result": "02cd7cc2"
       },
       "focus": {
         "columns": [
@@ -136,8 +136,8 @@
       },
       "explain": "2 of 7 records match this condition.",
       "fingerprints": {
-        "procedure": "56b6108f",
-        "result": "0bc3b426"
+        "procedure": "8417f6a1",
+        "result": "4c768f88"
       },
       "focus": {
         "columns": [
@@ -199,8 +199,8 @@
       },
       "explain": "Widget D holds 0 — the lowest value in this column.",
       "fingerprints": {
-        "procedure": "9fabbc02",
-        "result": "03d4aecd"
+        "procedure": "28a360f6",
+        "result": "3239dfde"
       },
       "focus": {
         "columns": [
@@ -265,8 +265,8 @@
       },
       "explain": "100 sits 2.2 standard deviations from the mean of 23.43.",
       "fingerprints": {
-        "procedure": "4717257a",
-        "result": "aa0a0f0a"
+        "procedure": "1b157a64",
+        "result": "26255d2b"
       },
       "focus": {
         "columns": [
@@ -483,7 +483,35 @@
   "ok": true,
   "relationships": [
     {
-      "composed": null,
+      "composed": {
+        "asserts": {
+          "count": 3,
+          "meets": true,
+          "sharedColumns": [
+            "Units"
+          ]
+        },
+        "policy": {
+          "params": "signals ≥ 2",
+          "rule": "Group anomaly signals that land on the same fields; report the cluster once at least the minimum are present.",
+          "source": "relationships/detectors/clustered-anomaly.js"
+        },
+        "supports": [
+          {
+            "id": "availability:qty:low",
+            "of": "claim"
+          },
+          {
+            "id": "availability:qty:zero",
+            "of": "claim"
+          },
+          {
+            "id": "outlier:outlier:Units",
+            "of": "claim"
+          }
+        ],
+        "verified": true
+      },
       "evidence": {
         "count": 3,
         "sharedColumns": [
@@ -505,7 +533,30 @@
       "type": "clustered-anomaly"
     },
     {
-      "composed": null,
+      "composed": {
+        "asserts": {
+          "leader": "Widget F",
+          "meets": true,
+          "total": 7,
+          "unavailable": 2
+        },
+        "policy": {
+          "params": "at least one unavailable record",
+          "rule": "Pair unavailable stock with whatever leads the metric, so exposure is stated against where the value sits.",
+          "source": "relationships/detectors/inventory-exposure.js"
+        },
+        "supports": [
+          {
+            "id": "availability:qty:zero",
+            "of": "claim"
+          },
+          {
+            "id": "extreme:max:Units",
+            "of": "claim"
+          }
+        ],
+        "verified": true
+      },
       "evidence": {
         "leader": "Widget F",
         "metricColumn": "Units",
@@ -522,7 +573,31 @@
       "type": "inventory-risk"
     },
     {
-      "composed": null,
+      "composed": {
+        "asserts": {
+          "leader": "Widget F",
+          "max": 100,
+          "mean": 23.428571428571427,
+          "meets": true,
+          "ratio": 4.2682926829268295
+        },
+        "policy": {
+          "params": "max ÷ mean ≥ 2.5",
+          "rule": "Flag when the leading record stands at least the ratio threshold above the mean.",
+          "source": "relationships/detectors/concentration.js"
+        },
+        "supports": [
+          {
+            "id": "extreme:max:Units",
+            "of": "claim"
+          },
+          {
+            "id": "central-tendency:avg:Units",
+            "of": "claim"
+          }
+        ],
+        "verified": true
+      },
       "evidence": {
         "kind": "max-vs-mean",
         "leader": "Widget F",
@@ -540,15 +615,32 @@
       "type": "concentration"
     },
     {
-      "composed": null,
+      "composed": {
+        "asserts": {
+          "label": "Widget F",
+          "meets": true,
+          "z": 2.168033614199439
+        },
+        "policy": {
+          "params": "z < 2.4σ",
+          "rule": "Flag an outlier that clears the detection line only narrowly, so it is reviewed rather than acted on.",
+          "source": "relationships/detectors/fragile-outlier.js"
+        },
+        "supports": [
+          {
+            "id": "outlier:outlier:Units",
+            "of": "claim"
+          }
+        ],
+        "verified": true
+      },
       "evidence": {
         "column": "Units",
-        "outlierConfidence": 0.5840168070997196,
         "value": 100,
         "z": 2.168033614199439
       },
       "id": "needs-investigation:needs-investigation:outlier:outlier:Units",
-      "summary": "A record looks like an outlier but the signal is weak (58% confidence) — investigate before acting on it.",
+      "summary": "Widget F sits 2.2σ from the mean — under the 2.4σ line where the signal firms up, so investigate before acting on it.",
       "supporting": [
         "outlier:outlier:Units"
       ],
