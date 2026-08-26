@@ -43,7 +43,7 @@ function card(entry) {
   const ds = entry.dataset || {};
   const rows = ds.rows?.length ?? 0;
   const cols = ds.columns?.length ?? 0;
-  const when = entry.savedAt ? new Date(entry.savedAt).toLocaleDateString() : '';
+  const when = entry.savedAt ? new Date(entry.savedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
   const scenes = entry.story?.scenes?.length ? ` · ${entry.story.scenes.length}-scene briefing` : '';
   return `
     <div class="case-card" role="button" tabindex="0" data-open="${entry.id}">

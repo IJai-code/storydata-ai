@@ -12,6 +12,7 @@ import {
   buildReport,
   rankedClaims,
   claimById,
+  checksRun,
   explain,
   provenanceOf,
   snapshotOf,
@@ -46,7 +47,7 @@ function renderList(report) {
   root.className = 'casefile';
 
   const lead = claims[0];
-  const checks = meta.detectors.length;
+  const checks = checksRun(report);
   const rest = claims.slice(1);
 
   root.innerHTML = `

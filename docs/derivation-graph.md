@@ -1,7 +1,9 @@
 # Design: the derivation graph
 
-Status: proposed. Implementation gated on agreement.
-Scope: replaces the flat evidence blob and the three detector-keyed switches in
+Status: **built and shipped.** Discovery and Relationship tiers are both
+implemented; this document is the record of the design, not a proposal. The
+Decision tier was removed as dormant — see the note at the end of §7.
+Scope: replaced the flat evidence blob and the three detector-keyed switches in
 `js/render/pull.js` with one content-addressed **Claim → Support** graph that
 spans all three reasoning tiers already in the repo — Discovery, Relationship,
 Decision. No new dependencies, no build step, static ES modules.
@@ -61,7 +63,7 @@ Justification = {
 }
 Support =
   | { of:'ground', witness }           // §1.2 witness (records|column|group) → cells → snapshot
-  | { of:'claim',  claimId }           // points at another Claim — Relationship/Decision use this
+  | { of:'claim',  id }                // points at another Claim — the Relationship tier uses this
 ```
 
 - **Discovery** is the tier whose supports are all `ground` and whose justification
@@ -72,8 +74,8 @@ Support =
   Today's `supporting[]` arrays *become* these `claim` supports; they are not a
   second mechanism, they are the same edge.
 - **Pull, Verify, Fingerprint recurse over `supports`** (§3), so one traversal
-  handles Decision → Relationship → Discovery → cells → snapshot. Phase 1 migrates
-  Discovery only; the reasoning tiers stay dormant but are no longer unrepresentable.
+  handles Relationship → Discovery → cells → snapshot. Both tiers ship; the
+  traversal is unchanged if a third is ever added.
 
 ### 1.1 Nodes (the Discovery tier's `opGraph`)
 
@@ -580,7 +582,7 @@ Coverage check against the real rules:
 | `concentration:record` | `record{ max: claim(maxD), mean: claim(avgD,'mean'), ratio: ratio(…), meets: atLeast(ratio, 2.5) }` |
 | `clustered-anomaly` | `record{ count: count(supports), meets: atLeast(count, 2) }` |
 | `inventory-risk` | `record{ unavailable: claim(crit), total: …, meets: atLeast(claim(crit), 1) }` |
-| `needs-investigation` | `record{ z: claim(outlier,'z'), meets: below(z, 2.29) }` — see §7.8 |
+| `needs-investigation` | `record{ label, z: claim(outlier,'z'), meets: below(z, 2.4) }` — see §7.8 |
 
 ## 7.5 (Q3, Q4) What `verify` returns, and why “supports verify AND predicate” is not enough
 
@@ -642,10 +644,11 @@ like a counterexample — its subject *is* weak confidence — but see §7.8.
 
 ## 7.8 The one rule with a prerequisite
 
-`fragile-outlier` currently thresholds on the outlier's *confidence* (< 0.7).
+`fragile-outlier` thresholded on the outlier's *confidence* (< 0.7).
 Confidence must not be load-bearing for truth, and the underlying quantity is
 right there: confidence is a pure function of z, `min(1, 0.5 + (z−2)/2)`, so
-`confidence < 0.7 ⟺ z < 2.4`. The rule should compose over **z**, which is a fact
+`confidence < 0.7 ⟺ z < 2.4`. (An earlier draft of this section said 2.29; that
+was an arithmetic slip. The implemented line is 2.4.) The rule should compose over **z**, which is a fact
 about the data, rather than over a presentational score.
 
 That requires `outliers` to assert `{ z, exceeds }` instead of bare `true` — a
@@ -704,3 +707,20 @@ re-derived values reproduced every stated quantity.
 becomes 64. The Discovery's `groupShare` now evaluates to `share:64` ≠ its
 asserted `69` → `support-failed`, and the Relationship reports `local-mismatch`
 on `share`. The chain breaks at the exact link that moved.
+
+
+---
+
+## 8. What shipped, and what did not
+
+Both tiers are live. All five Discovery detectors and all five Relationship rules
+carry justifications and verify through one generic `verifyClaim`. There is no
+detector-specific provenance code anywhere.
+
+**The Decision tier was deleted.** It existed as five rules, an engine and a
+scoring helper — 333 lines that nothing referenced, in any build, ever. It was
+representable under `Claim ← Support*` (that was the point of §7), but
+representable is not the same as earning its place in a v1. If it returns, it
+returns as `{of:'claim'}` supports over Relationships and needs no new machinery:
+that is the whole return on the redesign, and it holds whether or not the tier
+exists today.

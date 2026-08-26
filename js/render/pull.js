@@ -86,6 +86,12 @@ export function rankedClaims(report) {
 
 export const claimById = (report, id) => claimIndex(report).get(id) || null;
 
+// Every check that ran to produce this Case File. Relationships surface claims
+// on the same list as Discoveries, so counting only the detectors under-reported
+// the work behind what the reader is looking at.
+export const checksRun = (report) =>
+  report.meta.detectors.length + runRelationships(report).meta.rules.length;
+
 // One plain sentence naming what Ellery actually looked at — rendered from the
 // operation the detector performed, not from a per-detector special case.
 export function explain(focus, d, dataset, report) {

@@ -59,7 +59,7 @@ export function openPaywall(trigger = 'upgrade', detail = {}) {
   const copy = TRIGGER_COPY[trigger] || TRIGGER_COPY.upgrade;
   const headline =
     trigger === 'row-cap' && detail.totalRows
-      ? `Your data has ${detail.totalRows.toLocaleString()} records — all of them are read in the preview.`
+      ? `Your data has ${detail.totalRows.toLocaleString('en-US')} records — all of them are read in the preview.`
       : copy.headline;
 
   modalRoot.innerHTML = `

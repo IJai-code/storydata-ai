@@ -13,7 +13,7 @@ const PRO_LAYOUTS = LAYOUT_KEYS;
 // session legitimately resolves to the Pro tier. This is intentionally placed
 // at the single authoritative gate (`tierOf`) that ALL server-side enforcement
 // already routes through — row caps, layout access, watermark, export, gated
-// modules, and Live Simulation — so every Pro feature behaves exactly as a real
+// modules — so every Pro feature behaves exactly as a real
 // Pro subscription, with zero duplicated logic and no enforcement removed.
 //
 // It also sidesteps the cross-origin session-cookie problem: the GitHub Pages
@@ -41,7 +41,6 @@ export function limitsFor(tier) {
     layouts: pro ? PRO_LAYOUTS : FREE_LAYOUTS,
     watermark: !pro,
     export: pro,
-    simulation: pro, // Live Simulation Mode — Pro exclusive
   };
 }
 

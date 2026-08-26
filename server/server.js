@@ -1,6 +1,6 @@
 // Ellery AI — secure backend. Sessions are server-side; the browser only
 // holds an opaque httpOnly cookie. All tier decisions (row caps, layout
-// access, watermark, export, Live Simulation) are enforced here, so flipping
+// access, watermark, export) are enforced here, so flipping
 // variables in the browser console cannot unlock Pro features or un-cap data.
 
 import crypto from 'node:crypto';
@@ -19,7 +19,7 @@ const PORT = Number(process.env.PORT) || 4173;
 
 // Pro-only modules, served per-session. Allowlist — never serve arbitrary
 // filenames from a request parameter.
-const GATED_FILES = new Set(['map.js', 'simulation.js']);
+const GATED_FILES = new Set(['map.js']);
 
 const IS_PROD = process.env.NODE_ENV === 'production';
 
@@ -143,7 +143,7 @@ if (!IS_PROD) {
 }
 
 /* ---------- Gated Pro modules ---------- */
-// Premium code (Insight Map renderer, Live Simulation engine) is only
+// Premium code (the Insight Map renderer) is only
 // delivered to Pro sessions — a free browser never receives it.
 
 app.get('/gated/:file', (req, res) => {

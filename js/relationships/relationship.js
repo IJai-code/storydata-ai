@@ -55,9 +55,6 @@ export function createRelationship({
   });
 }
 
-// Same little number formatter the discovery side uses, kept local on purpose.
-export function formatNumber(v) {
-  if (typeof v !== 'number' || !Number.isFinite(v)) return String(v ?? '—');
-  const rounded = Math.abs(v) >= 100 ? Math.round(v) : Math.round(v * 100) / 100;
-  return rounded.toLocaleString('en-US');
-}
+// One formatter for every tier. A Relationship quotes numbers that a Discovery
+// already stated, so a second copy could only ever drift from it.
+export { formatNumber } from '../discovery/discovery.js';

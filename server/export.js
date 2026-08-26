@@ -3,7 +3,7 @@
 //   /api/share  — every tier, watermark injected HERE so the client can't
 //                 produce an unbranded share file.
 // Receives the rendered canvas markup, returns a self-contained HTML
-// document in the Ellery monochrome editorial style. Live Simulation pulses
+// document in the Ellery monochrome editorial style. Motion
 // survive export: mindmap pulses are SMIL elements inside the SVG, timeline
 // pulses get their keyframes below.
 
@@ -51,9 +51,8 @@ ${watermark ? WATERMARK_HTML : ''}
   return { ok: true, doc };
 }
 
-// Self-contained stylesheet for exported stories: monochrome tokens + the
+// Self-contained stylesheet for exported cases: monochrome tokens + the
 // viz classes, with entrance animations resolved to their final state.
-// Simulation pulse motion is preserved.
 function exportCSS(watermark) {
   const watermarkCSS = watermark
     ? `

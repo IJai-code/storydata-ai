@@ -20,6 +20,7 @@ import { exportMP4 } from '../render/video.js';
 import { escapeHTML } from '../render/util.js';
 import { api } from '../api.js';
 import { toast } from './toast.js';
+import { buildReport, rankedClaims } from '../render/pull.js';
 
 const SAVED_KEY = 'ellery_saved_stories';
 const MAX_SAVED = 12;
@@ -584,6 +585,19 @@ function writeSaved(list) {
   }
 }
 
+// A case is named by the claim that led it — the same headline the Case File
+// shows — so the saved list reads like a list of conclusions rather than a list
+// of file sizes. Falls back to the shape when nothing was concluded.
+function caseName(dataset, layout) {
+  try {
+    const lead = rankedClaims(buildReport(dataset))[0];
+    if (lead) return lead.title;
+  } catch {
+    /* naming must never block a save */
+  }
+  return `${LAYOUTS[layout].name} · ${dataset.rows.length} records`;
+}
+
 function saveStory() {
   const { dataset, layout } = getState();
   if (!dataset) {
@@ -598,9 +612,9 @@ function saveStory() {
   const story = getState().story;
   const entry = {
     id: Date.now(),
-    name: `${LAYOUTS[layout].name} · ${dataset.rows.length} records${
-      story?.scenes?.length ? ` · ${story.scenes.length}-scene story` : ''
-    }`,
+    // Name the case after what it concluded. "Findings · 5 records" told you
+    // nothing once you had more than one saved case.
+    name: caseName(dataset, layout),
     savedAt: new Date().toISOString(),
     layout,
     dataset,
@@ -642,7 +656,7 @@ function renderSavedList() {
       <div class="saved-item" data-saved-id="${s.id}" role="button" tabindex="0"
            title="Load this saved story">
         <span class="saved-name">${escapeHTML(s.name)}</span>
-        <span class="saved-date">${new Date(s.savedAt).toLocaleDateString()}</span>
+        <span class="saved-date">${new Date(s.savedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
         <button class="saved-delete" data-action="delete-saved" aria-label="Delete saved story">✕</button>
       </div>`
     )
