@@ -4,6 +4,7 @@
 
 import { profileDataset } from './profile.js';
 import { getDetectors } from './registry.js';
+import { byRank } from './discovery.js';
 
 export const DISCOVERY_ENGINE_VERSION = '1.0.0';
 
@@ -36,13 +37,7 @@ export function runDiscovery(dataset) {
     }
   }
 
-  // rank by importance, then confidence, with id as a stable tiebreaker
-  discoveries.sort(
-    (a, b) =>
-      b.importance - a.importance ||
-      b.confidence - a.confidence ||
-      (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
-  );
+  discoveries.sort(byRank);
 
   return {
     discoveries,

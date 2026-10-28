@@ -68,8 +68,8 @@ NEVER introduce into it:
 - network calls, model calls, or AI of any kind
 - arbitrary external state
 
-Float arithmetic is order-sensitive. Ops that mirror `discovery/profile.js` must
-be bit-identical to it, not merely equivalent.
+Float arithmetic is order-sensitive. Profiling and the derivation graph share
+one statistics implementation (`js/derive/stats.js`); do not fork it.
 
 Architecture of the reasoning layer is specified in `docs/derivation-graph.md`
 (Claim ← Support*, node identity, witness, verify semantics, fingerprints). Do

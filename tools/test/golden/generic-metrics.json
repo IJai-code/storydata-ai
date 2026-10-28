@@ -17,22 +17,10 @@
         "columns": [
           "Score"
         ],
-        "detector": "extremes",
-        "direction": "max",
-        "evidence": {
-          "column": "Score",
-          "label": "Delta",
-          "rowIndex": 3,
-          "value": 120
-        },
-        "id": "extreme:max:Score",
         "rowIndices": [
           3
         ],
-        "scope": "row",
-        "summary": "Delta leads on score at 120.",
-        "title": "Highest score",
-        "tone": "ok"
+        "scope": "row"
       },
       "id": "extreme:max:Score",
       "importance": 0.75,
@@ -81,22 +69,10 @@
         "columns": [
           "Score"
         ],
-        "detector": "extremes",
-        "direction": "min",
-        "evidence": {
-          "column": "Score",
-          "label": "Alpha",
-          "rowIndex": 0,
-          "value": 42
-        },
-        "id": "extreme:min:Score",
         "rowIndices": [
           0
         ],
-        "scope": "row",
-        "summary": "Alpha trails on score at 42.",
-        "title": "Lowest score",
-        "tone": "neutral"
+        "scope": "row"
       },
       "id": "extreme:min:Score",
       "importance": 0.5,
@@ -147,24 +123,10 @@
         "columns": [
           "Score"
         ],
-        "detector": "outliers",
-        "direction": null,
-        "evidence": {
-          "column": "Score",
-          "mean": 56.833333333333336,
-          "rowIndex": 3,
-          "stddev": 28.292617804335855,
-          "value": 120,
-          "z": 2.2326200814470534
-        },
-        "id": "outlier:outlier:Score",
         "rowIndices": [
           3
         ],
-        "scope": "row",
-        "summary": "Delta sits 2.2σ from the mean score (120).",
-        "title": "Notable outlier",
-        "tone": "warn"
+        "scope": "row"
       },
       "id": "outlier:outlier:Score",
       "importance": 0.5,
@@ -212,15 +174,6 @@
         "columns": [
           "Score"
         ],
-        "detector": "central-tendency",
-        "direction": null,
-        "evidence": {
-          "column": "Score",
-          "mean": 56.833333333333336,
-          "median": 44.5,
-          "stddev": 28.292617804335855
-        },
-        "id": "central-tendency:avg:Score",
         "rowIndices": [
           0,
           1,
@@ -229,10 +182,7 @@
           4,
           5
         ],
-        "scope": "dataset",
-        "summary": "Mean score is 56.83 (median 44.5).",
-        "title": "Average score",
-        "tone": "neutral"
+        "scope": "dataset"
       },
       "id": "central-tendency:avg:Score",
       "importance": 0.3,

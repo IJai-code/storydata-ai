@@ -3,6 +3,7 @@
 // raw dataset and never mutates the report it was handed.
 
 import { getRelationshipRules } from './registry.js';
+import { byRank } from '../discovery/discovery.js';
 
 export const RELATIONSHIP_ENGINE_VERSION = '1.0.0';
 
@@ -37,13 +38,7 @@ export function runRelationships(discoveryReport) {
     }
   }
 
-  // same ordering as discoveries: importance, then confidence, then id
-  relationships.sort(
-    (a, b) =>
-      b.importance - a.importance ||
-      b.confidence - a.confidence ||
-      (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
-  );
+  relationships.sort(byRank);
 
   return {
     relationships,

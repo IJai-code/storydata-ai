@@ -10,6 +10,7 @@
 // Node kinds: cell | column | param (ground/π leaves) · stat | reduce (operations).
 
 import { hash, rowFingerprint } from './fingerprint.js';
+import { numbers, ascending, mean, variance, median, groupCounts } from './stats.js';
 
 const canon = (v) => (typeof v === 'number' ? (Object.is(v, -0) ? '0' : String(v)) : JSON.stringify(v ?? null));
 
@@ -18,47 +19,12 @@ const canon = (v) => (typeof v === 'number' ? (Object.is(v, -0) ? '0' : String(v
    these keys, never on the detector that happened to use them. An op is added
    only when a new *kind of math* appears — not per detector. */
 
-const nums = (xs) => (Array.isArray(xs) ? xs.filter((v) => typeof v === 'number' && !Number.isNaN(v)) : []);
-
-// Numeric ops mirror profile.js's numericStats exactly — same filtering, same
-// ascending sort, same summation order. Float arithmetic is order-sensitive, so
-// "equivalent" is not good enough: the values must be bit-identical.
-const sorted = (xs) => nums(xs).slice().sort((a, b) => a - b);
-const sum = (v) => {
-  let s = 0;
-  for (let i = 0; i < v.length; i += 1) s += v[i];
-  return s;
-};
-const meanOf = (v) => sum(v) / v.length;
-const varianceOf = (v) => {
-  const m = meanOf(v);
-  let sq = 0;
-  for (let i = 0; i < v.length; i += 1) sq += (v[i] - m) ** 2;
-  return sq / v.length;
-};
-
-// Category grouping mirrors profile.js's categoricalStats and the distribution
-// detector: blanks dropped, ties broken by key ascending.
-const groupCounts = (xs) => {
-  const counts = new Map();
-  for (const val of xs) {
-    if (val === null || val === undefined || val === '') continue;
-    const k = String(val);
-    counts.set(k, (counts.get(k) || 0) + 1);
-  }
-  return [...counts.entries()].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1));
-};
-
 const OPS = Object.freeze({
-  max: ([xs]) => Math.max(...nums(xs)),
-  min: ([xs]) => Math.min(...nums(xs)),
-  mean: ([xs]) => meanOf(sorted(xs)),
-  median: ([xs]) => {
-    const v = sorted(xs);
-    const mid = v.length >> 1;
-    return v.length % 2 ? v[mid] : (v[mid - 1] + v[mid]) / 2;
-  },
-  stddev: ([xs]) => Math.sqrt(varianceOf(sorted(xs))),
+  max: ([xs]) => Math.max(...numbers(xs)),
+  min: ([xs]) => Math.min(...numbers(xs)),
+  mean: ([xs]) => mean(ascending(xs)),
+  median: ([xs]) => median(ascending(xs)),
+  stddev: ([xs]) => Math.sqrt(variance(ascending(xs))),
   distinct: ([xs]) => groupCounts(xs).length,
 
   // Bundles the three descriptive stats into one conclusion.
@@ -262,23 +228,13 @@ export const evaluateAll = (justification, dataset, profile, claimById) =>
 
 /* ---------- Verification ---------- */
 
-// Recompute each operation from its inputs and compare against the evaluated
-// value. Ground leaves are the floor — they are the snapshot, so they verify by
-// definition. Knows nothing about detectors.
-// Re-running a pure op on values that same pass just produced can only ever
-// agree with itself — that would be verification theatre. The real check is
-// against what the *detector asserted* when it made the claim: evaluate the
-// graph from fingerprinted ground, independently of the detector's own
-// arithmetic, and compare the result to the value the finding stands behind.
-// Three checks, per the frozen contract (docs/derivation-graph.md §7.5):
-//   1. resolvable — every cited support exists in this snapshot
-//   2. recursive  — every claim support verifies
-//   3. local      — the re-derived value equals what the claim asserts
-// Ground supports are the floor: a cell either is in the snapshot or is not.
-//
-// Step 3 is equality against the FULL asserted struct, not just the predicate
-// outcome. A rule that fires on `share >= 35` while stating "69%" must fail if
-// the real share is 64 — the predicate would still hold, but the claim lies.
+// Three checks (see "Verify" in docs/derivation-graph.md):
+//   1. every cited support exists in this snapshot
+//   2. every claim support verifies
+//   3. the graph, re-evaluated from ground, deep-equals what the claim asserts
+// Step 3 compares against `asserts`, never against the graph's own output:
+// re-running a pure op on values the same pass produced can only agree with
+// itself.
 export function verify(claim, ctx) {
   const j = claim.justification;
   const supports = [];

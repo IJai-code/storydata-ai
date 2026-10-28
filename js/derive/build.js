@@ -1,8 +1,6 @@
-// The detector-facing API. A detector states three things it already knows:
-// the computation it performed (as a small op graph), the support behind its
-// conclusion (a semantic witness), and the policy it applied (π). Everything
-// downstream — Pull, Verify, Fingerprint, the derivation and "because" lines —
-// is derived from that, generically.
+// What a detector hands over with each claim: the computation it performed (a
+// small op graph), what the claim stands on, the policy it applied, and the
+// value it asserts.
 
 import { newGraph } from './graph.js';
 import { rowFingerprint } from './fingerprint.js';
@@ -33,19 +31,15 @@ export const wholeColumn = (column, fields = []) => ({
 
 /* ---------- Justification ---------- */
 
-// Assemble a Discovery-tier justification: one ground support plus the op graph
-// that produced the value. Relationship claims use the same shape with `claim`
-// supports and no opGraph.
-//
-// `asserts` is the value the detector stands behind — what it computed by its
-// own route. Verification re-derives the graph from ground and checks it lands
-// on exactly this. Without it there is nothing to disagree with, and a
-// "re-check" would be theatre.
-export function justify({ build, witness, policy, confidence, asserts }) {
+// `asserts` must carry every quantity the claim states, not only whether its
+// rule fired. Verify re-derives the graph from ground and compares against this,
+// so a claim that says "69%" fails when the real share is 64, even though
+// "share >= 35" still holds.
+function justification(supports, { build, policy, confidence, asserts }) {
   const g = newGraph();
   const root = build(g);
   return Object.freeze({
-    supports: Object.freeze([Object.freeze({ of: 'ground', witness })]),
+    supports: Object.freeze(supports.map(Object.freeze)),
     opGraph: Object.freeze({ root, nodes: Object.freeze(g.nodes) }),
     policy: Object.freeze(policy),
     confidence: Object.freeze(confidence),
@@ -53,22 +47,10 @@ export function justify({ build, witness, policy, confidence, asserts }) {
   });
 }
 
-// Assemble a composed (Relationship-tier) justification: supports are other
-// Claims, and the op graph composes *their* values rather than cells. Selection
-// is recorded in `supports`, exactly as the Discovery witness records rows —
-// verification never re-runs the rule that chose them.
-//
-// `asserts` must carry every quantity the claim states, not merely the predicate
-// outcome: a rule firing on "share >= 35" while saying "69%" has to fail when the
-// real share is 64, and a bare boolean could not catch that.
-export function justifyOver({ supports, build, policy, confidence, asserts }) {
-  const g = newGraph();
-  const root = build(g);
-  return Object.freeze({
-    supports: Object.freeze(supports.map((id) => Object.freeze({ of: 'claim', id }))),
-    opGraph: Object.freeze({ root, nodes: Object.freeze(g.nodes) }),
-    policy: Object.freeze(policy),
-    confidence: Object.freeze(confidence),
-    asserts,
-  });
-}
+// Discovery tier: one ground support, an op graph over cells.
+export const justify = ({ witness, ...rest }) => justification([{ of: 'ground', witness }], rest);
+
+// Relationship tier: supports are other claims, recorded by id. Verify never
+// re-runs the rule that chose them.
+export const justifyOver = ({ supports, ...rest }) =>
+  justification(supports.map((id) => ({ of: 'claim', id })), rest);

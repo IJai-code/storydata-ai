@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "private": true,
   "type": "module",
-  "description": "Ellery AI — turn raw data into quiet, interactive data stories. Express backend with server-side tier enforcement.",
+  "description": "Ellery reads your data, tells you plainly what's true, and lets you trace any finding to the records behind it.",
   "author": "Ishaan Jha",
   "license": "MIT",
   "engines": {

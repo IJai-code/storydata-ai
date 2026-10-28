@@ -17,22 +17,10 @@
         "columns": [
           "Amount"
         ],
-        "detector": "extremes",
-        "direction": "max",
-        "evidence": {
-          "column": "Amount",
-          "label": "North",
-          "rowIndex": 0,
-          "value": 300
-        },
-        "id": "extreme:max:Amount",
         "rowIndices": [
           0
         ],
-        "scope": "row",
-        "summary": "North leads on amount at 300.",
-        "title": "Highest amount",
-        "tone": "ok"
+        "scope": "row"
       },
       "id": "extreme:max:Amount",
       "importance": 0.75,
@@ -81,24 +69,12 @@
         "columns": [
           "Region"
         ],
-        "detector": "distribution",
-        "direction": null,
-        "evidence": {
-          "column": "Region",
-          "count": 3,
-          "groups": 3,
-          "value": "East"
-        },
-        "id": "distribution:largest:Region",
         "rowIndices": [
           2,
           5,
           8
         ],
-        "scope": "group",
-        "summary": "East is the largest region with 3 records.",
-        "title": "Largest region",
-        "tone": "neutral"
+        "scope": "group"
       },
       "id": "distribution:largest:Region",
       "importance": 0.5,
@@ -148,25 +124,12 @@
           "Region",
           "Amount"
         ],
-        "detector": "distribution",
-        "direction": null,
-        "evidence": {
-          "categoryColumn": "Region",
-          "metricColumn": "Amount",
-          "share": 43,
-          "total": 840,
-          "value": "North"
-        },
-        "id": "distribution:top-by-metric:Region:Amount",
         "rowIndices": [
           0,
           3,
           6
         ],
-        "scope": "group",
-        "summary": "North drives 840 of amount (43% of total).",
-        "title": "Top region by amount",
-        "tone": "ok"
+        "scope": "group"
       },
       "id": "distribution:top-by-metric:Region:Amount",
       "importance": 0.5,
@@ -215,22 +178,10 @@
         "columns": [
           "Amount"
         ],
-        "detector": "extremes",
-        "direction": "min",
-        "evidence": {
-          "column": "Amount",
-          "label": "South",
-          "rowIndex": 1,
-          "value": 150
-        },
-        "id": "extreme:min:Amount",
         "rowIndices": [
           1
         ],
-        "scope": "row",
-        "summary": "South trails on amount at 150.",
-        "title": "Lowest amount",
-        "tone": "neutral"
+        "scope": "row"
       },
       "id": "extreme:min:Amount",
       "importance": 0.5,
@@ -279,15 +230,6 @@
         "columns": [
           "Amount"
         ],
-        "detector": "central-tendency",
-        "direction": null,
-        "evidence": {
-          "column": "Amount",
-          "mean": 217.22222222222223,
-          "median": 210,
-          "stddev": 50.39351320199363
-        },
-        "id": "central-tendency:avg:Amount",
         "rowIndices": [
           0,
           1,
@@ -299,10 +241,7 @@
           7,
           8
         ],
-        "scope": "dataset",
-        "summary": "Mean amount is 217 (median 210).",
-        "title": "Average amount",
-        "tone": "neutral"
+        "scope": "dataset"
       },
       "id": "central-tendency:avg:Amount",
       "importance": 0.3,
@@ -350,13 +289,6 @@
         "columns": [
           "Region"
         ],
-        "detector": "distribution",
-        "direction": null,
-        "evidence": {
-          "column": "Region",
-          "groups": 3
-        },
-        "id": "distribution:spread:Region",
         "rowIndices": [
           0,
           1,
@@ -368,10 +300,7 @@
           7,
           8
         ],
-        "scope": "dataset",
-        "summary": "Records span 3 region groups.",
-        "title": "Region spread",
-        "tone": "neutral"
+        "scope": "dataset"
       },
       "id": "distribution:spread:Region",
       "importance": 0.15,

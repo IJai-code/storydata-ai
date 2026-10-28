@@ -21,7 +21,12 @@ export const TONE = Object.freeze({
   NEUTRAL: 'neutral',
 });
 
-const clamp01 = (n) => (Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 0);
+export const clamp01 = (n) => (Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 0);
+
+// Case File order for every claim: importance, then confidence, then id so ties
+// are stable.
+export const byRank = (a, b) =>
+  b.importance - a.importance || b.confidence - a.confidence || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 
 // Build a frozen Discovery. We throw early (rather than coerce) if a detector
 // forgott type or title — a malformed finding downstream is way harder to trace.

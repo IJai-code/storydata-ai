@@ -4,6 +4,7 @@
 // identity so a Pull never re-runs analysis — it is pure navigation.
 
 import { runDiscovery } from '../discovery/index.js';
+import { byRank } from '../discovery/discovery.js';
 import { runRelationships } from '../relationships/index.js';
 import { evaluateAll, verify, pull as pullClaim, procedureFingerprint, resultFingerprint } from '../derive/graph.js';
 import { projectWitness, scopeOf, groundOf, derivationString, becauseString } from '../derive/project.js';
@@ -76,15 +77,16 @@ export function resolveFocus(d, dataset, report) {
 
 export function rankedClaims(report) {
   const rels = runRelationships(report).relationships;
-  return [...report.discoveries, ...rels].sort(
-    (a, b) =>
-      b.importance - a.importance ||
-      b.confidence - a.confidence ||
-      (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
-  );
+  return [...report.discoveries, ...rels].sort(byRank);
 }
 
 export const claimById = (report, id) => claimIndex(report).get(id) || null;
+
+const resolverFor = (report) => (id) => claimById(report, id);
+
+// A composed claim's graph has claim leaves, so evaluation needs the resolver.
+const valuesOf = (d, dataset, report) =>
+  evaluateAll(d.justification, dataset, report.profile, resolverFor(report));
 
 // Every check that ran to produce this Case File. Relationships surface claims
 // on the same list as Discoveries, so counting only the detectors under-reported
@@ -95,7 +97,7 @@ export const checksRun = (report) =>
 // One plain sentence naming what Ellery actually looked at — rendered from the
 // operation the detector performed, not from a per-detector special case.
 export function explain(focus, d, dataset, report) {
-  return becauseString(d.justification, dataset, report, evaluateAll(d.justification, dataset, report.profile, (id) => claimIndex(report).get(id) || null));
+  return becauseString(d.justification, dataset, report, valuesOf(d, dataset, report));
 }
 
 // Spotlight the focus rows inside a rendered lens: light the matches, dim the
@@ -117,13 +119,13 @@ export function applyFocus(container, focus) {
   return true;
 }
 
-/* ---------- Provenance: derivation, policy (π), confidence ----------
-   C = f(E, π). The derivation is rendered from the operation graph and π is read
-   back from the rule the detector authored — no per-detector special cases. */
+/* ---------- Provenance: derivation, policy, confidence ----------
+   The derivation is rendered from the operation graph; policy and confidence are
+   read back from what the detector recorded. */
 
 export function provenanceOf(d, report, dataset) {
   return {
-    derivation: derivationString(d.justification, dataset, report, evaluateAll(d.justification, dataset, report.profile, (id) => claimIndex(report).get(id) || null)),
+    derivation: derivationString(d.justification, dataset, report, valuesOf(d, dataset, report)),
     policy: d.justification.policy,
     confidence: d.justification.confidence,
   };
@@ -160,7 +162,7 @@ function claimIndex(report) {
 const claimCtx = (dataset, report) => ({
   dataset,
   profile: report.profile,
-  claimById: (id) => claimIndex(report).get(id) || null,
+  claimById: resolverFor(report),
 });
 
 // Re-run every operation from fingerprinted ground and confirm it reproduces the
@@ -170,7 +172,6 @@ export const verifyClaim = (claim, dataset, report) => verify(claim, claimCtx(da
 
 export const verifyFinding = (claim, dataset, report) => verifyClaim(claim, dataset, report).ok;
 
-// The Pull, across tiers. Yields the claim, then descends each support: a claim
-// support recurses, a ground support terminates at the fingerprinted witness.
-// Generic — nothing here knows what a "concentration" is.
-export const pullClaimChain = (claim, report) => [...pullClaim(claim, (id) => claimIndex(report).get(id) || null)];
+// The Pull, across tiers: a claim support recurses, a ground support ends at
+// the fingerprinted witness.
+export const pullClaimChain = (claim, report) => [...pullClaim(claim, resolverFor(report))];

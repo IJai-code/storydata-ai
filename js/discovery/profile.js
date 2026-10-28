@@ -6,53 +6,31 @@
 // is what keeps them domain-agnostic.
 
 import { resolveDomain } from './domains.js';
-
-const isNum = (v) => typeof v === 'number' && !Number.isNaN(v);
+import { ascending, sum, mean, variance, median, groupCounts, isBlank } from '../derive/stats.js';
 
 function numericStats(values) {
-  const v = values.filter(isNum).slice().sort((a, b) => a - b);
+  const v = ascending(values);
   const count = v.length;
   if (!count) return { count: 0, missing: values.length, distinct: 0 };
-
-  // two passes: sum first, then squared deviations (variance needs the mean
-  // anyway, no point being clever about it)
-  let sum = 0;
-  for (let i = 0; i < count; i++) sum += v[i];
-  const mean = sum / count;
-  let sq = 0;
-  for (let i = 0; i < count; i++) sq += (v[i] - mean) ** 2;
-  const variance = sq / count;
-
-  const mid = count >> 1;
-  const median = count % 2 ? v[mid] : (v[mid - 1] + v[mid]) / 2;
+  const spread = variance(v);
   return {
     count,
     missing: values.length - count,
     min: v[0],
     max: v[count - 1],
-    sum,
-    mean,
-    median,
-    variance,
-    stddev: Math.sqrt(variance),
+    sum: sum(v),
+    mean: mean(v),
+    median: median(v),
+    variance: spread,
+    stddev: Math.sqrt(spread),
     distinct: new Set(v).size,
   };
 }
 
 function categoricalStats(values) {
-  const counts = new Map();
-  let missing = 0;
-  for (const val of values) {
-    if (val === null || val === undefined || val === '') {
-      missing += 1;
-      continue;
-    }
-    const k = String(val);
-    counts.set(k, (counts.get(k) || 0) + 1);
-  }
-  // Stable order: count desc, then key asc — deterministic across runs.
-  const top = [...counts.entries()].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1));
-  return { count: values.length - missing, missing, distinct: counts.size, top };
+  const top = groupCounts(values);
+  const missing = values.filter(isBlank).length;
+  return { count: values.length - missing, missing, distinct: top.length, top };
 }
 
 function hintRole(col, domain) {

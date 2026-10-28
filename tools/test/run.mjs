@@ -72,7 +72,8 @@ function capture(raw) {
       confidence: d.confidence,
       evidence: d.evidence,
       metadata: d.metadata,
-      focus,
+      // Only what the Pull adds; the rest of focus repeats fields captured above.
+      focus: { rowIndices: focus.rowIndices, columns: focus.columns, scope: focus.scope },
       explain: explain(focus, d, dataset, report),
       provenance: provenanceOf(d, report, dataset),
       // Identity and verification: the procedure fingerprint is snapshot-free,

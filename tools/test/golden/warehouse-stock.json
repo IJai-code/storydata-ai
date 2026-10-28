@@ -16,23 +16,12 @@
         "columns": [
           "Units"
         ],
-        "detector": "availability",
-        "direction": null,
-        "evidence": {
-          "column": "Units",
-          "count": 3,
-          "threshold": 10
-        },
-        "id": "availability:qty:low",
         "rowIndices": [
           1,
           4,
           6
         ],
-        "scope": "subset",
-        "summary": "3 records are below 10 units.",
-        "title": "Low-stock warning",
-        "tone": "warn"
+        "scope": "subset"
       },
       "id": "availability:qty:low",
       "importance": 0.75,
@@ -80,22 +69,10 @@
         "columns": [
           "Units"
         ],
-        "detector": "extremes",
-        "direction": "max",
-        "evidence": {
-          "column": "Units",
-          "label": "Widget F",
-          "rowIndex": 5,
-          "value": 100
-        },
-        "id": "extreme:max:Units",
         "rowIndices": [
           5
         ],
-        "scope": "row",
-        "summary": "Widget F leads on units at 100.",
-        "title": "Highest units",
-        "tone": "ok"
+        "scope": "row"
       },
       "id": "extreme:max:Units",
       "importance": 0.75,
@@ -143,22 +120,11 @@
         "columns": [
           "Units"
         ],
-        "detector": "availability",
-        "direction": null,
-        "evidence": {
-          "column": "Units",
-          "count": 2,
-          "total": 7
-        },
-        "id": "availability:qty:zero",
         "rowIndices": [
           0,
           3
         ],
-        "scope": "subset",
-        "summary": "2 records have zero units.",
-        "title": "Units depleted",
-        "tone": "critical"
+        "scope": "subset"
       },
       "id": "availability:qty:zero",
       "importance": 0.6785714285714286,
@@ -206,22 +172,10 @@
         "columns": [
           "Units"
         ],
-        "detector": "extremes",
-        "direction": "min",
-        "evidence": {
-          "column": "Units",
-          "label": "Widget D",
-          "rowIndex": 3,
-          "value": 0
-        },
-        "id": "extreme:min:Units",
         "rowIndices": [
           3
         ],
-        "scope": "row",
-        "summary": "Widget D trails on units at 0.",
-        "title": "Lowest units",
-        "tone": "neutral"
+        "scope": "row"
       },
       "id": "extreme:min:Units",
       "importance": 0.5,
@@ -272,24 +226,10 @@
         "columns": [
           "Units"
         ],
-        "detector": "outliers",
-        "direction": null,
-        "evidence": {
-          "column": "Units",
-          "mean": 23.428571428571427,
-          "rowIndex": 5,
-          "stddev": 35.31837701681719,
-          "value": 100,
-          "z": 2.168033614199439
-        },
-        "id": "outlier:outlier:Units",
         "rowIndices": [
           5
         ],
-        "scope": "row",
-        "summary": "Widget F sits 2.2σ from the mean units (100).",
-        "title": "Notable outlier",
-        "tone": "warn"
+        "scope": "row"
       },
       "id": "outlier:outlier:Units",
       "importance": 0.5,
@@ -337,15 +277,6 @@
         "columns": [
           "Price"
         ],
-        "detector": "central-tendency",
-        "direction": null,
-        "evidence": {
-          "column": "Price",
-          "mean": 15.142857142857142,
-          "median": 14,
-          "stddev": 5.166611805721464
-        },
-        "id": "central-tendency:avg:Price",
         "rowIndices": [
           0,
           1,
@@ -355,10 +286,7 @@
           5,
           6
         ],
-        "scope": "dataset",
-        "summary": "Mean price is 15.14 (median 14).",
-        "title": "Average price",
-        "tone": "neutral"
+        "scope": "dataset"
       },
       "id": "central-tendency:avg:Price",
       "importance": 0.3,
@@ -408,15 +336,6 @@
         "columns": [
           "Units"
         ],
-        "detector": "central-tendency",
-        "direction": null,
-        "evidence": {
-          "column": "Units",
-          "mean": 23.428571428571427,
-          "median": 4,
-          "stddev": 35.31837701681719
-        },
-        "id": "central-tendency:avg:Units",
         "rowIndices": [
           0,
           1,
@@ -426,10 +345,7 @@
           5,
           6
         ],
-        "scope": "dataset",
-        "summary": "Mean units is 23.43 (median 4).",
-        "title": "Average units",
-        "tone": "neutral"
+        "scope": "dataset"
       },
       "id": "central-tendency:avg:Units",
       "importance": 0.3,

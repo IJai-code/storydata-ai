@@ -141,9 +141,10 @@ The truth path is a pure function of the snapshot and the policy. It must not
 contain `Date.now()`, `Math.random()`, unpinned locale formatting, network calls,
 model calls, or iteration whose order depends on anything but the data.
 
-Float arithmetic is order-sensitive, so ops that mirror `discovery/profile.js`
-(sorted input, same summation order) must stay **bit-identical** to it, not
-merely equivalent. Map and object iteration in the truth path is sorted
+Float arithmetic is order-sensitive, so profiling and the graph's ops share one
+statistics implementation, `js/derive/stats.js` (ascending input, left-to-right
+sums). Re-check compares against values profiling produced, so a second copy
+that was merely equivalent would report false failures. Map and object iteration in the truth path is sorted
 explicitly — ties broken by key ascending.
 
 `tools/test/` enforces this: golden baselines pin the full truth path, invariants

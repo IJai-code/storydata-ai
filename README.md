@@ -138,6 +138,7 @@ js/
     build.js                 the detector-facing API (justify / justifyOver)
     project.js               witness → rows, and op-keyed derivation prose
     fingerprint.js           snapshot, row and cell fingerprints
+    stats.js                 statistics shared with profiling (bit-identical)
   render/
     pull.js                  the Pull: claims, focus, provenance, verification
     layouts/findings.js      the Case File and the trace

@@ -1,29 +1,10 @@
-// A Relationship ties two or more discoveries together into one bigger signal —
-// "revenue is concentrated", say. Like a Discovery it's just frozen data: no
-// DOM, no UI, and it never touches the raw dataset. It points at discoveries by
-// id and keeps the numbers it pulled from them. Same shape language as Discovery
-// on purpose, so the engines downstream only have to learn one.
-//
-// Fields: id, type, title, summary, confidence, importance, supporting (the
-// discovery ids it was built from), evidence, metadata.
+// A Relationship ties two or more discoveries into one claim — "revenue is
+// concentrated", say. It never reads the dataset: it points at discoveries by id.
+// It shares the Discovery importance bands so the two rank on one scale.
 
-// Same bands as the Discovery Engine so the two scores line up.
-export const IMPORTANCE = Object.freeze({
-  CRITICAL: 0.95,
-  HIGH: 0.75,
-  MEDIUM: 0.5,
-  LOW: 0.3,
-  MINOR: 0.15,
-});
+import { IMPORTANCE, TONE, clamp01 } from '../discovery/discovery.js';
 
-export const TONE = Object.freeze({
-  CRITICAL: 'critical',
-  WARN: 'warn',
-  OK: 'ok',
-  NEUTRAL: 'neutral',
-});
-
-const clamp01 = (n) => (Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 0);
+export { IMPORTANCE, TONE };
 
 // Make a frozen Relationship; blows up early if a rule skipped type or title.
 export function createRelationship({

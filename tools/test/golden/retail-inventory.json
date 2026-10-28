@@ -17,22 +17,10 @@
         "columns": [
           "Revenue"
         ],
-        "detector": "extremes",
-        "direction": "max",
-        "evidence": {
-          "column": "Revenue",
-          "label": "Ember Sofa",
-          "rowIndex": 3,
-          "value": 900
-        },
-        "id": "extreme:max:Revenue",
         "rowIndices": [
           3
         ],
-        "scope": "row",
-        "summary": "Ember Sofa leads on revenue at 900.",
-        "title": "Highest revenue",
-        "tone": "ok"
+        "scope": "row"
       },
       "id": "extreme:max:Revenue",
       "importance": 0.75,
@@ -80,22 +68,11 @@
         "columns": [
           "Status"
         ],
-        "detector": "availability",
-        "direction": null,
-        "evidence": {
-          "column": "Status",
-          "count": 2,
-          "total": 8
-        },
-        "id": "availability:status:critical",
         "rowIndices": [
           2,
           6
         ],
-        "scope": "subset",
-        "summary": "2 of 8 records are unavailable.",
-        "title": "Out of stock",
-        "tone": "critical"
+        "scope": "subset"
       },
       "id": "availability:status:critical",
       "importance": 0.6649999999999999,
@@ -142,22 +119,11 @@
         "columns": [
           "Status"
         ],
-        "detector": "availability",
-        "direction": null,
-        "evidence": {
-          "column": "Status",
-          "count": 2,
-          "total": 8
-        },
-        "id": "availability:status:warn",
         "rowIndices": [
           1,
           5
         ],
-        "scope": "subset",
-        "summary": "2 records are running low or limited.",
-        "title": "Low / limited",
-        "tone": "warn"
+        "scope": "subset"
       },
       "id": "availability:status:warn",
       "importance": 0.5249999999999999,
@@ -202,14 +168,6 @@
       },
       "focus": {
         "columns": [],
-        "detector": "availability",
-        "direction": null,
-        "evidence": {
-          "healthy": 4,
-          "pct": 50,
-          "total": 8
-        },
-        "id": "availability:health",
         "rowIndices": [
           0,
           1,
@@ -220,10 +178,7 @@
           6,
           7
         ],
-        "scope": "dataset",
-        "summary": "50% of records are in good standing.",
-        "title": "Availability health",
-        "tone": "warn"
+        "scope": "dataset"
       },
       "id": "availability:health",
       "importance": 0.5,
@@ -271,24 +226,12 @@
         "columns": [
           "Category"
         ],
-        "detector": "distribution",
-        "direction": null,
-        "evidence": {
-          "column": "Category",
-          "count": 3,
-          "groups": 4,
-          "value": "Decor"
-        },
-        "id": "distribution:largest:Category",
         "rowIndices": [
           2,
           5,
           6
         ],
-        "scope": "group",
-        "summary": "Decor is the largest category with 3 records.",
-        "title": "Largest category",
-        "tone": "neutral"
+        "scope": "group"
       },
       "id": "distribution:largest:Category",
       "importance": 0.5,
@@ -338,25 +281,12 @@
           "Category",
           "Revenue"
         ],
-        "detector": "distribution",
-        "direction": null,
-        "evidence": {
-          "categoryColumn": "Category",
-          "metricColumn": "Revenue",
-          "share": 69,
-          "total": 1150,
-          "value": "Furniture"
-        },
-        "id": "distribution:top-by-metric:Category:Revenue",
         "rowIndices": [
           1,
           3,
           4
         ],
-        "scope": "group",
-        "summary": "Furniture drives 1,150 of revenue (69% of total).",
-        "title": "Top category by revenue",
-        "tone": "ok"
+        "scope": "group"
       },
       "id": "distribution:top-by-metric:Category:Revenue",
       "importance": 0.5,
@@ -405,22 +335,10 @@
         "columns": [
           "Revenue"
         ],
-        "detector": "extremes",
-        "direction": "min",
-        "evidence": {
-          "column": "Revenue",
-          "label": "Cobalt Rug",
-          "rowIndex": 2,
-          "value": 90
-        },
-        "id": "extreme:min:Revenue",
         "rowIndices": [
           2
         ],
-        "scope": "row",
-        "summary": "Cobalt Rug trails on revenue at 90.",
-        "title": "Lowest revenue",
-        "tone": "neutral"
+        "scope": "row"
       },
       "id": "extreme:min:Revenue",
       "importance": 0.5,
@@ -471,24 +389,10 @@
         "columns": [
           "Revenue"
         ],
-        "detector": "outliers",
-        "direction": null,
-        "evidence": {
-          "column": "Revenue",
-          "mean": 208.75,
-          "rowIndex": 3,
-          "stddev": 261.5190002657551,
-          "value": 900,
-          "z": 2.643211389220489
-        },
-        "id": "outlier:outlier:Revenue",
         "rowIndices": [
           3
         ],
-        "scope": "row",
-        "summary": "Ember Sofa sits 2.6σ from the mean revenue (900).",
-        "title": "Notable outlier",
-        "tone": "warn"
+        "scope": "row"
       },
       "id": "outlier:outlier:Revenue",
       "importance": 0.5,
@@ -536,15 +440,6 @@
         "columns": [
           "Price"
         ],
-        "detector": "central-tendency",
-        "direction": null,
-        "evidence": {
-          "column": "Price",
-          "mean": 224.81125,
-          "median": 109.25,
-          "stddev": 273.0589371105394
-        },
-        "id": "central-tendency:avg:Price",
         "rowIndices": [
           0,
           1,
@@ -555,10 +450,7 @@
           6,
           7
         ],
-        "scope": "dataset",
-        "summary": "Mean price is 225 (median 109).",
-        "title": "Average price",
-        "tone": "neutral"
+        "scope": "dataset"
       },
       "id": "central-tendency:avg:Price",
       "importance": 0.3,
@@ -608,15 +500,6 @@
         "columns": [
           "Revenue"
         ],
-        "detector": "central-tendency",
-        "direction": null,
-        "evidence": {
-          "column": "Revenue",
-          "mean": 208.75,
-          "median": 112.5,
-          "stddev": 261.5190002657551
-        },
-        "id": "central-tendency:avg:Revenue",
         "rowIndices": [
           0,
           1,
@@ -627,10 +510,7 @@
           6,
           7
         ],
-        "scope": "dataset",
-        "summary": "Mean revenue is 209 (median 113).",
-        "title": "Average revenue",
-        "tone": "neutral"
+        "scope": "dataset"
       },
       "id": "central-tendency:avg:Revenue",
       "importance": 0.3,
@@ -678,13 +558,6 @@
         "columns": [
           "Category"
         ],
-        "detector": "distribution",
-        "direction": null,
-        "evidence": {
-          "column": "Category",
-          "groups": 4
-        },
-        "id": "distribution:spread:Category",
         "rowIndices": [
           0,
           1,
@@ -695,10 +568,7 @@
           6,
           7
         ],
-        "scope": "dataset",
-        "summary": "Records span 4 category groups.",
-        "title": "Category spread",
-        "tone": "neutral"
+        "scope": "dataset"
       },
       "id": "distribution:spread:Category",
       "importance": 0.15,
