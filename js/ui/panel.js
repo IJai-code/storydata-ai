@@ -330,7 +330,7 @@ function wireStory() {
   document.getElementById('storyPlayBtn').addEventListener('click', () => {
     const sys = getKineticSystem();
     if (!sys) {
-      toast('Switch to Kinetic Rank to play your story.', 'warn');
+      toast('Switch to Kinetic Rank to play your briefing.', 'warn');
       return;
     }
     if (sys.storyPlaying()) {

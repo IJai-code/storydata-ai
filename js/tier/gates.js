@@ -83,10 +83,6 @@ export function isPro() {
   return getState().tier === 'pro';
 }
 
-export function proPrice() {
-  return getState().limits.price;
-}
-
 export function maxRows() {
   const { maxRows: cap } = getState().limits;
   return cap === null ? Infinity : cap;

@@ -1,139 +1,171 @@
-# Ellery AI
+# Ellery
 
-Turn raw data — CSV, JSON, or plain notes — into quiet, interactive,
-presentation-ready briefings. Ellery classifies what you import, renders it
-on a physics-driven canvas you can interrogate by hand, and exports it as a
-narrated MP4, a still PNG, or a self-contained interactive HTML file.
+Ellery reads your data, tells you plainly what's true, and lets you pull any
+claim all the way down to the exact, fingerprinted evidence that proves it.
 
-Built as a zero-build static frontend served by a small Express backend that
-enforces all tier limits server-side.
+It is a reasoning instrument, not a chart builder. You load a CSV, JSON or plain
+text file and Ellery opens with a ranked **Case File** — its conclusions, in
+English, before you touch a visualization. Every conclusion can be traced to the
+records behind it, re-derived from those records on demand, and checked against
+a content fingerprint of the data it was computed from.
 
-> **Status:** preview / MVP. The auth gate and checkout are deliberately
-> simulated (see [Preview limitations](#preview-limitations)). The
-> visualization, ingestion, Briefing Mode, and export pipelines are real.
+There is no model in the truth path. Findings are a deterministic function of the
+data and the policy applied to it: same snapshot, same policy, same conclusion.
 
----
-
-## Screenshots
-
-<!-- Add images to docs/ and reference them here before publishing. -->
-
-| Kinetic Rank board | Briefing Mode | Exported MP4 |
-| --- | --- | --- |
-| _`docs/kinetic-rank.png`_ | _`docs/briefing-mode.png`_ | _`docs/briefing-export.gif`_ |
+> **Status:** early access. Sign-in is a local workspace label, not
+> authentication, and billing is not wired up — see
+> [Preview limitations](#preview-limitations). The reasoning, ingestion, Pull,
+> verification and export pipelines are real.
 
 ---
 
-## Features
+## What it does
 
-- **Tolerant ingestion** — CSV/TSV, JSON (including nested objects → hierarchy),
-  and free-text notes. The parser repairs ragged rows, infers column types, and
-  never throws; unrecoverable input degrades to a readable text dataset.
-- **Kinetic Rank** — the flagship canvas. Cards are physically ranked; *sort
-  pulses* re-rank them with spring inertia, *drag-to-compare* shows live
-  differences, and *click-to-pin* sets a baseline. Verlet physics serves
-  comprehension, not decoration.
-- **Briefing Mode** — Ellery classifies the dataset (performance, timeline,
-  operations, knowledge, structured system map, or uniform) and authors a
-  narrated briefing: a cinematic title card (`MISSION BRIEFING` for operational
-  data, `DATA BRIEFING` otherwise), insight scenes each prefaced by *why* they
-  matter, and a closing Key Findings card. Degenerate data gets honest
-  captions, never invented insights.
-- **Four layouts** — Kinetic Rank, Interactive Timeline, Data Card Grid,
-  Branching Mindmap (plus a Pro Insight Map).
-- **Exports** — PNG for slides, a narrated MP4 of the live briefing, and (Pro) a
-  watermark-free standalone interactive HTML file.
-- **Local saves** — briefings (with their scene sequence) persist to the browser.
-- **Monochrome operations-center design system** — matte canvas, hairline
-  dividers, telemetry-style labels, `prefers-reduced-motion` respected.
+### Findings first — the Case File
 
-## Example use cases
+Load data and Ellery ranks what it found: extremes, outliers, distribution,
+central tendency, availability, and concentration. The most important claim leads
+as the headline. When the data is unremarkable, it says so instead of inventing
+drama.
 
-- **Business analytics** — revenue, growth, and customer metrics: identify
-  leaders, laggards, and the gaps between them.
-- **Engineering systems** — component readiness and subsystem status across an
-  operation; a `MISSION BRIEFING` of where things stand.
-- **Scientific datasets** — measurements across conditions and controls, ranked
-  and grouped with honest handling of equal results.
-- **Research projects** — trials and observations summarized with the strongest
-  and weakest results called out.
-- **Meeting notes** — recurring themes, important dates, and action items pulled
-  from free text.
-- **Mission planning** — milestones and workstreams grouped over a timeline.
+### The Pull
 
-Three of these ship as one-click example datasets (Startup metrics, Mission
-operations, Research data).
+Click any finding and the Case File descends into it, one layer at a time:
+
+```
+Finding → Evidence → Derivation → Policy → Confidence → the records → Ground
+```
+
+The bottom layer is a fingerprinted snapshot. Each record carries its own content
+fingerprint, and opening one shows its raw cells and its address on that snapshot.
+A traced finding stays lit across every lens.
+
+### Re-check
+
+Each trace has a **Re-check this finding** control. It re-derives the claim from
+the fingerprinted records and reports whether it reproduces. This is a real
+recomputation compared against what the detector asserted — not a stored flag.
+Tamper with a cell and only the findings that actually depend on it fail.
+
+### Two fingerprints
+
+Ground shows a **procedure** fingerprint and a **result** fingerprint. The
+procedure names the computation and is independent of the data; the result binds
+it to this snapshot. Together they distinguish "the data changed" from "the
+reasoning changed."
+
+### Composed claims
+
+Some findings rest on other findings rather than directly on records —
+"concentration risk", for example, stands on the finding that one category leads
+the metric. These are marked *from N findings* in the list, and their trace opens
+with a **Rests on** layer naming what they are built from. Each of those is a
+finding in its own right, so the Pull keeps going until it reaches records.
+
+### Lenses
+
+Visualizations are alternate renderings of the same Case File, not a separate
+product: Findings, Kinetic Rank, Timeline, Cards, Mindmap, and Insight Map (Pro).
+Kinetic Rank uses Verlet physics to serve comparison and ranking.
+
+### Exports
+
+PNG for slides, a narrated MP4 of the live briefing via `MediaRecorder`, and a
+self-contained interactive HTML file. Cases save to the browser and reopen from
+the Cases dashboard, named after the claim that led them.
 
 ---
 
-## Quick start
+## Running it locally
 
 Requires **Node ≥ 18**.
 
 ```bash
 npm install
-npm start            # → http://localhost:4173
+npm run dev      # → http://localhost:8130
 ```
 
-`PORT=8080 npm start` to change the port. `npm run lint` runs ESLint over the
-server and frontend.
+`npm run dev` starts `tools/preview-server.mjs`, which serves the frontend and a
+same-origin stub of the API using the real ingestion pipeline, so the app runs
+fully offline with no backend cold start.
 
-No Node available? `npm run dev:mock` starts a Python test double of the same
-HTTP contract (dev only — the Express server is the real implementation).
+`npm start` runs the actual Express backend on port 4173 (`PORT` to change it).
 
-Once running: sign in on the gate (any name, valid-looking email, 8+ char
-password — accounts are simulated locally), then click an **example dataset** to see the
-full experience, or paste your own CSV/JSON/notes.
+Sign-in asks only for a name and email; both are stored locally as a workspace
+label. Click an example dataset, or paste your own CSV, TSV, JSON or notes.
+
+### Tests
+
+```bash
+npm test          # golden output + cross-tier contract tests
+npm run lint      # ESLint over server, frontend and tools
+```
+
+- **Golden tests** (`tools/test/run.mjs`) pin the entire truth path for a set of
+  fixtures: ingestion, discovery, snapshot fingerprints and every layer the Pull
+  exposes. The engine is deterministic, so any diff is a real change in what
+  Ellery concludes. `npm run test:update` refreshes the baselines and should only
+  be run when a change in output is intended.
+- **Invariants** run before anything is compared or written: every finding must
+  carry a justification, assert a value, and verify against its own evidence. A
+  `--update` cannot bless a finding that fails them.
+- **Contract tests** (`tools/test/contract.mjs`) cover behaviour a snapshot can't
+  express: the three verification failure modes, compositional failure
+  propagation from ground upward, and that a claim which states a wrong number
+  fails even when its supports verify and its predicate still holds.
 
 ---
 
-## Architecture
+## Repository structure
 
-Zero build step on the frontend: plain ES modules served as static files. The
-backend is an Express app that owns sessions and enforces every tier limit.
+The frontend is a zero-build static site served from the repository root. The
+backend is a small Express app that owns sessions and enforces every tier limit.
 
 ```
-public/                     static frontend (served by Express)
-  index.html
-  css/                      design tokens, layout, components, animations
-  js/
-    app.js                  entry point — wires session → panel/canvas/auth
-    api.js                  fetch wrapper; every server call goes through here
-    state.js                single source of truth (pub/sub store)
-    ingest/                 (none — ingestion runs server-side; see below)
-    render/
-      canvas.js             renderer lifecycle + export/share orchestration
-      kinetic-engine.js     Kinetic Rank physics + Briefing camera engine
-      layouts/              timeline, cards, nodes (mindmap), kinetic
-      png.js                client-side PNG snapshot
-      video.js              MediaRecorder MP4 capture
-      util.js, watermark.js
-    tier/
-      gates.js              UI mirror of session limits (display only)
-      paywall.js            upgrade modal + sandbox checkout
-    ui/                     panel, auth gate, tutorial, toasts
+index.html, app/, css/       static frontend (GitHub Pages)
+js/
+  app.js                     entry point — session → panel/canvas/auth
+  api.js                     fetch wrapper; every server call goes through here
+  state.js                   pub/sub store
+  discovery/                 detectors + dataset profiling (the Discovery tier)
+    detectors/               extremes, central-tendency, distribution,
+                             availability, outliers
+  relationships/             rules that compose Discoveries into claims
+    detectors/               concentration, clustered-anomaly, inventory-exposure,
+                             fragile-outlier, pricing-opportunity
+  derive/                    the derivation graph
+    graph.js                 node identity, evaluation, verify, Pull traversal
+    build.js                 the detector-facing API (justify / justifyOver)
+    project.js               witness → rows, and op-keyed derivation prose
+    fingerprint.js           snapshot, row and cell fingerprints
+  render/
+    pull.js                  the Pull: claims, focus, provenance, verification
+    layouts/findings.js      the Case File and the trace
+    kinetic-engine.js        Kinetic Rank physics + briefing camera
+    canvas.js, png.js, video.js, util.js, watermark.js
+  tier/                      UI mirror of session limits (display only)
+  ui/                        panel, auth gate, tutorial, toasts
 server/
-  server.js                 Express app: sessions, static serving, API routes
-  tier.js                   authoritative tier policy + sandbox card validation
-  ingest/                   detect → parse → normalize pipeline (tolerant)
-  export.js                 document assembler for /api/export, /api/share,
-                            and the Pro interactive HTML
-  gated/                    Pro-only modules (Insight Map renderer, Live
-                            Simulation engine) — served only to Pro sessions
-tools/mock_api.py           dev test double of the API contract (no Node needed)
+  server.js                  Express app: sessions, static serving, API routes
+  tier.js                    authoritative tier policy
+  ingest/                    detect → parse → normalize (tolerant, never throws)
+  export.js                  document assembler for the export routes
+  gated/                     Pro-only modules, served only to Pro sessions
+tools/
+  preview-server.mjs         local dev server (frontend + stub API)
+  test/                      golden fixtures, baselines, and contract tests
+docs/derivation-graph.md     the derivation graph specification
 ```
 
-**Key design rule:** the frontend never decides access. `gates.js` only mirrors
-what `/api/session` reported so the UI can paint locks; the server re-checks
-every limit on every request. The Kinetic engine is a classic script with one
-global so the *identical* file powers the live canvas, the MP4 recorder, and the
-embedded Pro interactive export.
+**Key design rule:** the frontend never decides access. `tier/gates.js` only
+mirrors what `/api/session` reported so the UI can paint locks; the server
+re-checks every limit on every request.
 
 ### Data flow
 
 ```
-raw input → POST /api/ingest → detect → parse → normalize → dataset (capped
-            by the session's tier) → state store → canvas renderer → exports
+raw input → POST /api/ingest → detect → parse → normalize → dataset
+          → discovery + relationships → Case File → Pull → snapshot
 ```
 
 ---
@@ -142,58 +174,24 @@ raw input → POST /api/ingest → detect → parse → normalize → dataset (c
 
 | Route | Method | Purpose |
 | --- | --- | --- |
-| `/api/session` | GET | Current tier + the limits the UI should reflect |
+| `/api/session` | GET | Current tier and the limits the UI should reflect |
 | `/api/ingest` | POST | Parse raw data; row cap applied from the session |
 | `/api/checkout/sandbox` | POST | Simulated upgrade (test card only) |
-| `/api/share` | POST | HTML export, watermark injected server-side (any tier) |
+| `/api/share` | POST | HTML export, watermark injected server-side |
 | `/api/export` | POST | Watermark-free HTML export (Pro) |
-| `/api/export/interactive` | POST | Standalone interactive HTML with engine (Pro) |
+| `/api/export/interactive` | POST | Standalone interactive HTML (Pro) |
 | `/gated/:file` | GET | Pro-only JS modules, 403 to free sessions |
-
----
-
-## Tiers
-
-| | Free | Pro ($12.99/mo) |
-| --- | --- | --- |
-| Rows per briefing | 150 | unlimited |
-| Layouts | Kinetic Rank, Timeline, Card Grid, Branching Mindmap | + Insight Map |
-| Briefing Mode | ✓ | ✓ |
-| Save briefings locally | ✓ | ✓ |
-| Share preview (HTML) | ✓ — watermarked | ✓ |
-| Export PNG for slides | ✓ — attribution stamp | ✓ — clean |
-| Export narrated MP4 | ✓ — attribution caption | ✓ — clean |
-| Interactive Presentation Link (HTML) | — | ✓ |
-| Export Clean Code | — | ✓ |
-| Live Simulation Mode | — | ✓ |
-
-Limits are enforced server-side per request — flipping client variables changes
-pixels, not access.
-
----
-
-## Export capabilities
-
-- **PNG** — 2× client-side canvas/SVG snapshot, transparent margins so it drops
-  into slides cleanly. Free tier gets a low-opacity attribution stamp.
-- **MP4** — records the live briefing (title card → narrated scenes → Key Findings)
-  via `MediaRecorder` at 60 FPS. Falls back to WebM where H.264 recording is
-  unsupported (Safari/Firefox); the UI flags this since Keynote/PowerPoint need
-  MP4. Free tier bakes in an attribution caption.
-- **Interactive HTML (Pro)** — embeds the physics engine + data into one
-  self-contained, dependency-free file with a "Play Briefing" button.
-
-A tabbed **"How to Embed in Slides"** guide (PowerPoint / Google Slides /
-Keynote) ships in the top bar.
 
 ---
 
 ## Deployment
 
-Ellery needs a **stateful Node host** (Render, Railway, Fly.io, a VM) because
-sessions and tier gating run in a single Express process with an in-memory
-store. Vercel/Netlify's serverless model would require moving sessions to an
-external store first.
+The frontend is served from GitHub Pages at the repository root. The backend runs
+on Render at `https://ellery-backend.onrender.com`, with CORS restricted to the
+Pages origin.
+
+The backend needs a **stateful Node host** because sessions and tier gating live
+in a single Express process with an in-memory store.
 
 ```
 Build command:  npm install
@@ -207,35 +205,28 @@ and a stable `SESSION_SECRET`. See `.env.example`.
 
 ## Preview limitations
 
-These are intentional for the preview and must be replaced before a real launch:
+Intentional for early access, and to be replaced before a real launch:
 
-- **Auth is simulated.** The gate validates input shape and stores a display
-  name locally; the password is never sent or stored. It is a UX flow, not a
-  security boundary. Swap in a real identity provider.
-- **Checkout is a sandbox.** `/api/checkout/sandbox` accepts only the Stripe
-  test card `4242 4242 4242 4242`, never stores card data, and flips the session
-  to Pro in memory. Replace with Stripe Checkout + webhooks.
+- **Sign-in is not authentication.** It stores a display name and email locally
+  to label the workspace. Nothing is transmitted. Swap in a real identity
+  provider.
+- **Checkout is a sandbox.** `/api/checkout/sandbox` accepts only the Stripe test
+  card, never stores card data, and flips the session in memory. While early
+  access is on, every Pro feature is granted to everyone at the gate.
 - **Sessions are in-memory and single-process.** Add a persistent store before
   scaling horizontally.
 
 ---
 
-## Roadmap
-
-- Real authentication (OAuth/email) replacing the simulated gate.
-- Stripe Checkout + webhooks replacing the sandbox route.
-- Persistent session/store + horizontal scaling.
-- Server-side rendered exports for headless/automated generation.
-- Date parsing for year-less notes (e.g. "May 12") in the ingestion layer.
-
----
-
-## Project conventions
+## Conventions
 
 - ES modules, no bundler, no framework on the frontend.
 - ESLint flat config (`npm run lint`) — kept clean.
-- The Kinetic engine is intentionally a classic script (one global) so it can be
-  embedded verbatim into exports.
+- The Kinetic engine is deliberately a classic script with one global so the
+  identical file powers the live canvas, the MP4 recorder, and the embedded
+  interactive export.
+- Nothing in the truth path may use `Date.now()`, `Math.random()`, unpinned
+  locale formatting, or any network or model call.
 
 ---
 
@@ -245,4 +236,4 @@ MIT — see [LICENSE](LICENSE).
 
 ## Credit
 
-Ellery Studio — designed & engineered by **Ishaan Jha**.
+Ellery — designed and engineered by **Ishaan Jha**.

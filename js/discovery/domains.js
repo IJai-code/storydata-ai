@@ -36,8 +36,6 @@ const RETAIL = {
 // Order matters only for tie-breaks; resolveDomain scores explicitly.
 export const DOMAINS = [RETAIL, GENERIC];
 
-export const GENERIC_DOMAIN = GENERIC;
-
 /**
  * Choose the most specific domain whose name-hints match the dataset's columns.
  * Requires at least two distinct role matches before claiming a specialised

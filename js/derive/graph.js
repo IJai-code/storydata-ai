@@ -49,7 +49,7 @@ const groupCounts = (xs) => {
   return [...counts.entries()].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1));
 };
 
-export const OPS = Object.freeze({
+const OPS = Object.freeze({
   max: ([xs]) => Math.max(...nums(xs)),
   min: ([xs]) => Math.min(...nums(xs)),
   mean: ([xs]) => meanOf(sorted(xs)),
@@ -322,9 +322,8 @@ function deepEqual(a, b) {
 /* ---------- The Pull: one traversal, every tier ----------
    Descends a Claim through its supports. A `claim` support recurses into the
    referenced Claim; a `ground` support terminates at the fingerprinted witness.
-   Phase 1 only ever produces `ground` supports — the `claim` branch is what lets
-   Relationships and Decisions become pullable without a second provenance
-   system. */
+   Discoveries produce `ground` supports, Relationships `claim` supports, and
+   one traversal handles both. */
 
 export function* pull(claim, claimById = () => null, depth = 0) {
   yield { claim, depth };

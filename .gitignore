@@ -28,3 +28,6 @@ coverage/
 # Local screen recordings / demo captures (large, not part of the app)
 *.mp4
 *.mov
+
+# Personal tooling
+.wakatime-project

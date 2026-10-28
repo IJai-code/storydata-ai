@@ -143,13 +143,12 @@ export function fingerprintsOf(d, snapshot) {
 }
 
 /* ---------- The claim index ----------
-   One lookup spanning every tier, so a composed claim resolves its supports
-   without anyone hard-coding which engine produced them. Decisions will resolve
-   Relationships through exactly this, unchanged. */
+   One lookup spanning both tiers, so a composed claim resolves its supports
+   without anyone hard-coding which engine produced them. */
 
 let claimCache = { report: null, index: null };
 
-export function claimIndex(report) {
+function claimIndex(report) {
   if (claimCache.report === report) return claimCache.index;
   const index = new Map();
   for (const d of report.discoveries) index.set(d.id, d);

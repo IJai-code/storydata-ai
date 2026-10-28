@@ -1,402 +1,204 @@
-# Ellery AI — System Context
+# Ellery — System Context & Engineering Rules
 
-## Architecture Overview
+## Identity
 
-Ellery AI is a web application with separated frontend and backend:
+Ellery reads your data, tells you plainly what's true, and lets you pull any
+claim all the way down to the exact, fingerprinted evidence that proves it.
+
+The category is **accountable conclusions**. Ellery is a reasoning instrument.
+
+Ellery is NOT:
+
+- a chart builder
+- a dashboard platform
+- a spreadsheet replacement
+- a BI tool
+- a chatbot
+
+Visualizations exist, but they are lenses onto conclusions — never the product
+itself.
+
+---
+
+## The two axioms
+
+These govern the reasoning layer. Do not weaken them.
+
+**J — Grounded Justification.** A conclusion is inseparable from a traversable
+chain of evidence to fingerprinted ground. Nothing downstream may assert more
+than the chain proves.
+
+**P — Procedural Origin.** A conclusion is the reproducible output of an explicit
+deterministic procedure, not an author's judgement. Same evidence + same policy =
+same conclusion.
+
+---
+
+## Core experience
+
+```
+Landing → Continue → Load data → Analyze → Case File → Finding → Pull → evidence
+```
+
+- **Case File** — the findings-first home surface. Ranked conclusions in plain
+  English, headline first. Calm data gets said so, not dramatized.
+- **The Pull** — the signature interaction. Finding → Evidence → Derivation →
+  Policy → Confidence → records → Ground.
+- **Ground** — a fingerprinted snapshot. Records carry their own content
+  fingerprints.
+- **Re-check** — re-derives a claim from its records and reports whether it
+  reproduces. Must remain a real recomputation, never a stored flag.
+- **Composed claims** — Relationships rest on other findings and are marked as
+  such; their trace opens with a "Rests on" layer. They are another kind of
+  claim in the same Case File, not a separate surface.
+
+---
+
+## Truth-path rules
+
+The truth path is `server/ingest/` → `js/discovery/` → `js/relationships/` →
+`js/derive/` → `js/render/pull.js`.
+
+NEVER introduce into it:
+
+- `Date.now()` or any clock
+- `Math.random()`
+- unpinned locale formatting
+- iteration order that depends on anything but the data
+- network calls, model calls, or AI of any kind
+- arbitrary external state
+
+Float arithmetic is order-sensitive. Ops that mirror `discovery/profile.js` must
+be bit-identical to it, not merely equivalent.
+
+Architecture of the reasoning layer is specified in `docs/derivation-graph.md`
+(Claim ← Support*, node identity, witness, verify semantics, fingerprints). Do
+not redesign it without a demonstrated contradiction with J or P.
+
+No detector-specific provenance code. Presentation and verification dispatch on
+the operation algebra, never on which detector produced a claim.
+
+---
+
+## Architecture
 
 ### Frontend
-- Hosted on GitHub Pages
-- Located at repository root (NOT /public)
-- Entry point: index.html
-- Assets:
-  - /css
-  - /js
+- Zero build. Plain ES modules served as static files.
+- Hosted on GitHub Pages, **at the repository root** (NOT `/public`).
+- Entry points: `index.html`, `app/index.html`. Assets in `/css`, `/js`.
 
 ### Backend
-- Node.js + Express server
-- Located in /server
-- Deployed on Render
-- Base URL: https://ellery-backend.onrender.com
+- Node + Express in `/server`, deployed on Render.
+- Base URL: `https://ellery-backend.onrender.com`, CORS restricted to the Pages
+  origin.
+- `GET /api/session` returns tier info and feature flags.
+
+### Commands
+```bash
+npm run dev     # local dev server (frontend + stub API) → :8130
+npm start       # the real Express backend → :4173
+npm test        # golden output + contract tests
+npm run lint    # ESLint over server, frontend and tools
+```
+
+`npm run test:update` regenerates golden baselines. Only run it when a change in
+output is intended — never to make a failing test pass.
 
 ---
 
-## Core API
+## Key systems
 
-### Session Endpoint
-- GET /api/session
-- Returns tier info and feature flags
+**Tier system.** Free vs Pro is enforced server-side. Client-side gating is a
+display mirror only and is never authoritative.
 
----
+**Export system.** PNG, MP4 via MediaRecorder (H.264 + AAC), and self-contained
+interactive HTML. Free tier carries the watermark "Captured with Ellery Studio".
+No personal attribution text.
 
-## Key Systems
-
-### 1. Tier System
-- Free vs Pro gating handled server-side
-- Never modify client-side gating logic as authoritative
-
-### 2. Export System
-- MP4 export via MediaRecorder
-- Uses H.264 + AAC encoding
-- Free tier includes watermark "Captured with Ellery Studio"
-- Must NOT include personal attribution text
-
-### 3. Rendering Engine
-- Kinetic / timeline / cards / nodes layouts
-- Lives in /js/render/
+**Rendering engine.** Lenses live in `/js/render/`: Findings, Kinetic Rank,
+Timeline, Cards, Mindmap, Insight Map (Pro). The Kinetic engine is deliberately a
+classic script with one global so the identical file powers the live canvas, the
+MP4 recorder, and the embedded interactive export.
 
 ---
 
-## Critical Constraints
+## Removed features
 
-DO NOT:
-- Move frontend back into /public
-- Break Render deployment structure
-- Remove or bypass tier system
-- Modify API routes without explicit intent
+Do not reintroduce without explicit intent:
 
----
-
-## Deployment
-
-- Frontend: GitHub Pages
-- Backend: Render
-- Communication via fetch('/api/...') with CORS enabled
+- **Live Simulation** — deleted.
+- **The Decision tier** — prototyped and removed. It would attach as `{of:'claim'}`
+  supports over Relationships and needs no new machinery if it returns.
 
 ---
 
-## Stability Rule
+## Visualization ownership
+
+Each lens has one job. Do not duplicate between them.
+
+- **Kinetic Rank** — ranking, ordering, comparison, movement between rankings,
+  change over time.
+- **Branching Mindmap** — hierarchy, parent-child structure, dependencies.
+
+Motion is never decorative. Animation must communicate ranking, relationships,
+grouping, comparison, hierarchy, or change. If it exists only because it looks
+good, remove it.
+
+---
+
+## Interface rules
+
+- A first-time user should understand a view within 30 seconds.
+- Plain English labels. No unexplained symbols. Helpful empty states.
+- Records and fields — not rows and columns.
+- Cases, not "stories", in user-facing copy.
+- Cards: `#0B0B0C` background, `1px solid rgba(255,255,255,0.12)` border, sharp
+  edges, compact readable type.
+- Dragging may show elastic tension, but cards return to assigned positions. The
+  user can explore the layout but cannot destroy it.
+- No information may become inaccessible through truncation. If content is
+  shortened, hover reveals it, and the tooltip stays on-screen and readable.
+- Phoenix-orange editorial aesthetic; monochrome leads, brand colour is used
+  sparingly.
+- `prefers-reduced-motion` is respected.
+
+---
+
+## Engineering standards
+
+Assume this repository will be public.
+
+- No secrets, keys, credentials, or private data.
+- Favour deletion over addition. Prefer simplifying to rewriting.
+- No duplicated logic, no unexplained magic numbers, no temporary scaffolding
+  left behind.
+- Comments should carry engineering reasoning a maintainer needs — constraints,
+  invariants, non-obvious ordering. Not narration of what the line does.
+- Keep `npm test` and `npm run lint` green.
+
+---
+
+## Stability rule
 
 Any change must preserve:
+
+- the truth path's determinism and its golden/contract coverage
 - API compatibility
-- Export system integrity
-- Deployment structure# ELLERY AI — PRODUCT CONSTITUTION & ENGINEERING RULES
-
-## Core Mission
-
-Ellery AI transforms messy information into presentation-ready animated visual systems.
-
-Users should be able to:
-
-1. Import messy data.
-2. Instantly understand it visually.
-3. Interact with it meaningfully.
-4. Export it into presentations and shareable experiences.
-
-Every design decision must support one or more of these goals.
+- export system integrity
+- deployment structure (frontend at root, backend in `/server`)
 
 ---
 
-## Product Principles
+## Decision filter
 
-Every feature must satisfy at least one of the following:
+Before building anything, ask:
 
-* Make data easier to understand.
-* Make presentations more engaging.
-* Make insights easier to discover.
-* Make exports more valuable.
-* Make storytelling with data more effective.
+1. Does it make what's true easier to see?
+2. Does it make a conclusion more traceable or more checkable?
+3. Does it make the evidence easier to reach?
+4. Does it make the product simpler?
 
-If a feature does not satisfy one of these goals, do not build it.
+If the answer to all four is no, do not build it.
 
----
-
-## Product Positioning
-
-Ellery AI is:
-
-* A presentation visualization platform.
-* A data storytelling tool.
-* An animated information canvas.
-* A presentation enhancement system.
-
-Ellery AI is NOT:
-
-* A spreadsheet replacement.
-* A dashboard platform.
-* A generic chart builder.
-* A traditional BI tool.
-* Another chatbot.
-
----
-
-## Physics Philosophy
-
-Physics is never decorative.
-
-Motion must communicate:
-
-* ranking
-* relationships
-* grouping
-* comparison
-* hierarchy
-* transitions
-* change over time
-
-Avoid movement that exists only because it looks cool.
-
-Every animation should teach the viewer something.
-
----
-
-## Visualization Ownership
-
-Each visualization mode must have a unique purpose.
-
-### Branching Mindmap
-
-Responsible for:
-
-* hierarchy
-* parent-child structures
-* dependency relationships
-* concept maps
-* knowledge maps
-
-### Kinetic Rank Board
-
-Responsible for:
-
-* ranking
-* ordering
-* comparison
-* movement between rankings
-* change visibility
-* sorting stories
-
-Do not duplicate functionality between visualization modes.
-
----
-
-## Export Philosophy
-
-Exports are first-class features.
-
-Every visualization must answer:
-
-"Why would somebody place this inside a presentation?"
-
-If there is no compelling answer, reconsider the feature.
-
-Exports should create presentation assets that look professional immediately.
-
----
-
-## User Experience Rules
-
-A first-time user should understand a visualization within 30 seconds.
-
-Requirements:
-
-* Plain English labels.
-* Minimal jargon.
-* No unexplained symbols.
-* Clear onboarding.
-* Helpful empty states.
-* Obvious interactions.
-
-If a feature requires extensive explanation, simplify it.
-
----
-
-## Visual Layout Refinement
-
-Structure node maps into organized horizontal left-to-right systems.
-
-### Column Layout
-
-Far Left Column:
-
-* Core dataset root container.
-
-Middle Column:
-
-* Primary parsed category bridges.
-
-Far Right Column:
-
-* Individual records, leaves, milestones, and endpoints.
-
-Layouts should feel intentional and organized.
-
----
-
-## Card Design Rules
-
-Nodes must render as clean horizontal information cards.
-
-Requirements:
-
-* Background: #0B0B0C
-* Border: 1px solid rgba(255,255,255,0.12)
-* Sharp edges
-* Clean spacing
-* Professional appearance
-
-Typography:
-
-* Compact
-* Readable
-* Consistent
-* Center-aligned where appropriate
-
----
-
-## Physics Constraints
-
-Dragging cards may display elastic tension.
-
-Upon release:
-
-* Cards must return to their assigned locations.
-* No overlap.
-* No permanent disorder.
-* No broken layouts.
-
-The user may explore the system but cannot accidentally destroy organization.
-
----
-
-## Tooltip Rules
-
-No information may become inaccessible due to truncation.
-
-If content is shortened:
-
-* Hover reveals full content.
-* Tooltip must remain readable.
-* Tooltip must remain on-screen.
-* Tooltip must support long labels.
-
-Users must always have access to complete information.
-
----
-
-## Tutorial System
-
-Include a top-bar tutorial system.
-
-Required sections:
-
-* Microsoft PowerPoint
-* Google Slides
-* Apple Keynote
-
-Explain:
-
-* How to export
-* How to embed
-* How to loop animations
-* How to present exported assets
-
-Documentation should be concise and visual.
-
----
-
-## MP4 Export Standards
-
-MP4 exports must contain meaningful movement.
-
-Avoid static recordings.
-
-Preferred structure:
-
-1. Initial state
-2. Transition
-3. Reorganization
-4. Final resolved state
-
-The animation should tell a story.
-
-Examples:
-
-* chaos → order
-* unsorted → ranked
-* disconnected → organized
-
-The viewer should immediately understand what changed.
-
----
-
-## Performance Standards
-
-Prioritize:
-
-* Smooth interaction
-* Fast rendering
-* Responsive exports
-* Stable frame rates
-
-Measure before optimizing.
-
-Avoid premature optimization.
-
----
-
-## Engineering Standards
-
-Assume all code will eventually become public.
-
-Requirements:
-
-* No secrets
-* No API keys
-* No credentials
-* No private data
-
-Favor:
-
-* maintainability
-* readability
-* documentation
-* modular architecture
-
-Avoid:
-
-* hacks
-* duplicated logic
-* unexplained magic numbers
-
----
-
-## GitHub Readiness
-
-The repository should always be capable of becoming public.
-
-Document:
-
-* major systems
-* architecture decisions
-* export pipeline
-* physics engine
-* parsing systems
-
-Future contributors should be able to understand the project.
-
----
-
-## Decision Filter
-
-Before implementing any feature, ask:
-
-1. Does this improve understanding?
-2. Does this improve presentations?
-3. Does this improve storytelling?
-4. Does this improve exports?
-5. Does this improve usability?
-
-If the answer to all five is "no," do not build it.
-
----
-
-## Final Rule
-
-Prefer:
-
-* one excellent visualization
-* one memorable interaction
-* one compelling export
-
-over ten mediocre features.
-
-Ellery should feel focused, professional, and presentation-first.
+Prefer one excellent conclusion, one memorable interaction, and one compelling
+export over ten mediocre features.

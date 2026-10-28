@@ -4,7 +4,7 @@
 // transmitted, and server tier enforcement is completely independent. Replace
 // with a real identity provider when accounts become real.
 
-export const USER_KEY = 'ellery_user';
+const USER_KEY = 'ellery_user';
 const ACCOUNTS_KEY = 'ellery_accounts';
 
 export function currentUser() {

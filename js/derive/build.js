@@ -34,8 +34,8 @@ export const wholeColumn = (column, fields = []) => ({
 /* ---------- Justification ---------- */
 
 // Assemble a Discovery-tier justification: one ground support plus the op graph
-// that produced the value. Relationship/Decision claims use the same shape with
-// `claim` supports and no opGraph.
+// that produced the value. Relationship claims use the same shape with `claim`
+// supports and no opGraph.
 //
 // `asserts` is the value the detector stands behind — what it computed by its
 // own route. Verification re-derives the graph from ground and checks it lands
